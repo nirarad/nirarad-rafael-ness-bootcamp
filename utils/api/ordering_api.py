@@ -1,3 +1,6 @@
+import json
+import uuid
+
 import requests
 from bearer_tokenizer import BearerTokenizer
 
@@ -16,24 +19,30 @@ class OrderingAPI:
         order = requests.get(f'{self.base_url}/api/v1/orders', headers=self.headers)
         return order
 
-    def create_order(self, order_number):
+    def get_card_type(self):
+        order = requests.get(f'{self.base_url}/api/v1/orders/cardtypes', headers=self.headers)
+        return order
+
+    def cancel_order(self,order_id):
+        headers = {'x-requestid': str(uuid.uuid4()),
+                   'Authorization': f'Bearer {self.bearer_token}'}
+        body ={
+              "orderNumber": order_id
+            }
+        order = requests.put(f'{self.base_url}/api/v1/orders/cancel',headers=headers, json=body)
+        return order
+    def change_status_to_shipped(self, order_id):
+        headers = {'x-requestid': str(uuid.uuid4()),
+                   'Authorization': f'Bearer {self.bearer_token}'}
         body = {
-            "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-            "UserName": "alice",
-            "OrderNumber": order_number,
-            "City": "Redmond",
-            "Street": "15703 NE 61st Ct",
-            "State": "WA",
-            "Country": "U.S.",
-            "ZipCode": "98052",
-            "CardNumber": "4012888888881881",
-            "CardHolderName": "Alice Smith",
-            "CardExpiration": "2024-12-31T22:00:00Z",
-            "CardSecurityNumber": "123",
-            "CardTypeId": 1,
-            "Buyer": None,
-            "RequestId": str(uuid.uuid4()),
-            "Basket": {
+
+              "orderNumber": order_id
+            }
+        order = requests.put(f'{self.base_url}/api/v1/orders/ship', headers=headers, json=body)
+        return order
+
+    def create_order(self):
+        body =  {
                 "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
                 "Items": [
                     {
@@ -46,14 +55,17 @@ class OrderingAPI:
                         "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
                     }
                 ]
-            },
-            "Id": str(uuid.uuid4()),
-            "CreationDate": "2023-03-04T14:20:24.4730559Z"
-        }
-        # order = requests.put(f'{self.base_url})
+            }
+
+        order = requests.post(f'{self.base_url}/api/v1/orders/draft', json=body, headers=self.headers)
+        print(order.text)
+        return order
 
 
 if __name__ == '__main__':
     import pprint
     api = OrderingAPI()
-    pprint.pprint(api.get_order_by_id(1).json())
+    pprint.pprint(api.create_order())
+    #pprint.pprint(api.change_status_to_shipped(2))
+    #pprint.pprint(api.get_order_by_id(1).json())
+
