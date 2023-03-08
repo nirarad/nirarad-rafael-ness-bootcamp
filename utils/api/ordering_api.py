@@ -42,7 +42,7 @@ class OrderingAPI:
         return order
 
     def create_order(self):
-        body =  {
+        body = {
                 "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
                 "Items": [
                     {
