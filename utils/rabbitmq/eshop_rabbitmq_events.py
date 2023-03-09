@@ -1,71 +1,181 @@
 import json
 import uuid
-
-import requests
-from bearer_tokenizer import BearerTokenizer
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
-class OrderingAPI:
-    def __init__(self):
-        self.base_url = 'http://localhost:5102'
-        self.bearer_token = BearerTokenizer().bearer_token
-        self.headers = {"Authorization": f"Bearer {self.bearer_token}"}
+def rabbit_mq_publish(routing_key,body):
+    with RabbitMQ() as mq:
+        mq.publish(exchange='eshop_event_bus',
+                   routing_key=routing_key,
+                   body=json.dumps(body))
 
-    def get_order_by_id(self, order_id):
-        order = requests.get(f'{self.base_url}/api/v1/orders/{order_id}', headers=self.headers)
-        return order
 
-    def get_orders(self):
-        order = requests.get(f'{self.base_url}/api/v1/orders', headers=self.headers)
-        return order
+def create_order(order_number):
+    body = {
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserName": "alice",
+        "OrderNumber": order_number,
+        "City": "Redmond",
+        "Street": "15703 NE 61st Ct",
+        "State": "WA",
+        "Country": "U.S.",
+        "ZipCode": "98052",
+        "CardNumber": "4012888888881881",
+        "CardHolderName": "Alice Smith",
+        "CardExpiration": "2024-12-31T22:00:00Z",
+        "CardSecurityNumber": "123",
+        "CardTypeId": 1,
+        "Buyer": None,
+        "RequestId": str(uuid.uuid4()),
+        "Basket": {
+            "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Items": [
+                {
+                    "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+                    "ProductId": 1,
+                    "ProductName": ".NET Bot Black Hoodie",
+                    "UnitPrice": 19.5,
+                    "OldUnitPrice": 0,
+                    "Quantity": 1,
+                    "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+                }
+            ]
+        },
+        "Id": str(uuid.uuid4()),
+        "CreationDate": "2023-03-04T14:20:24.4730559Z"
+    }
+    rabbit_mq_publish('UserCheckoutAcceptedIntegrationEvent',body)
 
-    def get_card_type(self):
-        order = requests.get(f'{self.base_url}/api/v1/orders/cardtypes', headers=self.headers)
-        return order
+def create_order_empty_list(order_number):
+    body = {
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserName": "alice",
+        "OrderNumber": order_number,
+        "City": "Redmond",
+        "Street": "15703 NE 61st Ct",
+        "State": "WA",
+        "Country": "U.S.",
+        "ZipCode": "98052",
+        "CardNumber": "4012888888881881",
+        "CardHolderName": "Alice Smith",
+        "CardExpiration": "2024-12-31T22:00:00Z",
+        "CardSecurityNumber": "123",
+        "CardTypeId": 1,
+        "Buyer": None,
+        "RequestId": str(uuid.uuid4()),
+        "Basket": {
+            "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Items": [
+                {
+                }
+            ]
+        },
+        "Id": str(uuid.uuid4()),
+        "CreationDate": "2023-03-04T14:20:24.4730559Z"
+    }
+    rabbit_mq_publish('UserCheckoutAcceptedIntegrationEvent',body)
 
-    def cancel_order(self,order_id):
-        headers = {'x-requestid': str(uuid.uuid4()),
-                   'Authorization': f'Bearer {self.bearer_token}'}
-        body ={
-              "orderNumber": order_id
+def create_order_0_quantity(order_number):
+    body = {
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserName": "alice",
+        "OrderNumber": order_number,
+        "City": "Redmond",
+        "Street": "15703 NE 61st Ct",
+        "State": "WA",
+        "Country": "U.S.",
+        "ZipCode": "98052",
+        "CardNumber": "4012888888881881",
+        "CardHolderName": "Alice Smith",
+        "CardExpiration": "2024-12-31T22:00:00Z",
+        "CardSecurityNumber": "123",
+        "CardTypeId": 1,
+        "Buyer": None,
+        "RequestId": str(uuid.uuid4()),
+        "Basket": {
+            "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Items": [
+                {
+                    "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+                    "ProductId": 1,
+                    "ProductName": ".NET Bot Black Hoodie",
+                    "UnitPrice": 19.5,
+                    "OldUnitPrice": 0,
+                    "Quantity": 0,
+                    "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+                }
+            ]
+        },
+        "Id": str(uuid.uuid4()),
+        "CreationDate": "2023-03-04T14:20:24.4730559Z"
+    }
+    rabbit_mq_publish('UserCheckoutAcceptedIntegrationEvent',body)
+
+def confirm_stock(order_id):
+    body = {
+          "OrderId": order_id,
+          "Id": str(uuid.uuid4()),
+          "CreationDate": "2023-03-05T14:52:24.705823Z"
+        }
+    rabbit_mq_publish('OrderStockConfirmedIntegrationEvent',body)
+
+def reject_stock(order_id):
+    body ={
+        "OrderId": order_id,
+        "OrderStockItems": [
+            {
+                "ProductId": 1,
+                "HasStock": False
             }
-        order = requests.put(f'{self.base_url}/api/v1/orders/cancel',headers=headers, json=body)
-        return order
-    def change_status_to_shipped(self, order_id):
-        headers = {'x-requestid': str(uuid.uuid4()),
-                   'Authorization': f'Bearer {self.bearer_token}'}
-        body = {
+        ],
+        "Id": str(uuid.uuid4()),
+        "CreationDate": "2023-03-05T15:51:11.5458796Z"
+    }
+    rabbit_mq_publish('OrderStockRejectedIntegrationEvent',body)
 
-              "orderNumber": order_id
+def change_status_awaiting_validation(order_id):
+    body = {
+          "OrderId": order_id,
+          "OrderStatus": "awaitingvalidation",
+          "BuyerName": "alice",
+          "OrderStockItems": [
+            {
+              "ProductId": 1,
+              "Units": 1
             }
-        order = requests.put(f'{self.base_url}/api/v1/orders/ship', headers=headers, json=body)
-        return order
+          ],
+          "Id": str(uuid.uuid4()),
+          "CreationDate": "2023-03-05T14:27:28.8042812Z"
+        }
+    rabbit_mq_publish('OrderStatusChangedToAwaitingValidationIntegrationEvent', body)
 
-    def create_order(self):
-        body = {
-                "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-                "Items": [
-                    {
-                        "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
-                        "ProductId": 1,
-                        "ProductName": ".NET Bot Black Hoodie",
-                        "UnitPrice": 19.5,
-                        "OldUnitPrice": 0,
-                        "Quantity": 1,
-                        "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
-                    }
-                ]
-            }
+def payment_succeeded(order_id):
+    body = {
+          "OrderId": order_id,
+          "Id": str(uuid.uuid4()),
+          "CreationDate": "2023-03-05T15:33:18.1376971Z"
+        }
+    rabbit_mq_publish('OrderPaymentSucceededIntegrationEven', body)
 
-        order = requests.post(f'{self.base_url}/api/v1/orders/draft', json=body, headers=self.headers)
-        print(order.text)
-        return order
+def payment_failed(order_id):
+    body = {
+          "OrderId": order_id,
+          "OrderStatus": "stockconfirmed",
+          "BuyerName": "alice",
+          "Id": str(uuid.uuid4()),
+          "CreationDate": "2023-03-05T17:07:35.6306122Z"
+        }
+    rabbit_mq_publish('OrderPaymentFailedIntegrationEvent', body)
+
+
 
 
 if __name__ == '__main__':
-    import pprint
-    api = OrderingAPI()
-    pprint.pprint(api.create_order())
-    #pprint.pprint(api.change_status_to_shipped(2))
-    #pprint.pprint(api.get_order_by_id(1).json())
+    create_order(2)
+
+
+
+
+
+
 
