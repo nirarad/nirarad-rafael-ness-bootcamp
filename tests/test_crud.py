@@ -24,14 +24,14 @@ class TestAP(unittest.TestCase):
         """
         Name: Artsyom Sharametsieu
         Date:
-        Function Name:test_ship_order
+        Function Name: test_ship_order
         Description:
         """
         pass
         try:
             x = self.oam.ship_order(2, 'e05ebc63-8e5d-4530-b2ca-15e121fcc5d3')
             self.assertTrue(x, 200)
-            self.logger.info(f'\n{self.test_ship_order.__doc__} Actual: {x} , Expected:{200} ')
+            self.logger.info(f'{self.test_ship_order.__doc__}Actual: {x} , Expected:{200} ')
         except Exception as e:
             self.logger.exception(f"\n{self.test_ship_order.__doc__}{e}")
             raise

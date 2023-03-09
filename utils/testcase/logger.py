@@ -30,7 +30,7 @@ class Logger:
     def __init__(self, logger_name, file_name):
         self.message = ''
         self.logger_name = logger_name
-        self.fmt = '--------%(asctime)s | %(name)s | %(levelname)s: %(message)s'
+        self.fmt = '\n--------%(asctime)s | %(name)s | %(levelname)s: %(message)s'
         self.stdout_handler = logging.StreamHandler()
         self.stdout_handler.setLevel(logging.DEBUG)
         self.stdout_handler.setFormatter(CustomFormatter(self.fmt))

@@ -7,4 +7,5 @@ def callback(ch, method, properties, body):
 
 if __name__ == '__main__':
     with RabbitMQ() as mq:
-        mq.consume('Ordering', callback)
+        print(mq.consume('Ordering', callback))
+
