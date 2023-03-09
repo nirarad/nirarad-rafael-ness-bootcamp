@@ -1,6 +1,8 @@
-import pika
-import uuid
 import json
+import pprint
+import uuid
+
+import pika
 
 
 # To test RabbitMQ use the following command:
@@ -12,6 +14,7 @@ class RabbitMQ:
         self.connection = None
         self.channel = None
         self.host = host
+        self.waiting_messages = []
 
     def __enter__(self):
         self.connect()
@@ -36,13 +39,20 @@ class RabbitMQ:
                                    body=body)
         print(f"[{routing_key}] Sent '{body}'")
 
-    def consume(self, queue, callback):
-        self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+    def consume(self, queue):
+        self.channel.basic_consume(queue=queue, on_message_callback=self.add_message_to_list, auto_ack=True)
         self.channel.start_consuming()
+
+    def add_message_to_list(self, ch, method, properties, body):
+        self.waiting_messages.append(body)
+        pprint.pprint(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
+
+    def read_n_messages(self, message_number):
+        pass
 
 
 if __name__ == '__main__':
-    body = {
+    bodys = {
         "OrderId": 1,
         "Id": str(uuid.uuid4()),
         "CreationDate": "2023-03-05T15:33:18.1376971Z"
@@ -50,4 +60,4 @@ if __name__ == '__main__':
     with RabbitMQ() as mq:
         mq.publish(exchange='eshop_event_bus',
                    routing_key='OrderPaymentSucceededIntegrationEvent',
-                   body=json.dumps(body))
+                   body=json.dumps(bodys))
