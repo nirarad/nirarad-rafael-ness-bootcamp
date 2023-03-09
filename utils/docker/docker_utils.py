@@ -26,12 +26,18 @@ class DockerManager:
 
 if __name__ == '__main__':
     dm = DockerManager()
-    dm.stop('eshop/ordering.api:linux-latest')
-    time.sleep(1)
-    dm.start('eshop/ordering.api:linux-latest')
+    dm.stop('eshop/basket.api:linux-latest')
+    dm.stop('eshop/catalog.api:linux-latest')
+    dm.stop('eshop/payment.api:linux-latest')
+    dm.stop('eshop/ordering.signalrhub:linux-latest')
+    time.sleep(5)
+    dm.start('eshop/basket.api:linux-latest')
+    dm.start('eshop/catalog.api:linux-latest')
+    dm.start('eshop/payment.api:linux-latest')
+    dm.start('eshop/ordering.signalrhub:linux-latest')
 
-    dm.pause('eshop/ordering.api:linux-latest')
-    time.sleep(1)
-    dm.unpause('eshop/ordering.api:linux-latest')
-
-    dm.restart('eshop/ordering.api:linux-latest')
+    # dm.pause('eshop/ordering.api:linux-latest')
+    # time.sleep(1)
+    # dm.unpause('eshop/ordering.api:linux-latest')
+    #
+    # dm.restart('eshop/ordering.api:linux-latest')
