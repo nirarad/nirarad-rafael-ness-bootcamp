@@ -1,5 +1,6 @@
 import requests
-from bearer_tokenizer import BearerTokenizer
+
+from utils.api.bearer_tokenizer import BearerTokenizer
 
 
 class OrderingAPI:
@@ -16,4 +17,4 @@ class OrderingAPI:
 if __name__ == '__main__':
     import pprint
     api = OrderingAPI()
-    pprint.pprint(api.get_order_by_id(1).json())
+    # pprint.pprint(api.get_order_by_id(1).json())

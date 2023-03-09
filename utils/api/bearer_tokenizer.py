@@ -1,3 +1,5 @@
+from pprint import pprint
+
 import requests
 
 
@@ -36,12 +38,15 @@ class BearerTokenizer:
 
     @staticmethod
     def parse_request_verification_token(body_response):
+
         start_pos = body_response.find('__RequestVerificationToken') + 49
         length = body_response.index('"', start_pos)
+        # pprint(body_response[start_pos:length])
         return body_response[start_pos:length]
 
     @staticmethod
     def parse_bearer_token(body_response):
+        # pprint(body_response)
         start_pos = body_response.find('access_token=') + 13
         length = body_response.index('&', start_pos)
         return body_response[start_pos:length]
