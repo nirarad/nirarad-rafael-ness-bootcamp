@@ -1,6 +1,7 @@
 import unittest
 from dotenv import load_dotenv
 
+from utils.api.ordering_api_mocker import OrderingAPI_Mocker
 from utils.testcase.logger import Logger
 
 
@@ -10,7 +11,7 @@ class TestAP(unittest.TestCase):
     def setUpClass(cls) -> None:
         load_dotenv('.env.test')
         cls.logger = Logger('test', 'tests').logger
-        pass
+        cls.ordering = OrderingAPI_Mocker()
 
     def setUp(self) -> None:
         pass
