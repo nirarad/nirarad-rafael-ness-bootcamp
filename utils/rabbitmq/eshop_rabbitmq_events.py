@@ -1,13 +1,13 @@
 import json
 import uuid
-from utils.rabbitmq.rabbitmq_send import RabbitMQSend
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
-def rabbit_mq_publish(routing_key,body):
-    with RabbitMQSend() as mq:
+def rabbit_mq_publish(routing_key,data):
+    with RabbitMQ() as mq:
         mq.publish(exchange='eshop_event_bus',
                    routing_key=routing_key,
-                   body=json.dump(body))
+                   body=json.dumps(data))
 
 
 def create_order(order_number):
@@ -44,7 +44,7 @@ def create_order(order_number):
         "Id": str(uuid.uuid4()),
         "CreationDate": "2023-03-04T14:20:24.4730559Z"
     }
-    rabbit_mq_publish('UserCheckoutAcceptedIntegrationEvent',body)
+    rabbit_mq_publish('UserCheckoutAcceptedIntegrationEvent', body)
 
 def create_order_empty_list(order_number):
     body = {
