@@ -167,6 +167,34 @@ def payment_failed(order_id):
         }
     rabbit_mq_publish('OrderPaymentFailedIntegrationEvent', body)
 
+#output message
+def OrderStartedIntegrationEvent():
+        body = {
+            "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Id": str(uuid.uuid4()),
+            "CreationDate": "2023-03-05T13:43:13.8898923Z"
+        }
+        rabbit_mq_publish('OrderStartedIntegrationEvent', body)
+def OrderStatusChangedToSubmittedIntegrationEvent(order_id):
+    body = {
+      "OrderId": order_id,
+      "OrderStatus": "submitted",
+      "BuyerName": "alice",
+      "Id": str(uuid.uuid4()),
+      "CreationDate": "2023-03-05T13:43:15.7845974Z"
+        }
+    rabbit_mq_publish('OrderStatusChangedToSubmittedIntegrationEvent', body)
+
+def OrderStatusChangedToStockConfirmedIntegrationEvent(order_id):
+    body = {
+      "OrderId": order_id,
+      "OrderStatus": "stockconfirmed",
+      "BuyerName": "alice",
+      "Id": str(uuid.uuid4()),
+      "CreationDate": "2023-03-05T17:07:35.6306122Z"
+    }
+    rabbit_mq_publish('OrderStatusChangedToStockConfirmedIntegrationEvent', body)
+
 
 
 
