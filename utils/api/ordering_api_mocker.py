@@ -1,7 +1,7 @@
 import json
 
 import requests
-from bearer_tokenizer import BearerTokenizer
+from utils.api.bearer_tokenizer import BearerTokenizer
 
 
 class OrderingAPI_Mocker:
@@ -27,10 +27,10 @@ class OrderingAPI_Mocker:
         return res
 
 
-if __name__ == '__main__':
-    import pprint
-
-    api = OrderingAPI_Mocker()
-    # pprint.pprint(api.get_order_by_id(93).json())
-    # pprint.pprint(api.cancel_order())
-    pprint.pprint(api.ship_order(20, "43c7219a-a055-410f-847a-d7902c60d685"))
+# if __name__ == '__main__':
+#     import pprint
+#
+#     api = OrderingAPI_Mocker()
+#     # pprint.pprint(api.get_order_by_id(93).json())
+#     # pprint.pprint(api.cancel_order())
+#     pprint.pprint(api.ship_order(20, "43c7219a-a055-410f-847a-d7902c60d685"))
