@@ -1,10 +1,10 @@
 import json
 import uuid
-from utils.rabbitmq.rabbitmq_send import RabbitMQSend
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 def rabbit_mq_publish(routing_key,body):
-    with RabbitMQSend() as mq:
+    with RabbitMQ() as mq:
         mq.publish(exchange='eshop_event_bus',
                    routing_key=routing_key,
                    body=json.dump(body))
