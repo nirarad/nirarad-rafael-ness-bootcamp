@@ -1,15 +1,21 @@
-# Instructions:
-# Download https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
-import pyodbc
 
+import pyodbc
+from dotenv import load_dotenv
+import os
 
 class MSSQLConnector:
     def __init__(self, database='OrderingDb'):
+        load_dotenv('db.env')
         self.SERVER = '127.0.0.1,5433'
+        #self.SERVER= os.getenv('SERVER')
         self.USER = 'sa'
+        #self.USER = os.getenv('USER')
         self.PASSWORD = 'Pass@word'
+        #self.PASSWORD =  os.getenv('PASSWORD')
         self.DATABASE = f'Microsoft.eShopOnContainers.Services.{database}'
+        #self.DATABASE = f'{os.getenv("DATABASE")}{database}'
         self.DRIVER = '{ODBC Driver 18 for SQL Server}'
+        #self.DRIVER = os.getenv('DRIVER')
         self.connection_str = f"Driver={self.DRIVER};Server={self.SERVER};Database={self.DATABASE};UID={self.USER};PWD={self.PASSWORD};TrustServerCertificate=yes"
         self.conn = None
 
