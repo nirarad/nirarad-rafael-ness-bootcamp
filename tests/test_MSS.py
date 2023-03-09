@@ -3,6 +3,7 @@ from time import sleep
 import pytest
 from dotenv import load_dotenv
 import os
+import threading
 
 from utils.api.ordering_api import OrderingAPI
 from utils.db.db_utils import MSSQLConnector
@@ -49,6 +50,9 @@ def test_mss(MSS_scenario):
 
 def test_stock_reject(MSS_scenario):
     try:
+        mq=RabbitMQ()
+        thread = threading.Thread(target=mq.consume('Ordering', callback), args=(callback))
+        thread.start()
         create_order(100)
         OrderID=0
         sleep(5)
@@ -67,6 +71,9 @@ def test_stock_reject(MSS_scenario):
         print('Pass')
     except Exception:
         print("test faield")
+
+
+
 
 
 
