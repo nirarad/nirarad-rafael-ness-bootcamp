@@ -48,16 +48,18 @@ class RabbitMQ:
         pprint.pprint(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
 
     def read_n_messages(self, message_number):
-        pass
+        for i in range(len(self.waiting_messages)):
+            if i+1 == message_number:
+                return self.waiting_messages[i]
 
 
-if __name__ == '__main__':
-    bodys = {
-        "OrderId": 1,
-        "Id": str(uuid.uuid4()),
-        "CreationDate": "2023-03-05T15:33:18.1376971Z"
-    }
-    with RabbitMQ() as mq:
-        mq.publish(exchange='eshop_event_bus',
-                   routing_key='OrderPaymentSucceededIntegrationEvent',
-                   body=json.dumps(bodys))
+# if __name__ == '__main__':
+#     bodys = {
+#         "OrderId": 1,
+#         "Id": str(uuid.uuid4()),
+#         "CreationDate": "2023-03-05T15:33:18.1376971Z"
+#     }
+#     with RabbitMQ() as mq:
+#         mq.publish(exchange='eshop_event_bus',
+#                    routing_key='OrderPaymentSucceededIntegrationEvent',
+#                    body=json.dumps(bodys))
