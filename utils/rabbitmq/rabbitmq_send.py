@@ -1,6 +1,4 @@
-import json
 import pprint
-import uuid
 
 import pika
 
@@ -47,11 +45,26 @@ class RabbitMQ:
         self.waiting_messages.append(body)
         pprint.pprint(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
 
-    def read_n_messages(self, message_number):
-        for i in range(len(self.waiting_messages)):
-            if i+1 == message_number:
-                return self.waiting_messages[i]
+    def purge_queue(self, queue_name):
+        self.channel.queue_purge(queue_name)
 
+    # def read_first_message(self, message_number, queue_name):
+    #     for i in range(2):
+    #         try:
+    #             method_frame, header_frame, body = self.channel.basic_get(queue_name, auto_ack=True)
+    #         except ValueError as v:
+    #             raise ValueError(f'There was problem with getting the {message_number} message, the following exception was received: {v}')
+    #         print(body)
+    #         if i + 1 == message_number:
+    #             return body
+    #
+    def read_first_message(self, queue_name):
+        try:
+            method_frame, header_frame, body = self.channel.basic_get(queue_name, auto_ack=True)
+            return body
+        except ValueError as v:
+            raise ValueError(
+                f'There was problem with getting the first message, the following exception was received: {v}')
 
 # if __name__ == '__main__':
 #     bodys = {

@@ -1,36 +1,60 @@
+import json
+import os
+import uuid
+from datetime import datetime
+
+from simulators.simulator import Simulator
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
-class BasketSimulator(RabbitMQ):
+class BasketSimulator(Simulator):
     """
-    A class that simulate a Basket microservice,
-    the class single and only responsibility is to simulate the service communication with RabbitMQ (consume and publish messages).
+    A class that simulate the Basket microservice input and output messages to RabbitMQ.
     """
 
-    def __init__(self, body,
-                 accept_user_checkout="UserCheckoutAcceptedIntegrationEvent",
-                 exchange="eshop_event_bus"):
+    def __init__(self):
         """
-        The class initializer, the single required argument is the body argument,
-        which is the only one who likely to be changed each time new instance of the class will be created.
-        :param body: The payload of the message we want to publish or consume.
-        :param accept_user_checkout: A routing key for the accept_user_checkout method.
-        :param exchange: The exchange name that will lead the message to their designated queue.
+        The class initializer.
         """
         super().__init__()
-        self.__accept_user_checkout = accept_user_checkout
-        self.__exchange = exchange
-        self.__body = body
-        self.__queue = "Basket"
+        self.__queue = os.environ["BASKET_QUEUE"]
 
-    def start_consume_for_order_integration_message(self):
+    def read_first_message(self):
         """
-        Method to tell the simulator to start receiving messages.
+         Method which reads a certain amount of messages from the basket queue.
+        :return: The first message in the basket queue.
         """
-        self.consume(self.__queue)
+        try:
+            with RabbitMQ() as mq:
+                return mq.read_first_message(self.__queue)
+        except ValueError as v:
+            print(v)
+        except BaseException as b:
+            print(b)
 
-    def accept_user_checkout(self):
+    def purge_queue(self):
         """
-        Method that sends to the ordering service the confirmation message that the checkout process has been valid.
+        Method to purge the basket queue.
         """
-        self.publish(self.__exchange, self.__accept_user_checkout, body=self.__body)
+        try:
+            with RabbitMQ() as mq:
+                mq.purge_queue(self.__queue)
+        except ValueError as v:
+            print(v)
+        except BaseException as b:
+            print(b)
+
+    @staticmethod
+    def create_order(body):
+        """
+        Method to start the ordering process, bu sending a confirmation message from the basket simulator to the ordering queue.
+        """
+        request_id = str(uuid.uuid4())
+        current_date = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            with RabbitMQ() as mq:
+                mq.publish(exchange=os.environ["EXCHANGE"],
+                           routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"],
+                           body=json.dumps(body.format(request_id, request_id, current_date)))
+        except BaseException as b:
+            print(b)
