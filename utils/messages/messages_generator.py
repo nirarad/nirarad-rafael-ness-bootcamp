@@ -1,10 +1,11 @@
+import os
 import uuid
 
 
 class MessageGenerator:
 
     def __init__(self):
-        self.user_id = "b9e5dcdd-dae2-4b1c-a991-f74aae042814"
+        self.user_id = os.environ["ALICE_IDENTITY"]
         self.input_request_id = str(uuid.uuid4())
         self.output_request_id = str(uuid.uuid4())
         self.current_date = "2023-03-05T13:43:13.8898923Z"
@@ -12,8 +13,9 @@ class MessageGenerator:
 
     def basket_to_order(self):
         """
-        Method to generate order reservation details.
-        :return: The message that enters to the order queue, and the message that enters to the basket queue.
+        Method to generate order details.
+
+            :return: The message that enters to the order queue, and the message that enters to the basket queue.
         """
 
         return {"input": {
@@ -33,7 +35,7 @@ class MessageGenerator:
             "Buyer": None,
             "RequestId": self.input_request_id,
             "Basket": {
-                "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+                "BuyerId": self.user_id,
                 "Items": [
                     {
                         "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
@@ -47,7 +49,7 @@ class MessageGenerator:
                 ]
             },
             "Id": "16c5ddbc-229e-4c19-a4bd-d4148417529c",
-            "CreationDate": "2023-03-04T14:20:24.4730559Z"
+            "CreationDate": self.current_date
         },
             "output": {
                 "UserId": self.user_id,
@@ -55,3 +57,6 @@ class MessageGenerator:
                 "CreationDate": self.current_date
             }
         }
+
+    def catalog_to_order(self):
+        pass

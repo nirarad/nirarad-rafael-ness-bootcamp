@@ -4,6 +4,7 @@ from time import sleep
 import pytest
 
 from simulators.basket_simulator import BasketSimulator
+from simulators.catalog_simulator import CatalogSimulator
 from utils.db.db_utils import MSSQLConnector
 from utils.messages.messages_generator import MessageGenerator
 
@@ -12,8 +13,10 @@ pytest.mark.parametrize()
 
 def test_main_success_scenario():
     test_user_can_submit_an_order()
-    
-
+    mg = MessageGenerator()
+    messages = mg.basket_to_order()
+    catalog_simulator = CatalogSimulator()
+    catalog_simulator.validate_items_in_stock()
 
 
 def test_user_can_submit_an_order():
@@ -29,6 +32,7 @@ def test_user_can_submit_an_order():
         Source Test Case Traceability: 1.2.1
 
     """
+    # Preparing test environment
     basket_mock = BasketSimulator()
 
     # Message variable is a dictionary with 2 items:
@@ -59,7 +63,6 @@ def test_user_can_submit_an_order():
             "GROUP BY o.OrderStatusId"
         )) > 0  # Expected Result #2 - A new order entity has been created within the orders table, with OrderStatusID of 1.
 
-
-def test_temp():
-    b = BasketSimulator()
-    b.purge_queue()
+# def test_temp():
+#     b = BasketSimulator()
+#     b.purge_queue()
