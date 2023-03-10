@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
-from utils.messages.messages_generator import MessageGenerator
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
@@ -45,8 +44,7 @@ class BasketSimulator(Simulator):
         except BaseException as b:
             print(b)
 
-    @staticmethod
-    def create_order(body):
+    def create_order(self, body):
         """
         Method to start the ordering process, bu sending a confirmation message from the basket simulator to the ordering queue.
         """
@@ -58,6 +56,3 @@ class BasketSimulator(Simulator):
                            body=json.dumps(body))
             except BaseException as b:
                 print(b)
-
-
-BasketSimulator.create_order(MessageGenerator.generate_basket_to_order_message())
