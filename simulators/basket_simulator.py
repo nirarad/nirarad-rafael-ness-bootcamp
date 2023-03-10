@@ -9,7 +9,7 @@ from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 class BasketSimulator(Simulator):
     """
-    A class that simulate the Basket microservice input and output messages to RabbitMQ.
+    A class that simulate the Basket microservice's messages traffic with RabbitMQ.
     """
     load_dotenv()
 
@@ -19,36 +19,15 @@ class BasketSimulator(Simulator):
         """
         super().__init__('Basket')
 
-    def get_first_message(self):
-        """
-         Method which reads the first messages from the basket queue.
-        :return: The first message in the basket queue.
-        """
-        try:
-            with RabbitMQ() as mq:
-                return mq.read_first_message('Basket')
-        except ValueError as v:
-            print(v)
-        except BaseException as b:
-            print(b)
-
-    def purge_queue(self):
-        """
-        Method to purge the basket queue.
-        """
-        try:
-            with RabbitMQ() as mq:
-                mq.purge_queue('Basket')
-        except ValueError as v:
-            print(v)
-        except BaseException as b:
-            print(b)
-
     def create_order(self, body):
         """
         Method to start the ordering process, by sending a confirmation message from the basket simulator to the ordering queue.
+
+            Parameters:
+                body: The payload of the message.
+
         """
-        # try:
+        # The basket simulator sends to the ordering queue the validation for starting to create a new order.
         with RabbitMQ() as mq:
             try:
                 mq.publish(exchange=os.environ["EXCHANGE"],

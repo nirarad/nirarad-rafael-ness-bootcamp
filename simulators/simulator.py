@@ -1,4 +1,6 @@
-from abc import abstractmethod, ABC
+from abc import ABC
+
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 class Simulator(ABC):
@@ -13,16 +15,28 @@ class Simulator(ABC):
         super().__init__()
         self.__queue = queue
 
-    @abstractmethod
     def get_first_message(self):
         """
-        Abstract method to return the first queue message
-        """
-        pass
+         Method which reads the first messages from the given queue.
 
-    @abstractmethod
+            :return: The first message in the basket queue.
+        """
+        try:
+            with RabbitMQ() as mq:
+                return mq.read_first_message(self.__queue)
+        except ValueError as v:
+            print(v)
+        except BaseException as b:
+            print(b)
+
     def purge_queue(self):
         """
-        Abstract method to purge the queue
+        Method to purge the given queue.
         """
-        pass
+        try:
+            with RabbitMQ() as mq:
+                mq.purge_queue(self.__queue)
+        except ValueError as v:
+            print(v)
+        except BaseException as b:
+            print(b)
