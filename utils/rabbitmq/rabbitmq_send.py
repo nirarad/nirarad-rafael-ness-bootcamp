@@ -48,7 +48,7 @@ class RabbitMQ:
     def purge_queue(self, queue_name):
         self.channel.queue_purge(queue_name)
 
-    # def read_first_message(self, message_number, queue_name):
+    # def get_first_message(self, message_number, queue_name):
     #     for i in range(2):
     #         try:
     #             method_frame, header_frame, body = self.channel.basic_get(queue_name, auto_ack=True)

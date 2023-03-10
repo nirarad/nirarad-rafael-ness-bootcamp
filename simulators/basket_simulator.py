@@ -1,9 +1,10 @@
 import json
 import os
-import uuid
-from datetime import datetime
+
+from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
+from utils.messages.messages_generator import MessageGenerator
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
@@ -11,17 +12,17 @@ class BasketSimulator(Simulator):
     """
     A class that simulate the Basket microservice input and output messages to RabbitMQ.
     """
+    load_dotenv()
 
     def __init__(self):
         """
         The class initializer.
         """
-        super().__init__()
-        self.__queue = os.environ["BASKET_QUEUE"]
+        super().__init__(os.environ["BASKET_QUEUE"])
 
-    def read_first_message(self):
+    def get_first_message(self):
         """
-         Method which reads a certain amount of messages from the basket queue.
+         Method which reads the first messages from the basket queue.
         :return: The first message in the basket queue.
         """
         try:
@@ -49,12 +50,14 @@ class BasketSimulator(Simulator):
         """
         Method to start the ordering process, bu sending a confirmation message from the basket simulator to the ordering queue.
         """
-        request_id = str(uuid.uuid4())
-        current_date = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            with RabbitMQ() as mq:
+        # try:
+        with RabbitMQ() as mq:
+            try:
                 mq.publish(exchange=os.environ["EXCHANGE"],
                            routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"],
-                           body=json.dumps(body.format(request_id, request_id, current_date)))
-        except BaseException as b:
-            print(b)
+                           body=json.dumps(body))
+            except BaseException as b:
+                print(b)
+
+
+BasketSimulator.create_order(MessageGenerator.generate_basket_to_order_message())

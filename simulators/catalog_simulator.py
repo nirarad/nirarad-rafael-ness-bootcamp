@@ -1,13 +1,16 @@
-from utils.rabbitmq.rabbitmq_send import RabbitMQ
+from simulators.simulator import Simulator
 
 
-class CatalogSimulator(RabbitMQ):
+class CatalogSimulator(Simulator):
 
-    def receive_status_changed_to_awaiting_validation(self):
+    def get_first_message(self):
         pass
 
-    def send_order_stock_confirmed_message(self):
+    def purge_queue(self):
         pass
 
-    def send_order_out_of_stock_message(self):
+    def validate_items_in_stock(self):
+        pass
+
+    def inform_items_not_in_stock(self):
         pass

@@ -6,7 +6,15 @@ class Simulator(ABC):
     Class which contains general actions that a microservice simulator needs for communicating with RabbitMQ,
     """
 
-    def read_first_message(self):
+    def __init__(self, queue):
+        """
+        The class initializer.
+        """
+        super().__init__()
+        self.__queue = queue
+
+    @abstractmethod
+    def get_first_message(self):
         """
         Abstract method to return the first queue message
         """
