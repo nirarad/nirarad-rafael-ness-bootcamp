@@ -12,9 +12,12 @@ pytest.mark.parametrize()
 
 
 def test_main_success_scenario():
+    # Run step 1
     test_user_can_submit_an_order()
+
+    # If we reached here, then the rest of the test will run.
     mg = MessageGenerator()
-    messages = mg.basket_to_order()
+    messages = mg.catalog_to_order()
     catalog_simulator = CatalogSimulator()
     catalog_simulator.validate_items_in_stock()
 

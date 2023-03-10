@@ -1,10 +1,8 @@
-import json
 import os
 
 from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
-from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 class BasketSimulator(Simulator):
@@ -29,3 +27,6 @@ class BasketSimulator(Simulator):
         """
         # The basket simulator sends to the ordering queue the validation for starting to create a new order.
         self.send_message(body, os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
+
+    def verify_status_id_is_submitted(self, status_id):
+        self.verify_stats_status_id(1)

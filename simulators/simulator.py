@@ -1,6 +1,7 @@
 import os
 from abc import ABC
 
+from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
@@ -52,3 +53,15 @@ class Simulator(ABC):
                            body=body)
             except BaseException as b:
                 print(b)
+
+    def verify_stats_status_id(self, status_id):
+        with MSSQLConnector() as conn:
+            assert len(conn.select_query(
+                # In the below query, we fetch the last user order (max order id), and check if it's OrderStatusID is equals to 1.
+                "SELECT MAX(o.Id), o.OrderStatusId "
+                "FROM ordering.orders o "
+                "JOIN ordering.buyers b "
+                "ON b.Id = o.BuyerId "
+                f"WHERE o.OrderStatusId = {status_id} "
+                "GROUP BY o.OrderStatusId"
+            )) > 0

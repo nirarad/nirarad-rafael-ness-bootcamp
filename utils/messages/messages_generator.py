@@ -19,6 +19,7 @@ class MessageGenerator:
         """
 
         return {"input": {
+            # What to send to the ordering queue
             "UserId": self.user_id,
             "UserName": "alice",
             "OrderNumber": 0,
@@ -51,6 +52,7 @@ class MessageGenerator:
             "Id": "16c5ddbc-229e-4c19-a4bd-d4148417529c",
             "CreationDate": self.current_date
         },
+            # What should be received from the ordering queue
             "output": {
                 "UserId": self.user_id,
                 "Id": self.output_request_id,
@@ -59,4 +61,18 @@ class MessageGenerator:
         }
 
     def catalog_to_order(self):
-        pass
+        """
+              Method to generate catalog input message to send the ordering queue, and output message to consume from the ordering queue.
+
+                  :return: A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
+              """
+        return {
+            # What to send to the ordering queue
+            "input": {
+                "UserId": self.user_id,
+                "Id": self.output_request_id,
+                "CreationDate": self.current_date
+            },
+            # What should be received from the ordering queue (a sufficient parietal information for identification).
+            "output": "awaitingvalidation"
+        }
