@@ -1,3 +1,4 @@
+import os
 from abc import ABC
 
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
@@ -10,7 +11,9 @@ class Simulator(ABC):
 
     def __init__(self, queue):
         """
-        The class initializer.
+        Abstract simulator class initializer.
+            Parameters:
+                queue: The simulator related queue..
         """
         super().__init__()
         self.__queue = queue
@@ -40,3 +43,12 @@ class Simulator(ABC):
             print(v)
         except BaseException as b:
             print(b)
+
+    def send_message(self, body, routing_key, exchange=os.environ["EXCHANGE"]):
+        with RabbitMQ() as mq:
+            try:
+                mq.publish(exchange=exchange,
+                           routing_key=routing_key,
+                           body=body)
+            except BaseException as b:
+                print(b)

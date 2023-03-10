@@ -10,6 +10,12 @@ from utils.messages.messages_generator import MessageGenerator
 pytest.mark.parametrize()
 
 
+def test_main_success_scenario():
+    test_user_can_submit_an_order()
+    
+
+
+
 def test_user_can_submit_an_order():
     """
     Test to verify order's submission is valid.

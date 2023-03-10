@@ -1,10 +1,8 @@
-import json
 import os
 
 from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
-from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 class CatalogSimulator(Simulator):
@@ -15,7 +13,8 @@ class CatalogSimulator(Simulator):
 
     def __init__(self):
         """
-        The class initializer.
+        Catalog simulator class initializer, send the parent class (The Simulator class),
+        the basket class related queue,
         """
         super().__init__('Catalog')
 
@@ -26,15 +25,8 @@ class CatalogSimulator(Simulator):
           Parameters:
               body: The payload of the message.
         """
-
         # The catalog simulator sends to the ordering queue the stock validation confirmation message.
-        with RabbitMQ() as mq:
-            try:
-                mq.publish(exchange=os.environ["EXCHANGE"],
-                           routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"],
-                           body=json.dumps(body))
-            except BaseException as b:
-                print(b)
+        self.send_message(body, os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"])
 
     def inform_items_not_in_stock(self, body):
         """
@@ -43,13 +35,5 @@ class CatalogSimulator(Simulator):
             Parameters:
                 body: The payload of the message.
        """
-
         # The catalog simulator sends to the ordering queue the stock validation failure message.
-        with RabbitMQ() as mq:
-            try:
-                mq.publish(exchange=os.environ["EXCHANGE"],
-                           routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"],
-                           body=json.dumps(body))
-            except BaseException as b:
-                print(b)
-
+        self.send_message(body, os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])

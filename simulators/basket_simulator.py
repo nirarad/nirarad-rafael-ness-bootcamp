@@ -15,7 +15,8 @@ class BasketSimulator(Simulator):
 
     def __init__(self):
         """
-        The class initializer.
+        Basket simulator class initializer, send the parent class (The Simulator class),
+        the basket class related queue,
         """
         super().__init__('Basket')
 
@@ -25,13 +26,6 @@ class BasketSimulator(Simulator):
 
             Parameters:
                 body: The payload of the message.
-
         """
         # The basket simulator sends to the ordering queue the validation for starting to create a new order.
-        with RabbitMQ() as mq:
-            try:
-                mq.publish(exchange=os.environ["EXCHANGE"],
-                           routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"],
-                           body=json.dumps(body))
-            except BaseException as b:
-                print(b)
+        self.send_message(body, os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
