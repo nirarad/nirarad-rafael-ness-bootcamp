@@ -17,7 +17,7 @@ class BasketSimulator(Simulator):
         """
         The class initializer.
         """
-        super().__init__(os.environ["BASKET_QUEUE"])
+        super().__init__('Basket')
 
     def get_first_message(self):
         """
@@ -26,7 +26,7 @@ class BasketSimulator(Simulator):
         """
         try:
             with RabbitMQ() as mq:
-                return mq.read_first_message(self.__queue)
+                return mq.read_first_message('Basket')
         except ValueError as v:
             print(v)
         except BaseException as b:
@@ -38,7 +38,7 @@ class BasketSimulator(Simulator):
         """
         try:
             with RabbitMQ() as mq:
-                mq.purge_queue(self.__queue)
+                mq.purge_queue('Basket')
         except ValueError as v:
             print(v)
         except BaseException as b:
@@ -46,7 +46,7 @@ class BasketSimulator(Simulator):
 
     def create_order(self, body):
         """
-        Method to start the ordering process, bu sending a confirmation message from the basket simulator to the ordering queue.
+        Method to start the ordering process, by sending a confirmation message from the basket simulator to the ordering queue.
         """
         # try:
         with RabbitMQ() as mq:

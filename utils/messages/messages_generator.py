@@ -1,7 +1,5 @@
 import uuid
 
-from faker import Faker
-
 
 class MessageGenerator:
 
@@ -15,10 +13,9 @@ class MessageGenerator:
     def basket_to_order(self):
         """
         Method to generate order reservation details.
-        :return: The order reservation in json format.
+        :return: The message that enters to the order queue, and the message that enters to the basket queue.
         """
 
-        fake = Faker()
         return {"input": {
             "UserId": self.user_id,
             "UserName": "alice",
@@ -53,8 +50,8 @@ class MessageGenerator:
             "CreationDate": "2023-03-04T14:20:24.4730559Z"
         },
             "output": {
-                    "UserId": self.user_id,
-                    "Id": self.output_request_id,
-                    "CreationDate": self.current_date
+                "UserId": self.user_id,
+                "Id": self.output_request_id,
+                "CreationDate": self.current_date
             }
         }
