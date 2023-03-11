@@ -18,9 +18,9 @@ class PaymentSimulator(Simulator):
 
     def validate_payment(self, body):
         """
-        Method to validate that Payment process.
+        Method to validate the Payment process.
         Parameters:
-          body: The payload of the message.
+            body: The payload of the message.
         """
         # The payment simulator sends to the ordering queue the payment validation message.
         self.send_message(body=body, routing_key=os.environ["PAYMENT_TO_ORDER_ROUTING_KEY_VALID"])
