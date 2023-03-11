@@ -15,7 +15,7 @@ class CatalogSimulator(Simulator):
     def __init__(self):
         """
         Catalog simulator class initializer, send the parent class (The Simulator class),
-        the basket class related queue,
+        the catalog class related queue.
         """
         super().__init__('Catalog')
 
@@ -45,4 +45,4 @@ class CatalogSimulator(Simulator):
     def verify_status_id_is_stock_confirmed(self, timeout=30):
         return self.verify_state_status_id(status_id=3, timeout=30)
 
-    # def get_currnet_order_id():
+

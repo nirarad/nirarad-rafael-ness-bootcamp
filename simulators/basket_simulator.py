@@ -17,7 +17,7 @@ class BasketSimulator(Simulator):
     def __init__(self):
         """
         Basket simulator class initializer, send the parent class (The Simulator class),
-        the basket class related queue,
+        the basket class related queue.
         """
         super().__init__("Basket")
 

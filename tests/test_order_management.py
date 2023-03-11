@@ -7,11 +7,11 @@ from simulators.basket_simulator import BasketSimulator
 from simulators.catalog_simulator import CatalogSimulator
 from utils.messages.messages_generator import MessageGenerator
 
-pytest.mark.parametrize()
-
 load_dotenv()
 
 
+@pytest.mark.order_management
+@pytest.mark.main_sucsess_scenario
 def test_main_success_scenario():
     """
         Source Test Case Title: Verify the main success scenario for creating order is valid.
@@ -38,7 +38,11 @@ def test_main_success_scenario():
     # Expected Result #4 - The OrderStatusID in the orders table has been updated to 3.
     assert catalog_mock.verify_status_id_is_stock_confirmed(timeout=100)
 
+    # Step #5 - Verify that the payment queue received from the ordering service message from the Ordering queue.
 
+
+@pytest.mark.order_management
+@pytest.mark.creating_order
 def test_user_can_submit_an_order():
     """
         Source Test Case Title: Verify that the user can submit an order.
