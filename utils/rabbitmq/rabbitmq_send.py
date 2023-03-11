@@ -51,10 +51,10 @@ if __name__ == '__main__':
         }
 
     with RabbitMQ() as mq:
-        #mq.publish(exchange='eshop_event_bus',
-         #          routing_key='OrderPaymentSucceededIntegrationEvent',
-          #         body=json.dumps(body))
-
         mq.publish(exchange='eshop_event_bus',
-                   routing_key='UserCheckoutAcceptedIntegrationEvent',
-                   body=json.dumps(body))
+                  routing_key='OrderPaymentSucceededIntegrationEvent',
+                  body=json.dumps(body))
+
+        # mq.publish(exchange='eshop_event_bus',
+        #            routing_key='UserCheckoutAcceptedIntegrationEvent',
+        #            body=json.dumps(body))

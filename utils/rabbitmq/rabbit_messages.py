@@ -61,3 +61,33 @@ class RabbitMessages:
                 "CreationDate": "2023-03-05T15:33:18.1376971Z"
              }
         return body
+
+    def stockreject(self):
+        with MSSQLConnector() as conn:
+            id = conn.select_query('SELECT MAX(Id) FROM ordering.orders')
+        body={
+                "OrderId": id[0][''],
+                "OrderStockItems": [
+                 {
+                     "ProductId": 1,
+                     "HasStock": False
+                 }
+                                   ],
+                 "Id": "99c3f974-c6ed-41a4-8e01-5cb00f9e6335",
+                 "CreationDate": "2023-03-05T15:51:11.5458796Z"
+             }
+        return body
+
+    def paymentfail(self):
+        with MSSQLConnector() as conn:
+            id = conn.select_query('SELECT MAX(Id) FROM ordering.orders')
+        body={
+                "OrderId": id[0][''],
+                "OrderStatus": "stockconfirmed",
+                "BuyerName": "alice",
+                "Id": "cca155c0-4480-4c93-a763-910e54218040",
+                "CreationDate": "2023-03-05T17:07:35.6306122Z"
+             }
+
+        return body
+
