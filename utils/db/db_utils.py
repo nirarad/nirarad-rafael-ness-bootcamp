@@ -34,9 +34,15 @@ class MSSQLConnector:
         self.conn.close()
 
 
+
+
 if __name__ == '__main__':
     import pprint
-    with MSSQLConnector() as conn:
+    with MSSQLConnector('CatalogDb') as conn:
         #pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
-        result=conn.select_query('SELECT COUNT(Id) from ordering.orders')
-        print(result[0][''])
+        #result=conn.select_query('SELECT MAX(Id) FROM ordering.orders')
+        #result=conn.select_query('SELECT COUNT(Id) from ordering.orders')
+        #orderstatus = conn.select_query('select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
+        #productid=1
+        startingstock =conn.select_query('SELECT AvailableStock from dbo.Catalog where Id =1')
+        print(startingstock[0]['AvailableStock'])

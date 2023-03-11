@@ -3,10 +3,9 @@ import json
 import pika
 from utils.db.db_utils import MSSQLConnector
 class RabbitMessages:
-
-
-
-    def usercheckout(self):
+    #with MSSQLConnector() as conn:
+        #id = conn.select_query('SELECT MAX(Id) FROM ordering.orders')
+    def usercheckout(self,productid,quantity):
      body= {
                 "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
                 "UserName": "alice",
@@ -28,11 +27,11 @@ class RabbitMessages:
                     "Items": [
                         {
                             "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
-                            "ProductId": 1,
+                            "ProductId": productid,
                             "ProductName": ".NET Bot Black Hoodie",
                             "UnitPrice": 19.5,
                             "OldUnitPrice": 0,
-                            "Quantity": 1,
+                            "Quantity": quantity,
                             "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
                         }
                     ]
@@ -43,8 +42,10 @@ class RabbitMessages:
      return body
 
     def stockconfirmed(self):
+        with MSSQLConnector() as conn:
+            id=conn.select_query('SELECT MAX(Id) FROM ordering.orders')
         body={
-                "OrderId": 164,
+                "OrderId": id[0][''] ,
                 "Id": "e9b80940-c861-4e5b-9d7e-388fd256acef",
                 "CreationDate": "2023-03-07T09:52:56.6412897Z"
              }
@@ -52,8 +53,10 @@ class RabbitMessages:
 
 
     def paymentsuccses(self):
+        with MSSQLConnector() as conn:
+            id = conn.select_query('SELECT MAX(Id) FROM ordering.orders')
         body={
-                "OrderId": 164,
+                "OrderId": id[0][''],
                 "Id": "b84dc7a5-1d0e-429e-a800-d3024d9c724f",
                 "CreationDate": "2023-03-05T15:33:18.1376971Z"
              }
