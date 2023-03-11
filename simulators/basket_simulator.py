@@ -34,7 +34,7 @@ class BasketSimulator(Simulator):
             f"Message Route: Basket -> Ordering. Routing Key: OrderStockConfirmedIntegrationEvent. Current Order ID is: {Simulator.CURRENT_ORDER_ID}")
 
     def verify_status_id_is_submitted(self):
-        print("Verifying Status ID is submitted")
+        print("Verifying Status ID is submitted...")
         return self.verify_state_status_id()
 
     def get_order_id(self):

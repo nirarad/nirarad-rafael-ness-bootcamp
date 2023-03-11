@@ -1,4 +1,3 @@
-import time
 from time import sleep
 
 import pytest
@@ -29,39 +28,15 @@ def test_main_success_scenario():
     mg = MessageGenerator()
     catalog_to_order_msg = mg.catalog_to_order(catalog_mock.CURRENT_ORDER_ID)
 
-    # Step 3 - Verify that the catalog queue received the message from the ordering service.
-    # Waiting for the queue to get the massage, and for the status to update for 'awaitingvalidation'.
-
-    # Expected Result #3 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
+    # Step/Expected Result #3 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
     # The maximum time to wait for the order status to be updated is 30 seconds
-    for i in range(30):
-        # If the status is 2 - assert true
-        if catalog_mock.verify_status_id_is_awaiting_validation():
-            assert catalog_mock.verify_status_id_is_awaiting_validation()
-        # If the status is not 2 - wait 2 second and try again
-        else:
-            time.sleep(1)
-
-    # Finally, check if the status is 2 once again, if it is not, the test failed
-    else:
-        if not catalog_mock.verify_status_id_is_awaiting_validation():
-            assert catalog_mock.verify_status_id_is_awaiting_validation()
+    assert catalog_mock.verify_status_id_is_awaiting_validation(timeout=100)
 
     # Step #4 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
     catalog_mock.validate_items_in_stock(catalog_to_order_msg["input"])
 
     # Expected Result #4 - The OrderStatusID in the orders table has been updated to 3.
-    for i in range(30):
-        # If the status is 3 - assert true
-        if catalog_mock.verify_status_id_is_stock_confirmed():
-            assert catalog_mock.verify_status_id_is_stock_confirmed()
-        # If the status is not 3 - wait 2 second and try again
-        else:
-            time.sleep(1)
-        # Finally, check if the status is 3 once again, if it is not, the test failed
-    else:
-        if not catalog_mock.verify_status_id_is_stock_confirmed:
-            assert catalog_mock.verify_status_id_is_stock_confirmed()
+    assert catalog_mock.verify_status_id_is_stock_confirmed(timeout=100)
 
 
 def test_user_can_submit_an_order():
