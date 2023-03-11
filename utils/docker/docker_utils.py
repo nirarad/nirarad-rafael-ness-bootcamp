@@ -5,7 +5,7 @@ import time
 class DockerManager:
     def __init__(self):
         self.cli = docker.from_env()
-        self.containers = self.cli.containers.list()
+        self.containers = self.cli.containers.list(all=True)
         self.containers_dict = {c.image.tags[0]: c for c in self.containers}
 
     def start(self, container_name):
@@ -22,6 +22,25 @@ class DockerManager:
 
     def unpause(self, container_name):
         self.containers_dict[container_name].unpause()
+
+    # My addition methods
+    def is_stopped(self, container_name):
+        for c in self.containers:
+            if c.image.tags[0] == container_name:
+                return False
+        return True
+
+    def is_running(self, container_name):
+        for c in self.containers:
+            if c.image.tags[0] == container_name:
+                return c.status == 'running'
+        return False
+
+    def is_paused(self, container_name):
+        for c in self.containers:
+            if c.image.tags[0] == container_name:
+                return c.status == 'paused'
+        return False
 
 
 if __name__ == '__main__':

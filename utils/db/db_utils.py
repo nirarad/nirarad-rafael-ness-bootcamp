@@ -37,4 +37,6 @@ class MSSQLConnector:
 if __name__ == '__main__':
     import pprint
     with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+        res = conn.select_query('SELECT * from ordering.orders order by id desc')
+        pprint.pprint(res[0]['OrderStatusId'])
+
