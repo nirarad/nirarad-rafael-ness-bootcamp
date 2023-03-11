@@ -62,7 +62,7 @@ class Simulator(ABC):
         elif self.queue == 'Catalog':
             status_id = 2
         elif self.queue == 'Payment':
-            status_id = 4
+            status_id = 3
         else:
             status_id = 0
         try:

@@ -22,7 +22,6 @@ class CatalogSimulator(Simulator):
     def validate_items_in_stock(self, body):
         """
         Method to validate that each order items quantity does not exceeding from the stock's limits.
-
           Parameters:
               body: The payload of the message.
         """
@@ -32,7 +31,6 @@ class CatalogSimulator(Simulator):
     def inform_items_not_in_stock(self, body):
         """
         Method to inform that one or more of the order items quantity does exceed from the stock's limits.
-
             Parameters:
                 body: The payload of the message.
        """

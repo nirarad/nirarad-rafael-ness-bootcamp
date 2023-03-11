@@ -70,7 +70,7 @@ class MessageGenerator:
         return {
             # What to send to the ordering queue
             "input": {
-                "UserId": self.user_id,
+                "OrderId": self.user_id,
                 "Id": self.output_request_id,
                 "CreationDate": self.current_date
             },
