@@ -1,11 +1,14 @@
 import os
 import uuid
 
+from dotenv import load_dotenv
+
 
 class MessageGenerator:
+    load_dotenv()
 
     def __init__(self):
-        self.user_id = os.environ["ALICE_IDENTITY"]
+        self.user_id = "b9e5dcdd-dae2-4b1c-a991-f74aae042814"
         self.input_request_id = str(uuid.uuid4())
         self.output_request_id = str(uuid.uuid4())
         self.current_date = "2023-03-05T13:43:13.8898923Z"
@@ -17,7 +20,6 @@ class MessageGenerator:
 
             :return: The message that enters to the order queue, and the message that enters to the basket queue.
         """
-
         return {"input": {
             # What to send to the ordering queue
             "UserId": self.user_id,

@@ -4,12 +4,13 @@ from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
 
+load_dotenv()
+
 
 class CatalogSimulator(Simulator):
     """
     A class that simulate the Catalog microservice's messages traffic with RabbitMQ.
     """
-    load_dotenv()
 
     def __init__(self):
         """
@@ -26,7 +27,7 @@ class CatalogSimulator(Simulator):
               body: The payload of the message.
         """
         # The catalog simulator sends to the ordering queue the stock validation confirmation message.
-        self.send_message(body, os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"])
+        self.send_message(body=body, routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"])
 
     def inform_items_not_in_stock(self, body):
         """
@@ -36,4 +37,4 @@ class CatalogSimulator(Simulator):
                 body: The payload of the message.
        """
         # The catalog simulator sends to the ordering queue the stock validation failure message.
-        self.send_message(body, os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])
+        self.send_message(body=body, routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])

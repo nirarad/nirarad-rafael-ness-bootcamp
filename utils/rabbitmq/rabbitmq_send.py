@@ -1,3 +1,4 @@
+import json
 import pprint
 
 import pika
@@ -51,7 +52,7 @@ class RabbitMQ:
     def read_first_message(self, queue_name):
         try:
             method_frame, header_frame, body = self.channel.basic_get(queue_name, auto_ack=True)
-            return body
+            return json.loads(body.decode('utf-8'))
         except ValueError as v:
             raise ValueError(
                 f'There was problem with getting the first message, the following exception was received: {v}')

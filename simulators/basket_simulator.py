@@ -4,19 +4,20 @@ from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
 
+load_dotenv()
+
 
 class BasketSimulator(Simulator):
     """
     A class that simulate the Basket microservice's messages traffic with RabbitMQ.
     """
-    load_dotenv()
 
     def __init__(self):
         """
         Basket simulator class initializer, send the parent class (The Simulator class),
         the basket class related queue,
         """
-        super().__init__('Basket')
+        super().__init__("Basket")
 
     def create_order(self, body):
         """
@@ -26,7 +27,7 @@ class BasketSimulator(Simulator):
                 body: The payload of the message.
         """
         # The basket simulator sends to the ordering queue the validation for starting to create a new order.
-        self.send_message(body, os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
+        self.send_message(body=body, routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
 
-    def verify_status_id_is_submitted(self, status_id):
-        self.verify_stats_status_id(1)
+    def verify_status_id_is_submitted(self):
+        return self.verify_stats_status_id()
