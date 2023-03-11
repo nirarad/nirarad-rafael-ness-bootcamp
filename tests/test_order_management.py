@@ -14,11 +14,9 @@ load_dotenv()
 
 def test_main_success_scenario():
     """
-    Test to verify MSS is valid.
+        Source Test Case Title: Verify the main success scenario for creating order is valid.
 
-        Source Test Case Title: Verify that the user can submit an order.
-
-        Source Test Case Description: Verify that the submitting order functionality of the service is working.
+        Source Test Case Purpose: Verify that the submitting order functionality of the service is working.
 
         Source Test Case ID:1
 
@@ -26,12 +24,9 @@ def test_main_success_scenario():
     """
     # Preparing test environment
     basket_mock = BasketSimulator()
-    catalog_mock = CatalogSimulator()
     basket_mock.purge_queue()
-    catalog_mock.purge_queue()
     mg = MessageGenerator()
     basket_to_order_msg = mg.basket_to_order()
-    catalog_to_order_msg = mg.catalog_to_order()
     sleep(3)
 
     # Step #1 - Send from the basket mock to the Ordering queue massage to create a new order.
@@ -46,12 +41,19 @@ def test_main_success_scenario():
     # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
     assert basket_mock.verify_status_id_is_submitted()
 
+    # Add additional simulators
+    catalog_mock = CatalogSimulator()
+    catalog_mock.purge_queue()
+    catalog_to_order_msg = mg.catalog_to_order()
+
     # Step 3 - Verify that the catalog queue received the message from the ordering service.
     catalog_mock.validate_items_in_stock(catalog_to_order_msg["input"])
 
+    # Waiting for the queue to get the massage, and for the status to update for 'awaitingvalidation'.
+    sleep(60)
+
     # Expected Result #3 - The catalog queue received the message from the ordering service.
     expected_message = catalog_to_order_msg["output"]["OrderStatus"]
-    sleep(60)
     actual_message = catalog_mock.get_first_message()["OrderStatus"]
     assert expected_message == actual_message
 
@@ -61,11 +63,9 @@ def test_main_success_scenario():
 
 def test_user_can_submit_an_order():
     """
-    Test to verify order's submission is valid.
-
         Source Test Case Title: Verify that the user can submit an order.
 
-        Source Test Case Description: Verify that the submitting order functionality of the service is working.
+        Source Test Case Purpose: Verify that the submitting order functionality of the service is working.
 
         Source Test Case ID:2
 

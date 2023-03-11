@@ -4,4 +4,3 @@ pytest
 pytest-html-reporter
 pyodbc
 docker
-aio-pika
