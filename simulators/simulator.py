@@ -29,18 +29,20 @@ class Simulator(ABC):
 
     def get_first_message(self, timeout=100):
         """
-         Method which reads the first messages from the given queue.
-        :return: The first message in the basket queue.
+        Method which reads the first messages from the given queue.
+        Returns:
+            The first message in the basket queue.
         """
         try:
             with RabbitMQ() as mq:
                 actual_message = None
                 for i in range(timeout):
+                    time.sleep(1)
                     if actual_message is None:
                         actual_message = mq.read_first_message(self.queue)
                     else:
-                        time.sleep(1)
                         return actual_message
+
 
         except ValueError as v:
             print(v)
@@ -65,7 +67,7 @@ class Simulator(ABC):
                        routing_key=routing_key,
                        body=json.dumps(body))
 
-    def verify_state_status_id(self, status_id=None, timeout=30):
+    def verify_state_status_id(self, status_id=None, timeout=300):
         if status_id is None:
             if self.queue == 'Basket':
                 status_id = 1

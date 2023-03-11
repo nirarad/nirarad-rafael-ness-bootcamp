@@ -64,16 +64,39 @@ class MessageGenerator:
     def catalog_to_order(self, order_id):
         """
         Method to generate catalog input message to send the ordering queue, and output message to consume from the ordering queue.
-            Return:
-                 A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
+        Return:
+             A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
         """
         return {
-            # What to send to the ordering queue
+            # What to send to the ordering queue.
             "input": {
                 "OrderId": order_id,
                 "Id": self.output_request_id,
                 "CreationDate": self.current_date
             },
-            # What should be received from the ordering queue (a sufficient parietal information for identification).
+            # What should be received from the ordering queue (a sufficient parietal information).
             "output": {"OrderStatus": "awaitingvalidation"}
         }
+
+    def payment_to_order(self, order_id):
+        """
+        Method to generate for the payment simulator, an input message to send the ordering queue, and an output message to consume from the ordering queue.
+        Return:
+            A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
+        """
+        return {
+            # What to send to the ordering queue.
+            "input": {
+                "OrderId": order_id,
+                "Id": self.output_request_id,
+                "CreationDate": self.current_date
+            },
+            # What should be received from the ordering queue (a sufficient parietal information).
+            "output": {
+                "OrderId": order_id,
+                "OrderStatus": "stockconfirmed",
+                "BuyerName": "alice"
+                }
+        }
+
+
