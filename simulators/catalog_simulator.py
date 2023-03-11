@@ -38,3 +38,6 @@ class CatalogSimulator(Simulator):
        """
         # The catalog simulator sends to the ordering queue the stock validation failure message.
         self.send_message(body=body, routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])
+
+    def verify_status_id_is_awaiting_validation(self):
+        return self.verify_state_status_id()

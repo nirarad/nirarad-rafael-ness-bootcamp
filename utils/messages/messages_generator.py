@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from dotenv import load_dotenv
@@ -64,10 +63,10 @@ class MessageGenerator:
 
     def catalog_to_order(self):
         """
-              Method to generate catalog input message to send the ordering queue, and output message to consume from the ordering queue.
-
-                  :return: A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
-              """
+        Method to generate catalog input message to send the ordering queue, and output message to consume from the ordering queue.
+            Return:
+                 A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
+        """
         return {
             # What to send to the ordering queue
             "input": {
@@ -76,5 +75,5 @@ class MessageGenerator:
                 "CreationDate": self.current_date
             },
             # What should be received from the ordering queue (a sufficient parietal information for identification).
-            "output": "awaitingvalidation"
+            "output": {"OrderStatus": "awaitingvalidation"}
         }

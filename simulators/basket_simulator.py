@@ -30,4 +30,4 @@ class BasketSimulator(Simulator):
         self.send_message(body=body, routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
 
     def verify_status_id_is_submitted(self):
-        return self.verify_stats_status_id()
+        return self.verify_state_status_id()

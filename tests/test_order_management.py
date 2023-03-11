@@ -14,7 +14,7 @@ load_dotenv()
 
 def test_main_success_scenario():
     """
-    Test to verify order's submission is valid.
+    Test to verify MSS is valid.
 
         Source Test Case Title: Verify that the user can submit an order.
 
@@ -26,26 +26,37 @@ def test_main_success_scenario():
     """
     # Preparing test environment
     basket_mock = BasketSimulator()
+    catalog_mock = CatalogSimulator()
     basket_mock.purge_queue()
-    sleep(2)
+    catalog_mock.purge_queue()
     mg = MessageGenerator()
     basket_to_order_msg = mg.basket_to_order()
+    catalog_to_order_msg = mg.catalog_to_order()
+    sleep(3)
 
     # Step #1 - Send from the basket mock to the Ordering queue massage to create a new order.
     basket_mock.create_order(basket_to_order_msg["input"])
 
     # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
-    sleep(3)
     expected_message = basket_to_order_msg["output"]['UserId']
+    sleep(3)
     actual_message = basket_mock.get_first_message()['UserId']
     assert actual_message == expected_message
 
-    # If we reached here, then the rest of the test will run.
-    catalog_to_order_msg = mg.catalog_to_order()
-    catalog_simulator = CatalogSimulator()
-    catalog_simulator.validate_items_in_stock()
     # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
     assert basket_mock.verify_status_id_is_submitted()
+
+    # Step 3 - Verify that the catalog queue received the message from the ordering service.
+    catalog_mock.validate_items_in_stock(catalog_to_order_msg["input"])
+
+    # Expected Result #3 - The catalog queue received the message from the ordering service.
+    expected_message = catalog_to_order_msg["output"]["OrderStatus"]
+    sleep(60)
+    actual_message = catalog_mock.get_first_message()["OrderStatus"]
+    assert expected_message == actual_message
+
+    # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
+    assert catalog_mock.verify_state_status_id()
 
 
 def test_user_can_submit_an_order():

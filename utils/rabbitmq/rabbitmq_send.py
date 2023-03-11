@@ -23,7 +23,8 @@ class RabbitMQ:
         self.connection.close()
 
     def connect(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(self.host))
         self.channel = self.connection.channel()
 
     def declare_queue(self, queue):
@@ -52,7 +53,11 @@ class RabbitMQ:
     def read_first_message(self, queue_name):
         try:
             method_frame, header_frame, body = self.channel.basic_get(queue_name, auto_ack=True)
-            return json.loads(body.decode('utf-8'))
+            if method_frame:
+                self.channel.basic_ack(method_frame.delivery_tag)
+                return json.loads(body.decode('utf-8'))
+            else:
+                raise TimeoutError
         except ValueError as v:
             raise ValueError(
                 f'There was problem with getting the first message, the following exception was received: {v}')

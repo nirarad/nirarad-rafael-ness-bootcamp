@@ -56,15 +56,15 @@ class Simulator(ABC):
                        routing_key=routing_key,
                        body=json.dumps(body))
 
-    def verify_stats_status_id(self):
+    def verify_state_status_id(self):
         if self.queue == 'Basket':
             status_id = 1
         elif self.queue == 'Catalog':
             status_id = 2
         elif self.queue == 'Payment':
-            status_id = 3
-        else:
             status_id = 4
+        else:
+            status_id = 0
         try:
             with MSSQLConnector() as conn:
                 return len(conn.select_query(
