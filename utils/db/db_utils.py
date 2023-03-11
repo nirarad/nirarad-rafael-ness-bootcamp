@@ -28,11 +28,44 @@ class MSSQLConnector:
             results.append(dict(zip(columns, row)))
         return results
 
+    def update_order_db_id(self, db_order_id, to_id):
+        query = 'Update [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
+                f'set OrderStatusId = {to_id}' \
+                f'where Id = {db_order_id}'
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        cursor.commit()
+        return True
+
+    def get_order_status_from_db(self, order_id):
+        query = 'select o.OrderStatusId from [Microsoft.eShopOnContainers.Services.OrderingDb].ordering.orders as o ' \
+                f'where Id = {order_id}'
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        order_status = cursor.fetchall()
+        return order_status[0][0]
+
+    def get_last_order_record_id_in_db(self):
+        query = 'select TOP 1 o.Id from [Microsoft.eShopOnContainers.Services.OrderingDb].ordering.orders as o order ' \
+                'by Id desc'
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        last_order_id = cursor.fetchall()
+        return last_order_id[0][0]
+
     def close(self):
         self.conn.close()
 
 
 if __name__ == '__main__':
-    import pprint
+    from pprint import pprint as p
+
     with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+        query = 'Update [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
+                'set OrderStatusId = 4' \
+                'where Id = 161'
+        # pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+        # p(conn.get_order_status_from_db(151))
+        # conn.update_order_db_id(161, 1)
+        # p(conn.get_order_status_from_db(151))
+        p(conn.get_last_order_record_id_in_db())

@@ -17,20 +17,20 @@ class OrderingAPI_Mocker:
     def cancel_order(self, order_number=0, x_requestid=None):
         headers = {**self.base_header, **{"x-requestid": str(x_requestid)}}
         json_body = {"orderNumber": order_number}
-        res = requests.put(f'{self.base_url}/api/v1/orders/cancel', headers=headers, json=json_body)
-        return res
+        response_status = requests.put(f'{self.base_url}/api/v1/orders/cancel', headers=headers, json=json_body)
+        return response_status
 
     def ship_order(self, order_number=0, x_requestid=None):
         headers = {**self.base_header, **{"x-requestid": str(x_requestid)}}
         json_body = {"orderNumber": order_number}
-        res = requests.put(f'{self.base_url}/api/v1/orders/ship', headers=headers, json=json_body)
-        return res
+        response_status = requests.put(f'{self.base_url}/api/v1/orders/ship', headers=headers, json=json_body)
+        return response_status
 
 
-# if __name__ == '__main__':
-#     import pprint
-#
-#     api = OrderingAPI_Mocker()
-#     # pprint.pprint(api.get_order_by_id(93).json())
-#     # pprint.pprint(api.cancel_order())
-#     pprint.pprint(api.ship_order(20, "43c7219a-a055-410f-847a-d7902c60d685"))
+if __name__ == '__main__':
+    import pprint
+
+    api = OrderingAPI_Mocker()
+    # pprint.pprint(api.get_order_by_id(93).json())
+    # pprint.pprint(api.cancel_order())
+    pprint.pprint(api.cancel_order(162, "eb24532a-be23-417f-b6a9-587ff9f6b845"))

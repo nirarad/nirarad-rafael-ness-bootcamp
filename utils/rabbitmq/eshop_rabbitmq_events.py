@@ -14,7 +14,7 @@ def create_order(x_requestid=None, order_number=0):
     body = {
         "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
         "UserName": "alice",
-        "OrderNumber": 160,
+        "OrderNumber": order_number,
         "City": "Redmond",
         "Street": "15703 NE 61st Ct",
         "State": "WA",
@@ -41,10 +41,11 @@ def create_order(x_requestid=None, order_number=0):
                 }
             ]
         },
-        "Id": str(uuid.uuid4()),
+        "Id": x_requestid,
         "CreationDate": "2023-03-04T14:20:24.4730559Z"
     }
     rabbit_mq_publish('UserCheckoutAcceptedIntegrationEvent', body)
+    return True
 
 
 def create_order_empty_list(order_number=0, x_requestid=None):
