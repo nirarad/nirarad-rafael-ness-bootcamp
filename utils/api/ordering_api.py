@@ -19,16 +19,16 @@ class OrderingAPI:
         response.raise_for_status()
         return response.json()
 
-    def status_shipped(self, order_id):
+    def status_shipped(self, order_number):
         url = f"{self.base_url}/api/v1/orders/ship"
         headers = {
             'x-requestid': str(uuid.uuid4()),
             'Authorization': f'Bearer {self.bearer_token}'
         }
-        data = {
-            "orderNumber": order_id
+        body = {
+            "orderNumber": order_number
         }
-        response = requests.put(url, headers=headers, json=data)
+        response = requests.put(url, headers=headers, json=body)
         response.raise_for_status()
         return response.json()
 
