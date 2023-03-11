@@ -22,20 +22,27 @@ class CatalogSimulator(Simulator):
     def validate_items_in_stock(self, body):
         """
         Method to validate that each order items quantity does not exceeding from the stock's limits.
-          Parameters:
-              body: The payload of the message.
+        Parameters:
+          body: The payload of the message.
         """
         # The catalog simulator sends to the ordering queue the stock validation confirmation message.
         self.send_message(body=body, routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"])
+        print("Message Route: Catalog -> Ordering. Routing Key: UserCheckoutAcceptedIntegrationEvent")
 
     def inform_items_not_in_stock(self, body):
         """
         Method to inform that one or more of the order items quantity does exceed from the stock's limits.
-            Parameters:
-                body: The payload of the message.
+        Parameters:
+            body: The payload of the message.
        """
         # The catalog simulator sends to the ordering queue the stock validation failure message.
         self.send_message(body=body, routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])
 
     def verify_status_id_is_awaiting_validation(self):
         return self.verify_state_status_id()
+
+    def verify_status_id_is_stock_confirmed(self):
+        return self.verify_state_status_id(status_id=3)
+
+    # def get_currnet_order_id():
+

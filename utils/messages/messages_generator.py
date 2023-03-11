@@ -61,7 +61,7 @@ class MessageGenerator:
             }
         }
 
-    def catalog_to_order(self):
+    def catalog_to_order(self, order_id):
         """
         Method to generate catalog input message to send the ordering queue, and output message to consume from the ordering queue.
             Return:
@@ -70,7 +70,7 @@ class MessageGenerator:
         return {
             # What to send to the ordering queue
             "input": {
-                "OrderId": self.user_id,
+                "OrderId": order_id,
                 "Id": self.output_request_id,
                 "CreationDate": self.current_date
             },
