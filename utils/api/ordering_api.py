@@ -41,6 +41,9 @@ class OrderingAPI:
         return response.status_code
 
 
+    def get_orders(self):
+        order = requests.get(url='http://host.docker.internal:5102/ordering-api/api/v1/Orders', headers=self.headers)
+        return order
 
 
 if __name__ == '__main__':
@@ -48,12 +51,12 @@ if __name__ == '__main__':
     api = OrderingAPI()
 
     #pprint.pprint(api.get_order_by_id(21).json())
-    with MSSQLConnector() as conn:
-        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
+    #with MSSQLConnector() as conn:
+        #orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
         #print(orderid[0][''])
-        orderid=orderid[0]['']
+        #orderid=orderid[0]['']
 
-    api.cancel_order(orderid)
+    print(api.get_orders().json())
     #print(api.status())
     #api.cancel_order(44)
 

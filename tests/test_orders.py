@@ -217,13 +217,67 @@ def test_cancel_order_status_5_fail(order_api):
         newstatus=conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
     assert newstatus[0]['OrderStatusId'] == 5
 
+@pytest.mark.test_update_order_to_shiped_fail_status_2
+def test_update_order_to_shiped_fail_status_2(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
+        orderid = orderid[0]['']
+        order_api.update_to_shiped(orderid)
+        newstatus = conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+        assert newstatus[0]['OrderStatusId'] == 2
 
-# def test_update_order_to_shiped_fail(order_api):
-#     with MSSQLConnector() as conn:
-#         orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 3')
-#         orderid = orderid[0]['']
-#         order_api.update_to_shiped(orderid)
-#         newstatus = conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
-#         assert newstatus[0]['OrderStatusId'] == 5
+
+@pytest.mark.test_update_order_to_shiped_fail_status_3
+def test_update_order_to_shiped_fail_status_3(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 3')
+        orderid = orderid[0]['']
+        order_api.update_to_shiped(orderid)
+        newstatus = conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+        assert newstatus[0]['OrderStatusId'] == 3
 
 
+
+@pytest.mark.test_update_order_to_shiped_fail_status_6
+def test_update_order_to_shiped_fail_status_6(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 6')
+        orderid = orderid[0]['']
+        order_api.update_to_shiped(orderid)
+        newstatus = conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+        assert newstatus[0]['OrderStatusId'] == 6
+
+
+@pytest.mark.test_order_fail_with_card_type_4
+def test_order_fail_with_card_type_4(order_api):
+    productid = 1
+    quantity = 1
+    cardtype=4
+    body = messages.usercheckout(productid, quantity,cardtype)
+    with MSSQLConnector() as conn:
+        with RabbitMQ() as mq:
+            startcount = conn.select_query('SELECT COUNT(Id) from ordering.orders')
+
+            mq.publish(exchange='eshop_event_bus', routing_key='UserCheckoutAcceptedIntegrationEvent',
+                       body=json.dumps(body))
+
+            endingcount= conn.select_query('SELECT COUNT(Id) from ordering.orders')
+
+        assert startcount==endingcount
+
+@pytest.mark.test_order_fail_with_card_type_0
+def test_order_fail_with_card_type_4(order_api):
+    productid = 1
+    quantity = 1
+    cardtype=0
+    body = messages.usercheckout(productid, quantity,cardtype)
+    with MSSQLConnector() as conn:
+        with RabbitMQ() as mq:
+            startcount = conn.select_query('SELECT COUNT(Id) from ordering.orders')
+
+            mq.publish(exchange='eshop_event_bus', routing_key='UserCheckoutAcceptedIntegrationEvent',
+                       body=json.dumps(body))
+
+            endingcount= conn.select_query('SELECT COUNT(Id) from ordering.orders')
+
+        assert startcount==endingcount
