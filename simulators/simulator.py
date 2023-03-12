@@ -100,6 +100,7 @@ class Simulator(ABC):
 
     @staticmethod
     def implicit_status_id_validation(status_id, timeout=300):
+        print(f"Validate id id {status_id}...")
         try:
             with MSSQLConnector() as conn:
                 for i in range(timeout):

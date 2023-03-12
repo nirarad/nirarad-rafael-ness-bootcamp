@@ -2,7 +2,7 @@ import uuid
 
 import requests
 
-from bearer_tokenizer import BearerTokenizer
+from utils.api.bearer_tokenizer import BearerTokenizer
 
 
 class OrderingAPI:
