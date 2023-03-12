@@ -17,7 +17,8 @@ class MessageGenerator:
         """
         Method to generate order details.
 
-            :return: The message that enters to the order queue, and the message that enters to the basket queue.
+        Return:
+            The message that enters to the order queue, and the message that enters to the basket queue.
         """
         return {"input": {
             # What to send to the ordering queue
