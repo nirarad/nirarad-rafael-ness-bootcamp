@@ -13,7 +13,4 @@ def callback(ch, method, properties, body):
 
 if __name__ == '__main__':
     with RabbitMQ() as mq:
-        if mq.connection is None:
-            pprint("no connecting, try to restart")
-            mq.connect()
         mq.consume('Basket', callback)

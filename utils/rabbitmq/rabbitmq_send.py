@@ -27,7 +27,7 @@ class RabbitMQ:
         self.channel = self.connection.channel()
 
     def declare_queue(self, queue):
-        self.channel.queue_declare(queue=queue)
+        self.channel.queue_declare(queue=queue, durable=True, exclusive=True)
 
     def close(self):
         self.connection.close()
@@ -35,8 +35,11 @@ class RabbitMQ:
     def publish(self, exchange, routing_key, body):
         self.channel.basic_publish(exchange=exchange,
                                    routing_key=routing_key,
-                                   body=body)
-        pprint(f"[{routing_key}]\n\n Sent '{body}'")
+                                   body=body,
+                                   properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE)
+
+                                   )
+        # pprint(f"[{routing_key}]\n\n Sent '{body}'")
 
     def consume(self, queue, callback):
         self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
@@ -48,38 +51,37 @@ if __name__ == '__main__':
     # "Id": str(uuid.uuid4()),
     # "CreationDate": "2023-03-05T15:33:18.1376971Z"
     body = {
-            "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-            "UserName": "alice",
-            "OrderNumber": 1,
-            "City": "Redmond",
-            "Street": "15703 NE 61st Ct",
-            "State": "WA",
-            "Country": "U.S.",
-            "ZipCode": "98052",
-            "CardNumber": "4012888888881881",
-            "CardHolderName": "Alice Smith",
-            "CardExpiration": "2024-12-31T22:00:00Z",
-            "CardSecurityNumber": "123",
-            "CardTypeId": 1,
-            "Buyer": None,
-            "RequestId": str(uuid.uuid4()),
-            "Basket": {
-                "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-                "Items": [
-                    {
-                        "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
-                        "ProductId": 1,
-                        "ProductName": ".NET Bot Black Hoodie",
-                        "UnitPrice": 19.5,
-                        "OldUnitPrice": 0,
-                        "Quantity": 1,
-                        "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
-                    }
-                ]
-            },
-            "Id": str(uuid.uuid4()),
-            "CreationDate": "2023-03-04T14:20:24.4730559Z"
-
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserName": "alice",
+        "OrderNumber": 1,
+        "City": "Redmond",
+        "Street": "15703 NE 61st Ct",
+        "State": "WA",
+        "Country": "U.S.",
+        "ZipCode": "98052",
+        "CardNumber": "4012888888881881",
+        "CardHolderName": "Alice Smith",
+        "CardExpiration": "2024-12-31T22:00:00Z",
+        "CardSecurityNumber": "123",
+        "CardTypeId": 1,
+        "Buyer": None,
+        "RequestId": str(uuid.uuid4()),
+        "Basket": {
+            "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Items": [
+                {
+                    "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+                    "ProductId": 1,
+                    "ProductName": ".NET Bot Black Hoodie",
+                    "UnitPrice": 19.5,
+                    "OldUnitPrice": 0,
+                    "Quantity": 1,
+                    "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+                }
+            ]
+        },
+        "Id": str(uuid.uuid4()),
+        "CreationDate": "2023-03-04T14:20:24.4730559Z"
 
     }
 
@@ -87,4 +89,3 @@ if __name__ == '__main__':
         mq.publish(exchange='eshop_event_bus',
                    routing_key='UserCheckoutAcceptedIntegrationEvent',
                    body=json.dumps(body))
-
