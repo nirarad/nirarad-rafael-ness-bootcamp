@@ -149,7 +149,7 @@ def payment_failed(order_id, x_requestid=None):
 
 if __name__ == '__main__':
     order_uuid = str(uuid.uuid4())
-    datareader = JSONDataReader()
+    datareader = JSONDataReader(os.getenv('ORDERS_PATH'))
     # body = datareader.get_json_order('alice_normal_order', order_uuid)   # normal order
     # create_order(body)  # normal order
     # body = datareader.get_json_order('alice_order_empty_list', order_uuid)  # empty list

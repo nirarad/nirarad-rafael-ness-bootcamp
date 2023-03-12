@@ -1,0 +1,23 @@
+{
+    "alice_normal_order_response":
+    {
+        "ordernumber": 0,
+        "date": "2023-03-12T18:34:20.2415837",
+        "status": "submitted",
+        "description": null,
+        "street": "15703 NE 61st Ct",
+        "city": "Redmond",
+        "zipcode": "98052",
+        "country": "U.S.",
+        "orderitems":
+        [
+          {
+            "productname": ".NET Bot Black Hoodie",
+            "units": 1,
+            "unitprice": 19.5,
+            "pictureurl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+          }
+        ],
+        "total": 19.5
+    }
+}

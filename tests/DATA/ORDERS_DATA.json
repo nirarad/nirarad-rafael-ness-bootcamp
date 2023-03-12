@@ -1,7 +1,7 @@
 {
   "alice_normal_order":
   {
-          "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
         "UserName": "alice",
         "OrderNumber": 0,
         "City": "Redmond",
