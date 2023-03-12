@@ -9,6 +9,7 @@ import json
 
 class RabbitMQ:
     def __init__(self, host='localhost'):
+        self.consumer_tag = None
         self.connection = None
         self.channel = None
         self.host = host
@@ -37,7 +38,7 @@ class RabbitMQ:
         print(f"[{routing_key}] Sent '{body}'")
 
     def consume(self, queue, callback):
-        self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+        self.consumer_tag = self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
         self.channel.start_consuming()
 
 
@@ -49,5 +50,5 @@ if __name__ == '__main__':
     }
     with RabbitMQ() as mq:
         mq.publish(exchange='eshop_event_bus',
-                   routing_key='OrderPaymentSucceededIntegrationEvent',
+                   routing_key='OrderStatusChangedToAwaitingValidationIntegrationEvent',
                    body=json.dumps(body))

@@ -1,57 +1,190 @@
 [
-	
+
 	{
 		"RoutingKey": "UserCheckoutAcceptedIntegrationEvent",
 		"Body": {
 			"UserId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
-  "UserName": "demouser@microsoft.com",
-  "OrderNumber": 0,
-  "City": "Redmond",
-  "Street": "15703 NE 61st Ct",
-  "State": "WA",
-  "Country": "U.S.",
-  "ZipCode": "98052",
-  "CardNumber": "4012888888881881",
-  "CardHolderName": "DemoUser",
-  "CardExpiration": "2025-12-31T22:00:00Z",
-  "CardSecurityNumber": "535",
-  "CardTypeId": 1,
-  "Buyer": null,
-  "RequestId": "8879d1dc-ff7a-4558-9e39-deeb03ace700",
-  "Basket": {
-    "BuyerId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
-    "Items": [
-      {
-        "Id": "aefa6b11-b1d2-4d10-ab00-4e5009075e35",
-        "ProductId": 11,
-        "ProductName": "Cup\u003CT\u003E Pin",
-        "UnitPrice": 8.5,
-        "OldUnitPrice": 0,
-        "Quantity": 1,
-        "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/11/pic/"
-      }
-    ]
-  },
-  "Id": "324a0374-7486-400b-bdc2-76c4115946ca",
-  "CreationDate": "2023-03-09T15:27:18.9554576Z"
+            "UserName": "demouser@microsoft.com",
+            "OrderNumber": 0,
+            "City": "Redmond",
+            "Street": "15703 NE 61st Ct",
+            "State": "WA",
+            "Country": "U.S.",
+            "ZipCode": "98052",
+            "CardNumber": "4012888888881881",
+            "CardHolderName": "DemoUser",
+            "CardExpiration": "2025-12-31T22:00:00Z",
+            "CardSecurityNumber": "535",
+            "CardTypeId": 1,
+            "Buyer": null,
+            "RequestId": "",
+            "Basket": {
+              "BuyerId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+              "Items": [
+                {
+                  "Id": "aefa6b11-b1d2-4d10-ab00-4e5009075e35",
+                  "ProductId": 11,
+                  "ProductName": "Roslyn Red T-Shirt",
+                  "UnitPrice": 8.5,
+                  "OldUnitPrice": 0,
+                  "Quantity": 1,
+                  "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/11/pic/"
+                }
+              ]
+            },
+            "Id": "",
+            "CreationDate": "2023-03-09T15:27:18.9554576Z"
 		}
 	},
 
 	{
-		"RoutingKey": "GracePeriodConfirmedIntegrationEvent",
+		"RoutingKey": "OrderStockConfirmedIntegrationEvent",
 		"Body": {
-        "OrderId": 1,
-        "Id": "31aqb054-2891-4q4c-90f4-ff49bff0123p",
+        "OrderId": "",
+        "Id": "",
         "CreationDate": "2023-03-05T15:33:18.1376971Z"
     	}
 	},
 
-		{
-		"RoutingKey": "OrderPaymentFailedIntegrationEvent",
+    {
+		"RoutingKey": "OrderPaymentSucceededIntegrationEvent",
 		"Body": {
-        "OrderId": 1,
-        "Id": "31aqb054-2891-4q4c-90f4-ff49bff0123p",
+        "OrderId": "",
+        "Id": "",
         "CreationDate": "2023-03-05T15:33:18.1376971Z"
     	}
-	}
+	},
+
+    {
+      "RoutingKey": "OrderStockRejectedIntegrationEvent",
+      "Body": {
+          "OrderId": "",
+          "OrderStockItems": [
+            {
+              "ProductId": 7,
+              "HasStock": false
+            }
+          ],
+          "Id": "",
+          "CreationDate": "2023-03-12T10:38:46.2083329Z"
+      }
+    },
+
+  {
+    "RoutingKey": "OrderPaymentFailedIntegrationEvent",
+    "Body": {
+      "OrderId": "",
+      "Id": "",
+      "CreationDate": "2023-03-05T15:33:18.1376971Z"
+    }
+  },
+
+  {
+		"RoutingKey": "UserCheckoutAcceptedIntegrationEvent",
+		"Body": {
+			"UserId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+            "UserName": "demouser@microsoft.com",
+            "OrderNumber": 0,
+            "City": "Redmond",
+            "Street": "15703 NE 61st Ct",
+            "State": "WA",
+            "Country": "U.S.",
+            "ZipCode": "98052",
+            "CardNumber": "4012888888881881",
+            "CardHolderName": "DemoUser",
+            "CardExpiration": "2025-12-31T22:00:00Z",
+            "CardSecurityNumber": "535",
+            "CardTypeId": 1,
+            "Buyer": null,
+            "RequestId": "",
+            "Basket": {
+              "BuyerId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+              "Items": [
+                {
+                  "Id": "aefa6b11-b1d2-4d10-ab00-4e5009075e35",
+                  "ProductName": "Roslyn Red T-Shirt",
+                  "UnitPrice": 8.5,
+                  "OldUnitPrice": 0,
+                  "Quantity": 1,
+                  "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/11/pic/"
+                }
+              ]
+            },
+            "Id": "",
+            "CreationDate": "2023-03-09T15:27:18.9554576Z"
+		}
+  },
+
+    {
+		"RoutingKey": "UserCheckoutAcceptedIntegrationEvent",
+		"Body": {
+			"UserId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+            "UserName": "demouser@microsoft.com",
+            "OrderNumber": 0,
+            "City": "Redmond",
+            "Street": "15703 NE 61st Ct",
+            "State": "WA",
+            "Country": "U.S.",
+            "ZipCode": "98052",
+            "CardNumber": "4012888888881881",
+            "CardHolderName": "DemoUser",
+            "CardExpiration": "2025-12-31T22:00:00Z",
+            "CardSecurityNumber": "535",
+            "CardTypeId": 1,
+            "Buyer": null,
+            "RequestId": "",
+            "Basket": {
+              "BuyerId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+              "Items": [
+                {
+                  "Id": "aefa6b11-b1d2-4d10-ab00-4e5009075e35",
+                  "ProductId": 11,
+                  "ProductName": "Roslyn Red T-Shirt",
+                  "UnitPrice": 8.5,
+                  "OldUnitPrice": 0,
+                  "Quantity": 1,
+                  "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/11/pic/"
+                }
+              ]
+            },
+            "Id": "",
+            "CreationDate": "2023-03-09T15:27:18.9554576Z"
+		}
+  },
+
+    {
+		"RoutingKey": "UserCheckoutAcceptedIntegrationEvent",
+		"Body": {
+			"UserId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+            "UserName": "demouser@microsoft.com",
+            "OrderNumber": 0,
+            "City": "Redmond",
+            "Street": "15703 NE 61st Ct",
+            "State": "WA",
+            "Country": "U.S.",
+            "ZipCode": "98052",
+            "CardNumber": "4012888888881881",
+            "CardHolderName": "DemoUser",
+            "CardExpiration": "2025-12-31T22:00:00Z",
+            "CardSecurityNumber": "535",
+            "CardTypeId": 1,
+            "Buyer": null,
+            "RequestId": "",
+            "Basket": {
+              "BuyerId": "55aec9e7-1858-48c2-8b9a-6129a5673e39",
+              "Items": [
+                {
+                  "Id": "aefa6b11-b1d2-4d10-ab00-4e5009075e35",
+                  "ProductId": 11,
+                  "UnitPrice": 8.5,
+                  "OldUnitPrice": 0,
+                  "Quantity": 1,
+                  "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/11/pic/"
+                }
+              ]
+            },
+            "Id": "",
+            "CreationDate": "2023-03-09T15:27:18.9554576Z"
+		}
+  }
 ]

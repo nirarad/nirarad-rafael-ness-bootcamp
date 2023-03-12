@@ -1,5 +1,7 @@
 # Instructions:
 # Download https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
+import json
+
 import pyodbc
 
 
@@ -20,6 +22,11 @@ class MSSQLConnector:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
+    def req_query(self, req):
+        with MSSQLConnector() as conn:
+            # pprint.pprint(conn.select_query(req))
+            return conn.select_query(req)
+
     def select_query(self, query):
         """Executes a select query on the database and returns a list of dictionaries per row"""
         cursor = self.conn.cursor()
@@ -36,5 +43,12 @@ class MSSQLConnector:
 
 if __name__ == '__main__':
     import pprint
-    with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+
+    # with MSSQLConnector() as conn:
+    #     pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+
+    # MSSQLConnector().req_query('SELECT * from ordering.orders')
+    a = MSSQLConnector().req_query('SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC')[0]
+    print(a)
+
+
