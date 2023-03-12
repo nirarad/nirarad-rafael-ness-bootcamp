@@ -37,6 +37,6 @@ class MSSQLConnector:
 if __name__ == '__main__':
     import pprint
     with MSSQLConnector() as conn:
-        res = conn.select_query('SELECT * from ordering.orders order by id desc')
-        pprint.pprint(res[0]['OrderStatusId'])
+        pprint.pprint(conn.select_query('select * from (SELECT top 3 * from ordering.orders order by id desc) as T where OrderStatusId=4'))
+
 

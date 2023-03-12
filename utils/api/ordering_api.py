@@ -1,33 +1,45 @@
+import time
 import uuid
-
 import requests
-from bearer_tokenizer import BearerTokenizer
+from utils.api.bearer_tokenizer import BearerTokenizer
 
 
 class OrderingAPI:
-    def __init__(self):
+    def __init__(self, username='alice', password='Pass123%24'):
         self.base_url = 'http://localhost:5102'
-        self.bearer_token = BearerTokenizer().bearer_token
+        self.bearer_token = BearerTokenizer(username, password).bearer_token
         self.headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
     def get_order_by_id(self, order_id):
         order = requests.get(f'{self.base_url}/api/v1/orders/{order_id}', headers=self.headers)
         return order
 
-    def ship_order_by_id(self, order_id):
+
+    def ship_order_by_id(self, order_id, unauthorised=False):
         body = {"orderNumber": order_id}
-        # alice Pass123$
-        # headers={"user": user, "password": password}
-        headers = {'Authorization': 'Basic YWxpY2U6UGFzMTIzJA==',
-                   'Content-Type': 'application/json'}
-        return requests.put(f'{self.base_url}/api/v1/orders/ship', json=body, headers=self.headers)
+        if not unauthorised:
+            headers = self.headers
+        else:
+            headers = {}
+        headers['x-requestid']=str(uuid.uuid4())
+        return requests.put(f'{self.base_url}/api/v1/orders/ship', json=body, headers=headers)
+
+
+    def cancel_order_by_id(self, order_id, unauthorised=False):
+        body = {"orderNumber": order_id}
+        if not unauthorised:
+            headers = self.headers
+        else:
+            headers={}
+        headers['x-requestid']=str(uuid.uuid4())
+        return requests.put(f'{self.base_url}/api/v1/orders/cancel', json=body, headers=headers)
+
 
 
 if __name__ == '__main__':
-    # import pprint
-    # api = OrderingAPI()
-    # pprint.pprint(api.get_order_by_id(1).json())
-    op = OrderingAPI()
-    res = op.ship_order_by_id(1050)
-    print(res.status_code)
+    import pprint
+    api = OrderingAPI()
+    res = api.get_order_by_id(1).json()
+    pprint.pprint(res)
+
 
