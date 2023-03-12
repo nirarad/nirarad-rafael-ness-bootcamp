@@ -5,9 +5,9 @@ from utils.api.bearer_tokenizer import BearerTokenizer
 
 
 class OrderingAPI_Mocker:
-    def __init__(self):
-        self.base_url = 'http://host.docker.internal:5102'
-        self.bearer_token = BearerTokenizer().bearer_token
+    def __init__(self, username='alice', password='Pass123%24'):
+        self.base_url = 'http://localhost:5102'
+        self.bearer_token = BearerTokenizer(username, password).bearer_token
         self.base_header = {"Authorization": f"Bearer {self.bearer_token}"}
 
     def get_order_by_id(self, order_id):
