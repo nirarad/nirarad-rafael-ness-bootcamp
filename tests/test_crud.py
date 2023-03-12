@@ -6,6 +6,7 @@ from utils.testcase.logger import Logger
 from utils.api.ordering_api_mocker import OrderingAPI_Mocker
 from utils.rabbitmq.eshop_rabbitmq_events import *
 from utils.db.db_utils import MSSQLConnector
+from utils.testcase.jsondatareader import JSONDataReader
 
 
 class TestCRUD(unittest.TestCase):
@@ -36,6 +37,9 @@ class TestCRUD(unittest.TestCase):
         # Order Id saver
         cls.new_order_id = None
 
+        # Json Data handler
+        cls.jdata = JSONDataReader()
+
     def setUp(self) -> None:
         self.conn.__enter__()
 
@@ -44,29 +48,32 @@ class TestCRUD(unittest.TestCase):
         cls.conn.close()
 
     # TC001
-    def test_create_order(self):
+    def test_create_order(self, body=None):
         """
         TC_ID: TC001
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_create_order
-        Description: Function tests Ordering service creation order by RabbitMQ.
+        Description: By default function creates normal order.
+                     Function tests Ordering service creation order by RabbitMQ.
                      Function sends message to RabbitMQ queue Ordering to create order,
                      Ordering service have to create order in DB.
                      Validates if order is created and with status.
         """
         try:
-            # Find last order id to compare if getting right order id,will be   after creating new order
+            # Find last order id to compare if getting right order id,will be pre last after creating new order
             last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
-            print(last_order_record_in_db)
+            # Message body to send
+            if body is None:
+                body = self.jdata.get_json_order('alice_normal_order', self.order_uuid)
             # Sending message to RabbitMQ to Ordering queue to create order
-            create_order(self.order_uuid, 'alice_normal_order')
+            create_order(body)
             # Wait until ordering creates order in DB
             start_time = time.time()
             while True:
                 # Getting last order id
                 x = self.conn.get_last_order_record_id_in_db()
-                # if last order updated so it will new order
+                # if last order updated so it will be new order
                 if x != last_order_record_in_db:
                     # To pass into loger Actual
                     self.new_order_id = x
@@ -87,6 +94,96 @@ class TestCRUD(unittest.TestCase):
                 time.sleep(0.1)
         except Exception as e:
             self.logger.exception(f"\n{self.test_create_order.__doc__}Actual {e}")
+            raise
+
+    # TC002
+    def test_create_empty_list(self):
+        """
+        TC_ID: TC002
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_create_empty_list
+        Description: Function creates order with empty list of item,order may not to be created.
+                     Function tests Ordering service creation order by RabbitMQ.
+                     Function sends message to RabbitMQ queue Ordering to create order,
+                     Ordering service have to create order in DB.
+                     Validates if order is not created.
+        """
+        try:
+            # Find last order id to compare if getting right order id,will be pre last after creating new order
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            # Message body to send
+            body = self.jdata.get_json_order('alice_order_empty_list', self.order_uuid)
+            # Sending message to RabbitMQ to Ordering queue to create order
+            create_order(body)
+            # Wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.error(
+                        f'{self.test_create_empty_list.__doc__}Order Id in DB -> Actual: ID {self.new_order_id} , '
+                        f'Expected: Order not created')
+                    raise Exception('Order with empty list created')
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    self.logger.info(
+                        f'{self.test_create_empty_list.__doc__}Order in DB -> Actual: Order not created , '
+                        f'Expected: Order not created')
+                    break
+                # Updating timer
+                time.sleep(0.1)
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_create_empty_list.__doc__}Actual {e}")
+            raise
+
+    # TC002
+    def test_create_empty_list1(self):
+        """
+        TC_ID: TC002
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_create_empty_list
+        Description: Function creates order with empty list of item,order may not to be created.
+                     Function tests Ordering service creation order by RabbitMQ.
+                     Function sends message to RabbitMQ queue Ordering to create order,
+                     Ordering service have to create order in DB.
+                     Validates if order is not created.
+        """
+        try:
+            # Find last order id to compare if getting right order id,will be pre last after creating new order
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            # Message body to send
+            body = self.jdata.get_json_order('alice_order_empty_list', self.order_uuid)
+            # Sending message to RabbitMQ to Ordering queue to create order
+            create_order(body)
+            # Wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.error(
+                        f'{self.test_create_empty_list.__doc__}Order Id in DB -> Actual: ID {self.new_order_id} , '
+                        f'Expected: Order not created')
+                    raise Exception('Order with empty list created')
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    self.logger.info(
+                        f'{self.test_create_empty_list.__doc__}Order in DB -> Actual: Order not created , '
+                        f'Expected: Order not created')
+                    break
+                # Updating timer
+                time.sleep(0.1)
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_create_empty_list.__doc__}Actual {e}")
             raise
 
     # TC002
@@ -263,7 +360,7 @@ class TestCRUD(unittest.TestCase):
             # Validation status canceled in DB
             # Get current status of the order
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(current_order_status, 6)
+            self.assertEqual(current_order_status, 4)
             self.logger.info(
                 f'{self.test_cancel_order_v4.__doc__}Order status in DB after cancel-> '
                 f'Actual:  {current_order_status} , Expected:{4}')
@@ -346,7 +443,7 @@ class TestCRUD(unittest.TestCase):
             last_order = self.conn.get_last_order_record_id_in_db()
             self.assertNotEqual(last_order, self.new_order_id)
             self.logger.info(
-                f'{self.test_cancel_order_v1.__doc__}Response to cancel status -> '
+                f'{self.test_cancel_order_v6.__doc__}Response to cancel status -> '
                 f'Actual:  {last_order} , Expected: not {self.new_order_id}')
 
             # Cancel via mocker the order that not exists yet
@@ -355,8 +452,45 @@ class TestCRUD(unittest.TestCase):
             # Response validation must be 200
             self.assertEqual(cancel_response.status_code, 400)
             self.logger.info(
-                f'{self.test_cancel_order_v1.__doc__}Response to cancel status -> '
+                f'{self.test_cancel_order_v6.__doc__}Response to cancel status -> '
                 f'Actual:  {cancel_response.status_code} , Expected:{400}')
         except Exception as e:
-            self.logger.exception(f"\n{self.test_cancel_order_v1.__doc__}{e}")
+            self.logger.exception(f"\n{self.test_cancel_order_v6.__doc__}{e}")
+            raise
+
+    # TC008
+    def test_get_order_details(self):
+        """
+        TC_ID: TC008
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_get_order_details
+        Description: Function tests Ordering api cancel request when order not existing.
+                     1. Sends message to RabbitMQ queue to create order.
+                     2. Validates order creation in DB with status 1.
+                     3. Delete order from DB.
+                     4. Cancels order in DB.
+                     5. Validates response status 400.
+        """
+        try:
+            # Order creation
+            self.test_create_order()
+
+            # Validate deleting
+            last_order = self.conn.get_last_order_record_id_in_db()
+            self.assertNotEqual(last_order, self.new_order_id)
+            self.logger.info(
+                f'{self.test_cancel_order_v6.__doc__}Response to cancel status -> '
+                f'Actual:  {last_order} , Expected: not {self.new_order_id}')
+
+            # Cancel via mocker the order that not exists yet
+            # Ordering api sends request to cancel order
+            cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
+            # Response validation must be 200
+            self.assertEqual(cancel_response.status_code, 400)
+            self.logger.info(
+                f'{self.test_cancel_order_v6.__doc__}Response to cancel status -> '
+                f'Actual:  {cancel_response.status_code} , Expected:{400}')
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_cancel_order_v6.__doc__}{e}")
             raise

@@ -1,12 +1,12 @@
 import json
-import uuid
 import os
+import uuid
+
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
-from utils.testcase.jsondatagetter import JSONDatagetter
+from utils.testcase.jsondatareader import JSONDataReader
 from dotenv import load_dotenv
 
 load_dotenv('../../tests/DATA/.env.test')
-Data = JSONDatagetter()
 
 
 def rabbit_mq_publish(routing_key, body):
@@ -16,59 +16,19 @@ def rabbit_mq_publish(routing_key, body):
                    body=json.dumps(body))
 
 
-def create_order(x_requestid=None, order_name_json=None):
+def create_order(body):
     """
     Name: Artsyom Sharametsieu
     Date: 05.03.2023
     Function Name: create_order
     Description: Function of Basket simulator.
-                 1.Gets order from json data.
-                 2.Sends message to RabbitMQ queue Ordering to create order
-    :param order_name_json: name of order to create
-    :param x_requestid: unique id of order generated from outside
+                 1.Sends message to RabbitMQ queue Ordering to create order
+    :param body: body to send in message
     :return:
     """
-    # body = {
-    #     "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-    #     "UserName": "alice",
-    #     "OrderNumber": 0,
-    #     "City": "Redmond",
-    #     "Street": "15703 NE 61st Ct",
-    #     "State": "WA",
-    #     "Country": "U.S.",
-    #     "ZipCode": "98052",
-    #     "CardNumber": "4012888888881881",
-    #     "CardHolderName": "Alice Smith",
-    #     "CardExpiration": "2024-12-31T22:00:00Z",
-    #     "CardSecurityNumber": "123",
-    #     "CardTypeId": 1,
-    #     "Buyer": None,
-    #     "RequestId": str(uuid.uuid4()),
-    #     "Basket": {
-    #         "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-    #         "Items": [
-    #             {
-    #                 "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
-    #                 "ProductId": 1,
-    #                 "ProductName": ".NET Bot Black Hoodie",
-    #                 "UnitPrice": 19.5,
-    #                 "OldUnitPrice": 0,
-    #                 "Quantity": 1,
-    #                 "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
-    #             }
-    #         ]
-    #     },
-    #     "Id": str(uuid.uuid4()),
-    #     "CreationDate": "2023-03-04T14:20:24.4730559Z"
-    # }
-    # rabbit_mq_publish(os.getenv('CREATE_ORDER_ROUTING_KEY'), body)
     try:
-        if x_requestid is None:
-            raise Exception('Unique order id is None.')
-        if order_name_json is None:
-            raise Exception('Order name to create is None.')
-        # Getting order to create from json data
-        body = Data.get_json_order(order_name_json, x_requestid)
+        if body is None:
+            raise Exception('Message body is None.')
         # Sending message to RabbitMQ queue Ordering
         rabbit_mq_publish(os.getenv('CREATE_ORDER_ROUTING_KEY'), body)
         return True
@@ -188,5 +148,12 @@ def payment_failed(order_id, x_requestid=None):
 
 
 if __name__ == '__main__':
-    order_unique_id = str(uuid.uuid4())
-    create_order(order_unique_id, 'alice_normal_order')
+    order_uuid = str(uuid.uuid4())
+    datareader = JSONDataReader()
+    # body = datareader.get_json_order('alice_normal_order', order_uuid)   # normal order
+    # create_order(body)  # normal order
+    # body = datareader.get_json_order('alice_order_empty_list', order_uuid)  # empty list
+    # create_order(body)  # empty list
+    body = datareader.get_json_order('alice_order_0_quantity', order_uuid)  # 0 quantity
+    create_order(body)  # 0 quantity
+    pass

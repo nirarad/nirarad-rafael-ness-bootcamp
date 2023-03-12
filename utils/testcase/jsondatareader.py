@@ -1,15 +1,17 @@
 import json
 import os
+import pprint
 import uuid
 
 from dotenv import load_dotenv
 
 
-class JSONDatagetter(object):
+class JSONDataReader(object):
     # Data getter for order in json file
     load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
 
     def __init__(self):
+        self.orders = None
         self.order = None
         self.filepath = os.getenv('ORDERS_PATH')
 
@@ -41,8 +43,35 @@ class JSONDatagetter(object):
             raise Exception('Orders JSON file path not found.')
         return self.order
 
+    def get_json_all_orders(self):
+        """
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: get_json_order
+        Description: 1.Function loads JSON ORDER DATA.
+                     2.Searching order for all orders.
+                     3.Inserting in order unique id and Order unique id
+                     4.Returning full proper orders.
+        :return: full order with ids
+        """
+        self.orders = []
+        if self.filepath is not None:
+            with open(self.filepath, 'r') as f:
+                data = json.load(f)
+                for e in data:
+                    data[e]['Id'] = str(uuid.uuid4())
+                    data[e]['RequestId'] = str(uuid.uuid4())
+                    self.orders.append(data[e])
+        else:
+            raise Exception('Orders JSON file path not found.')
+        if len(self.orders) < 1:
+            raise Exception('List of orders is empty.')
+        return self.orders
+
 
 if __name__ == '__main__':
-    d = JSONDatagetter()
-    order = d.get_json_order('alice_normal_order', str(uuid.uuid4()))
-    print(order)
+    d = JSONDataReader()
+    # order = d.get_json_order('alice_normal_order', str(uuid.uuid4()))
+    # print(order)
+    orders = d.get_json_all_orders()
+    pprint.pp(orders)
