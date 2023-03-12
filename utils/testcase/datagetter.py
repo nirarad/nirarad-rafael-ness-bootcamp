@@ -5,7 +5,8 @@ import uuid
 from dotenv import load_dotenv
 
 
-class Datareader:
+class Datagetter:
+    # Data getter for order in json file
 
     def __init__(self):
         load_dotenv('../../tests/DATA/.env.test')
@@ -42,6 +43,6 @@ class Datareader:
 
 
 if __name__ == '__main__':
-    d = Datareader()
+    d = Datagetter()
     order = d.get_json_order('normal_alice_order', str(uuid.uuid4()))
     print(order)
