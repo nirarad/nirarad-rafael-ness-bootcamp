@@ -5,6 +5,9 @@ import json
 from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.rabbit_messages import RabbitMessages
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
+#from utils.api.ordering_api import BearerTokenizer
+from utils.api.ordering_api import OrderingAPI
+from utils.api.bearer_tokenizer import BearerTokenizer
 from utils.rabbitmq.rabbitmq_receive import *
 from time import sleep
 
@@ -14,6 +17,10 @@ from time import sleep
 @pytest.fixture()
 def messages():
     return RabbitMessages()
+
+@pytest.fixture()
+def order_api():
+    return OrderingAPI()
 
 @pytest.fixture()
 def rabbitsend():
@@ -32,6 +39,10 @@ def test_MSS(messages,rabbitsend):
 
                 mq.consume('Basket', callback)
                 assert returnglob() == 'OrderStartedIntegrationEvent'
+
+                mq.consume('Ordering.signalrhub', callback)
+                assert returnglob() == 'OrderStatusChangedToSubmittedIntegrationEvent'
+
                 orderstatus = conn.select_query('select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
                 assert orderstatus[0]['OrderStatusId'] == 1
 
@@ -40,8 +51,15 @@ def test_MSS(messages,rabbitsend):
                 orderstatus = conn.select_query('select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
                 assert orderstatus[0]['OrderStatusId'] == 2
 
+                mq.consume('Ordering.signalrhub', callback)
+                assert returnglob() == 'OrderStatusChangedToAwaitingValidationIntegrationEvent'
+
                 body=messages.stockconfirmed()
                 mq.publish(exchange='eshop_event_bus', routing_key='OrderStockConfirmedIntegrationEvent',body=json.dumps(body))
+
+                mq.consume('Ordering.signalrhub', callback)
+                assert returnglob() == 'OrderStatusChangedToStockConfirmedIntegrationEvent'
+
                 mq.consume('Payment', callback)
                 assert returnglob() == 'OrderStatusChangedToStockConfirmedIntegrationEvent'
                 orderstatus = conn.select_query('select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
@@ -49,6 +67,9 @@ def test_MSS(messages,rabbitsend):
 
                 body = messages.paymentsuccses()
                 mq.publish(exchange='eshop_event_bus', routing_key='OrderPaymentSucceededIntegrationEvent', body=json.dumps(body))
+
+                mq.consume('Ordering.signalrhub', callback)
+                assert returnglob() == 'OrderStatusChangedToPaidIntegrationEvent'
 
                 mq.consume('Catalog', callback)
                 assert returnglob() == 'OrderStatusChangedToPaidIntegrationEvent'
@@ -74,7 +95,13 @@ def test_outofstock(messages):
             mq.consume('Basket', callback)
             assert returnglob() == 'OrderStartedIntegrationEvent'
 
+            mq.consume('Ordering.signalrhub', callback)
+            assert returnglob() == 'OrderStatusChangedToSubmittedIntegrationEvent'
+
             mq.consume('Catalog', callback)
+            assert returnglob() == 'OrderStatusChangedToAwaitingValidationIntegrationEvent'
+
+            mq.consume('Ordering.signalrhub', callback)
             assert returnglob() == 'OrderStatusChangedToAwaitingValidationIntegrationEvent'
 
             body=messages.stockreject()
@@ -107,15 +134,25 @@ def test_paymentfail(messages):
                 'select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
             assert orderstatus[0]['OrderStatusId'] == 1
 
+            mq.consume('Ordering.signalrhub', callback)
+            assert returnglob() == 'OrderStatusChangedToSubmittedIntegrationEvent'
+
             mq.consume('Catalog', callback)
             assert returnglob() == 'OrderStatusChangedToAwaitingValidationIntegrationEvent'
             orderstatus = conn.select_query('select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
             assert orderstatus[0]['OrderStatusId'] == 2
 
+            mq.consume('Ordering.signalrhub', callback)
+            assert returnglob() == 'OrderStatusChangedToAwaitingValidationIntegrationEvent'
+
 
             body = messages.stockconfirmed()
             mq.publish(exchange='eshop_event_bus', routing_key='OrderStockConfirmedIntegrationEvent',
                        body=json.dumps(body))
+
+            mq.consume('Ordering.signalrhub', callback)
+            assert returnglob() == 'OrderStatusChangedToStockConfirmedIntegrationEvent'
+
             mq.consume('Payment', callback)
             assert returnglob() == 'OrderStatusChangedToStockConfirmedIntegrationEvent'
             orderstatus = conn.select_query(
@@ -131,4 +168,62 @@ def test_paymentfail(messages):
             orderstatus = conn.select_query('select OrderStatusId from ordering.orders where Id = (select max(id) from ordering.orders)')
     assert result[0][''] == ordersnum[0][''] + 1
     assert orderstatus[0]['OrderStatusId'] == 6
+
+
+
+@pytest.mark.test_update_order_to_shiped
+def test_update_order_to_shiped(order_api):
+        with MSSQLConnector() as conn:
+            orderid=conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 4')
+            orderid=orderid[0]['']
+            order_api.update_to_shiped(orderid)
+            newstatus=conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+        assert newstatus[0]['OrderStatusId']==5
+
+@pytest.mark.test_cancel_order_status_2
+def test_cancel_order_status_2(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
+        orderid = orderid[0]['']
+        order_api.cancel_order(orderid)
+        newstatus=conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+    assert newstatus[0]['OrderStatusId'] == 6
+
+
+@pytest.mark.test_cancel_order_status_3
+def test_cancel_order_status_3(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 3')
+        orderid = orderid[0]['']
+        order_api.cancel_order(orderid)
+        newstatus=conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+    assert newstatus[0]['OrderStatusId'] == 6
+
+@pytest.mark.test_cancel_order_status_4_fail
+def test_cancel_order_status_4_fail(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 4')
+        orderid = orderid[0]['']
+        order_api.cancel_order(orderid)
+        newstatus=conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+    assert newstatus[0]['OrderStatusId'] == 4
+
+@pytest.mark.test_cancel_order_status_5_fail
+def test_cancel_order_status_5_fail(order_api):
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 5')
+        orderid = orderid[0]['']
+        order_api.cancel_order(orderid)
+        newstatus=conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+    assert newstatus[0]['OrderStatusId'] == 5
+
+
+# def test_update_order_to_shiped_fail(order_api):
+#     with MSSQLConnector() as conn:
+#         orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 3')
+#         orderid = orderid[0]['']
+#         order_api.update_to_shiped(orderid)
+#         newstatus = conn.select_query(f'SELECT OrderStatusId from ordering.orders where Id = {orderid}')
+#         assert newstatus[0]['OrderStatusId'] == 5
+
 

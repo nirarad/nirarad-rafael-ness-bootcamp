@@ -1,7 +1,8 @@
 import json
 import uuid
 import requests
-from bearer_tokenizer import BearerTokenizer
+from utils.api.bearer_tokenizer import BearerTokenizer
+from utils.db.db_utils import *
 
 
 class OrderingAPI:
@@ -15,44 +16,44 @@ class OrderingAPI:
         order = requests.get(f'{self.base_url}/api/v1/orders/{order_id}', headers=self.headers)
         return order
 
-    def update5(self,order_id):
-        auto=self.headers
+    def update_to_shiped(self,order_id):
         headers = {
                     'Authorization':f'Bearer {BearerTokenizer().bearer_token}',
                     'Content-Type': 'application/json',
                     'x-requestid': str(uuid.uuid4())
                   }
-        print(headers)
-        #self.headers['Content-Type'] = 'application/json'
-        #self.headers['x-requestid'] = str(uuid.uuid4())
-        print(self.headers)
         endpoint = f'{self.base_url}/ordering-api/api/v1/Orders/ship'
         self.body = {"orderNumber": order_id}
-        print(self.body)
         requests.put(url=endpoint, data=json.dumps(self.body),headers=headers)
 
-        # self.headers['Content-Type'] = 'application/json'
-        # self.headers['x-requestid'] = str(uuid.uuid4())
-        # if not str(order_id).isnumeric():
-        #     raise ValueError("order id have to be a number")
-        # try:
-        #     endpoint = f'{self.base_url}/ordering-api/api/v1/Orders/ship'
-        #     self.body = {"orderNumber": order_id}
-        #     response = requests.put(url=endpoint, data=json.dumps(self.body), headers=self.headers)
-        # except requests.exceptions.RequestException as e:
-        #     raise SystemExit(e)
-        # return response
+    def cancel_order(self,order_id):
+        headers = {
+                    'Authorization': f'Bearer {BearerTokenizer().bearer_token}',
+                    'Content-Type': 'application/json',
+                    'x-requestid': str(uuid.uuid4())
+                  }
+        endpoint = f'{self.base_url}/ordering-api/api/v1/Orders/cancel'
+        self.body = {"orderNumber": order_id}
+        requests.put(url=endpoint, data=json.dumps(self.body), headers=headers)
+
+    def status(self):
+        response = requests.get(self.base_url, headers=self.headers)
+        return response.status_code
 
 
-        # body = "{" \
-        #         "\"orderNumber\": " +order_id+ \
-        #         "}"
-        #requests.put('http://host.docker.internal:5102/ordering-api/api/v1/Orders/ship',data=json.dumps(body),headers=headers)
 
 
 if __name__ == '__main__':
     import pprint
     api = OrderingAPI()
-    pprint.pprint(api.get_order_by_id(21).json())
-    api.update5(28)
+
+    #pprint.pprint(api.get_order_by_id(21).json())
+    with MSSQLConnector() as conn:
+        orderid = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
+        #print(orderid[0][''])
+        orderid=orderid[0]['']
+
+    api.cancel_order(orderid)
+    #print(api.status())
+    #api.cancel_order(44)
 
