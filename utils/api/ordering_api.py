@@ -1,4 +1,5 @@
 import requests
+
 from bearer_tokenizer import BearerTokenizer
 
 
@@ -12,8 +13,19 @@ class OrderingAPI:
         order = requests.get(f'{self.base_url}/api/v1/orders/{order_id}', headers=self.headers)
         return order
 
+    def cancel_order(self, order_number):
+        data = {"orderNumber": order_number}
+        response = requests.put(f'{self.base_url}/api/v1/orders/cancel', headers=self.headers)
+        return response
+
+    def ship_order(self, order_number):
+        data = {"orderNumber": order_number}
+        response = requests.put(f'{self.base_url}/api/v1/orders/ship', headers=self.headers)
+        return response
+
 
 if __name__ == '__main__':
     import pprint
+
     api = OrderingAPI()
     pprint.pprint(api.get_order_by_id(1).json())

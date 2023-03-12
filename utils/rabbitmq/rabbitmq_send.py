@@ -50,6 +50,12 @@ class RabbitMQ:
     def purge_queue(self, queue_name):
         self.channel.queue_purge(queue_name)
 
+    def get_all_queues_names(self):
+        queues = []
+        for queue in self.channel.get_queue(''):
+            queues.append(queue.method)
+        return queues
+
     def read_first_message(self, queue_name):
         try:
             method_frame, header_frame, body = self.channel.basic_get(queue_name, auto_ack=True)

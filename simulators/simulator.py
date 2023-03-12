@@ -27,7 +27,7 @@ class Simulator(ABC):
         super().__init__()
         self.queue = queue
 
-    def get_first_message(self, timeout=100):
+    def get_first_message(self, timeout=300):
         """
         Method which reads the first messages from the given queue.
         Returns:
@@ -75,6 +75,31 @@ class Simulator(ABC):
                 status_id = 2
             elif self.queue == 'Payment':
                 status_id = 4
+        try:
+            with MSSQLConnector() as conn:
+                for i in range(timeout):
+                    counter = len(conn.select_query(
+                        # In the below query, we fetch the last user order (max order id), and check if it's OrderStatusID is equals to 1.
+                        "SELECT o.OrderStatusId "
+                        "FROM ordering.orders o "
+                        f"WHERE o.OrderStatusId = {status_id} "
+                        f"and o.Id = {Simulator.CURRENT_ORDER_ID}"))
+                    if counter > 0:
+                        return True
+                    else:
+                        time.sleep(1)
+                return False
+        except ConnectionError as c:
+            raise f'There were problem to retrieve the status id.\nException is: {c}'
+
+    @staticmethod
+    def purge_all_queues(queues_list):
+        for q in queues_list:
+            with RabbitMQ() as mq:
+                mq.purge_queue(q)
+
+    @staticmethod
+    def implicit_status_id_validation(status_id, timeout=300):
         try:
             with MSSQLConnector() as conn:
                 for i in range(timeout):

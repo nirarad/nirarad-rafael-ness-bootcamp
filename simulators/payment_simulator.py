@@ -24,7 +24,7 @@ class PaymentSimulator(Simulator):
         """
         # The payment simulator sends to the ordering queue the payment validation message.
         self.send_message(body=body, routing_key=os.environ["PAYMENT_TO_ORDER_ROUTING_KEY_VALID"])
-        print("Message Route: Catalog -> Ordering. Routing Key: OrderStatusChangedToStockConfirmedIntegrationEvent")
+        print("Message Route: Payment -> Ordering. Routing Key: OrderPaymentSucceededIntegrationEvent")
 
     def inform_payment_process_failed(self, body):
         """
@@ -35,6 +35,6 @@ class PaymentSimulator(Simulator):
         # The catalog simulator sends to the ordering queue the stock validation failure message.
         self.send_message(body=body, routing_key=os.environ["PAYMENT_TO_ORDER_ROUTING_KEY_INVALID"])
 
-    def verify_status_id_is_paid(self, timeout=150):
+    def verify_status_id_is_paid(self, timeout=300):
         return self.verify_state_status_id(timeout=timeout)
 
