@@ -37,7 +37,6 @@ if __name__ == '__main__':
     dm.start('eshop/identity.api:linux-latest')
     dm.start('mcr.microsoft.com/mssql/server:2019-latest')
     dm.start('rabbitmq:3-management-alpine')
-    dm.start('eshop/basket.api:linux-latest')
 
 
     #dm.pause('eshop/ordering.api:linux-latest')
