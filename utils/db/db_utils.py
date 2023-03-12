@@ -1,14 +1,19 @@
 import pyodbc
+import os
+from dotenv import load_dotenv
 
 
 class MSSQLConnector:
-    def __init__(self, database='OrderingDb'):
-        self.SERVER = '127.0.0.1,5433'
-        self.USER = 'sa'
-        self.PASSWORD = 'Pass@word'
-        self.DATABASE = f'Microsoft.eShopOnContainers.Services.{database}'
-        self.DRIVER = '{SQL Server}'
-        self.connection_str = f"Driver={self.DRIVER};Server={self.SERVER};Database={self.DATABASE};UID={self.USER};PWD={self.PASSWORD};TrustServerCertificate=yes"
+
+    def __init__(self):
+        load_dotenv('../../tests/DATA/.env.test')
+        self.SERVER = str(os.getenv('SERVER'))
+        self.USER = os.getenv('USER')
+        self.PASSWORD = os.getenv('PASSWORD')
+        self.DATABASE = os.getenv('DATABASE')
+        self.DRIVER = os.getenv('DRIVER')
+        self.connection_str = f"Driver={self.DRIVER};Server={self.SERVER};" \
+                              f"Database={self.DATABASE};UID={self.USER};PWD={self.PASSWORD};TrustServerCertificate=yes"
         self.conn = None
 
     def __enter__(self):
@@ -51,7 +56,10 @@ class MSSQLConnector:
         cursor = self.conn.cursor()
         cursor.execute(query)
         last_order_id = cursor.fetchall()
-        return last_order_id[0][0]
+        if len(last_order_id) > 0:
+            return last_order_id[0][0]
+        else:
+            return -1
 
     def close(self):
         self.conn.close()
