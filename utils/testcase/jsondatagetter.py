@@ -5,11 +5,11 @@ import uuid
 from dotenv import load_dotenv
 
 
-class JSONDatagetter:
+class JSONDatagetter(object):
     # Data getter for order in json file
+    load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
 
     def __init__(self):
-        load_dotenv('../../tests/DATA/.env.test')
         self.order = None
         self.filepath = os.getenv('ORDERS_PATH')
 
@@ -44,5 +44,5 @@ class JSONDatagetter:
 
 if __name__ == '__main__':
     d = JSONDatagetter()
-    order = d.get_json_order('normal_alice_order', str(uuid.uuid4()))
+    order = d.get_json_order('alice_normal_order', str(uuid.uuid4()))
     print(order)

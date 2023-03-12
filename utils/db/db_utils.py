@@ -61,6 +61,14 @@ class MSSQLConnector:
         else:
             return -1
 
+    def delete_order_in_db(self,db_order_id):
+        query = f'delete FROM [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders]' \
+                f' where Id = {db_order_id}'
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        cursor.commit()
+        return True
+
     def close(self):
         self.conn.close()
 

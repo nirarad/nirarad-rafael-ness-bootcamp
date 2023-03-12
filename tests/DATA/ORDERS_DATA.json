@@ -14,7 +14,7 @@
         "CardExpiration": "2024-12-31T22:00:00Z",
         "CardSecurityNumber": "123",
         "CardTypeId": 1,
-        "Buyer": 11,
+        "Buyer": "",
         "RequestId": 0,
         "Basket": {
             "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",

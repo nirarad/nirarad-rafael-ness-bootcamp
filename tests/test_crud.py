@@ -60,7 +60,7 @@ class TestCRUD(unittest.TestCase):
             last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
             print(last_order_record_in_db)
             # Sending message to RabbitMQ to Ordering queue to create order
-            create_order(self.order_uuid)
+            create_order(self.order_uuid, 'alice_normal_order')
             # Wait until ordering creates order in DB
             start_time = time.time()
             while True:
@@ -321,5 +321,42 @@ class TestCRUD(unittest.TestCase):
             raise
 
     # TC007
-    def test_get_order_details(self):
-        pass
+    def test_cancel_order_v6(self):
+        """
+        TC_ID: TC007
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_cancel_order_v6
+        Description: Function tests Ordering api cancel request when order not existing.
+                     1. Sends message to RabbitMQ queue to create order.
+                     2. Validates order creation in DB with status 1.
+                     3. Delete order from DB.
+                     4. Cancels order in DB.
+                     5. Validates response status 400.
+        """
+        try:
+
+            # Order creation
+            self.test_create_order()
+
+            # Deleting the order
+            self.conn.delete_order_in_db(self.new_order_id)
+
+            # Validate deleting
+            last_order = self.conn.get_last_order_record_id_in_db()
+            self.assertNotEqual(last_order, self.new_order_id)
+            self.logger.info(
+                f'{self.test_cancel_order_v1.__doc__}Response to cancel status -> '
+                f'Actual:  {last_order} , Expected: not {self.new_order_id}')
+
+            # Cancel via mocker the order that not exists yet
+            # Ordering api sends request to cancel order
+            cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
+            # Response validation must be 200
+            self.assertEqual(cancel_response.status_code, 400)
+            self.logger.info(
+                f'{self.test_cancel_order_v1.__doc__}Response to cancel status -> '
+                f'Actual:  {cancel_response.status_code} , Expected:{400}')
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_cancel_order_v1.__doc__}{e}")
+            raise
