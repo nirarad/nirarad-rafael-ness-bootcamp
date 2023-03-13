@@ -62,7 +62,7 @@ class Basket(object):
 
         def callback(ch, method, properties, body):
             self.log.send(
-                f"\n\n[{ch}]\n\n Method: {method},\n\n Properties: {properties},\n\n Body: {body}\n\n method manipulate {method.routing_key}")
+                f"\n\ncomponent: Basket\n\n[{ch}]\n\n Method: {method},\n\n Properties: {properties},\n\n Body: {body}\n\n ----------------")
 
             if len(str(method)) > 0 or self.count == 0:
                 self.routing_key_basket_get = method.routing_key
