@@ -3,10 +3,9 @@ import os
 import uuid
 
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
-from utils.testcase.jsondatareader import JSONDataReader
 from dotenv import load_dotenv
 
-
+# For local running ONLY!
 load_dotenv('../../tests/DATA/.env.test')
 
 
@@ -37,7 +36,7 @@ def create_order(body_to_send):
         raise
 
 
-def confirm_stock(order_id, x_requestid=None):
+def confirm_stock(order_id, x_requestid, date):
     """
     Name: Artsyom Sharametsieu
     Date: 05.03.2023
@@ -46,6 +45,7 @@ def confirm_stock(order_id, x_requestid=None):
                  1.Sends message to RabbitMQ queue Ordering that items in stock
                  P.S:
                  It is response message for request of Ordering service to check items in stock.
+    :param date: server generated date
     :param order_id: autoincremented order id in db
     :param x_requestid: unique id of order generated from outside
     :return: True
@@ -53,13 +53,13 @@ def confirm_stock(order_id, x_requestid=None):
     body = {
         "OrderId": order_id,
         "Id": x_requestid,
-        "CreationDate": "2023-03-05T14:52:24.705823Z"
+        "CreationDate": date
     }
     rabbit_mq_publish(os.getenv('CONFIRM_STOCK_ROUTING_KEY'), body)
     return True
 
 
-def reject_stock(order_id, x_requestid=None):
+def reject_stock(order_id, x_requestid, date):
     """
     Name: Artsyom Sharametsieu
     Date: 05.03.2023
@@ -68,6 +68,7 @@ def reject_stock(order_id, x_requestid=None):
                  1.Sends message to RabbitMQ queue Ordering that items not in stock
                  P.S:
                  It is response message for request of Ordering service to check items in stock.
+    :param date: server generated date
     :param order_id: autoincremented order id in db
     :param x_requestid: unique id of order generated from outside
     :return: True
@@ -81,7 +82,7 @@ def reject_stock(order_id, x_requestid=None):
             }
         ],
         "Id": x_requestid,
-        "CreationDate": "2023-03-05T15:51:11.5458796Z"
+        "CreationDate": date
     }
     rabbit_mq_publish(os.getenv('REJECT_STOCK_ROUTING_KEY'), body)
     return True
@@ -110,25 +111,27 @@ def payment_succeeded(order_id, x_requestid, date):
     rabbit_mq_publish(os.getenv('PAYMENT_SUCCEEDED_ROUTING_KEY'), body_to_send)
 
 
-def payment_failed(order_id, x_requestid=None):
+def payment_failed(order_id, x_requestid, date):
     """
     Name: Artsyom Sharametsieu
     Date: 05.03.2023
-    Function Name: payment_succeeded
+    Function Name: payment_failed
     Description: Function of Payment simulator.
                  1.Sends message to RabbitMQ queue Ordering that order payment failed.
                  P.S:
                  It is response message for request of Ordering service to order payment.
+    :param date: order date,must be the same as in order,cause live processing
     :param order_id: autoincremented order id in db
     :param x_requestid: unique id of order generated from outside
     :return: True
     """
+    load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
     body = {
         "OrderId": order_id,
         "OrderStatus": "stockconfirmed",
         "BuyerName": "alice",
         "Id": x_requestid,
-        "CreationDate": "2023-03-05T17:07:35.6306122Z"
+        "CreationDate": date
     }
     rabbit_mq_publish(os.getenv('PAYMENT_FAILED_ROUTING_KEY'), body)
 

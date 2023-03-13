@@ -74,7 +74,7 @@ class TestCRUD(unittest.TestCase):
                 message_body = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
             # Sending message to RabbitMQ to Ordering queue to create order
             create_order(message_body)
-            # Wait until ordering creates order in DB
+            # Explicit wait until ordering creates order in DB
             start_time = time.time()
             while True:
                 # Getting last order id
@@ -121,7 +121,7 @@ class TestCRUD(unittest.TestCase):
             message_body = self.jdata_orders.get_json_order('alice_order_empty_list', self.order_uuid)
             # Sending message to RabbitMQ to Ordering queue to create order
             create_order(message_body)
-            # Wait until ordering creates order in DB
+            # Explicit wait until ordering creates order in DB
             start_time = time.time()
             while True:
                 # Getting last order id
@@ -166,7 +166,7 @@ class TestCRUD(unittest.TestCase):
             message_body = self.jdata_orders.get_json_order('alice_order_0_quantity', self.order_uuid)
             # Sending message to RabbitMQ to Ordering queue to create order
             create_order(message_body)
-            # Wait until ordering creates order in DB
+            # Explicit wait until ordering creates order in DB
             start_time = time.time()
             while True:
                 # Getting last order id
@@ -210,6 +210,7 @@ class TestCRUD(unittest.TestCase):
             # Cancel via mocker the order in status 1 (submitted)
             # Ordering api sends request to cancel order
             cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
+            # Wait sec
             # Response validation must be 200
             self.assertEqual(cancel_response.status_code, 200)
             self.logger.info(
@@ -263,11 +264,7 @@ class TestCRUD(unittest.TestCase):
             self.logger.info(
                 f'{self.test_cancel_order_v2.__doc__}Response to cancel status -> '
                 f'Actual:  {cancel_response.status_code} , Expected:{200}')
-            # start_time = time.time()
-            # while True:
-            #     if time.time() - start_time > 5:
-            #         break
-            #     time.sleep(0.1)
+
             # Validation status canceled in DB
             # Get current status of the order
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
