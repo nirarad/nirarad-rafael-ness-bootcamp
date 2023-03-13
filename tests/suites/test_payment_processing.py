@@ -1,4 +1,6 @@
-from tests.scenarios.scenarios import *
+import pytest
+
+from tests.scenarios.scenarios_1 import *
 
 
 @pytest.mark.payment_processing
@@ -13,11 +15,11 @@ def test_payment_validation_process():
     Source Test Case Traceability: 3.1
      """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run Steps 2-3
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run Steps 4-5
-    test_payment_confirmation_scenario()
+    assert payment_confirmation_scenario()
 
 
 @pytest.mark.payment_processing
@@ -32,11 +34,11 @@ def test_payment_rejection_process(purge_all_queues):
     Source Test Case Traceability: 3.2
      """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run Steps 2-3
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run Steps 4-5
-    test_payment_confirmation_scenario()
+    assert payment_confirmation_scenario()
 
 
 @pytest.mark.payment_processing

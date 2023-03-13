@@ -1,4 +1,28 @@
-from tests.scenarios.scenarios import *
+import pytest
+
+from tests.scenarios.scenarios_1 import *
+
+
+@pytest.mark.order_management
+@pytest.mark.main_sucsess_scenario
+def test_mss_1():
+    """
+    Source Test Case Title: Verify the main success scenario for creating order is valid.
+
+    Source Test Case Purpose: Verify that the submitting order functionality of the service is working.
+
+    Source Test Case ID:1
+
+    Source Test Case Traceability: 1.1.1
+    """
+    # Run steps 1-2
+    assert order_submission_scenario()
+    # Run steps 3-5
+    assert catalog_stock_confirmation_scenario()
+    # Run steps 5-6
+    assert payment_confirmation_scenario()
+    # Run step 7
+    assert ship_api_request_scenario()
 
 
 @pytest.mark.order_management
@@ -14,13 +38,13 @@ def test_mss():
     Source Test Case Traceability: 1.1.1
     """
     # Run steps 1-2
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run steps 3-5
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run steps 5-6
-    test_payment_confirmation_scenario()
+    assert payment_confirmation_scenario()
     # Run step 7
-    test_ship_api_request_scenario()
+    assert ship_api_request_scenario()
 
 
 @pytest.mark.order_management
@@ -36,7 +60,7 @@ def test_user_can_submit_an_order():
     Source Test Case Traceability: 1.2.1
     """
     # Run Step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
 
 
 @pytest.mark.order_management
@@ -52,9 +76,9 @@ def test_user_can_cancel_order_on_status_1():
     Source Test Case Traceability: 1.3.1, 5.4
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2
-    test_cancel_api_request_scenario()
+    assert cancel_api_request_scenario()
 
 
 @pytest.mark.order_management
@@ -70,11 +94,11 @@ def test_user_can_cancel_order_on_status_2():
     Source Test Case Traceability: 1.3.2, 5.4
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2 - Verify that the catalog queue received from the ordering service the correct message.
     assert Simulator.explicit_status_id_validation(status_id=2, timeout=300)
     # Run step 3
-    test_cancel_api_request_scenario()
+    assert cancel_api_request_scenario()
 
 
 @pytest.mark.order_management
@@ -90,11 +114,11 @@ def test_user_can_cancel_order_on_status_3():
     Source Test Case Traceability: 1.3.3, 5.4
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run step 3
-    test_cancel_api_request_scenario()
+    assert cancel_api_request_scenario()
 
 
 @pytest.mark.order_management
@@ -110,13 +134,13 @@ def test_user_can_not_cancel_order_on_status_4():
     Source Test Case Traceability: 1.3.4
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run Steps 2-3
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run Steps 4-5
-    test_payment_confirmation_scenario()
+    assert payment_confirmation_scenario()
     # Run step 6
-    test_cancel_api_request_scenario(status_code=400, timeout=100)
+    assert cancel_api_request_scenario(status_code=400, timeout=100)
     assert Simulator.explicit_status_id_validation(status_id=4, timeout=100)
 
 
@@ -133,15 +157,15 @@ def test_user_can_not_cancel_order_on_status_5():
     Source Test Case Traceability: 1.3.5
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run steps 2-3
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run steps 4-5
-    test_payment_confirmation_scenario()
+    assert payment_confirmation_scenario()
     # Run step 6
-    test_ship_api_request_scenario()
+    assert ship_api_request_scenario()
     # Run step 7
-    test_cancel_api_request_scenario(status_code=400)
+    assert cancel_api_request_scenario(status_code=400)
     assert Simulator.explicit_status_id_validation(status_id=5, timeout=100)
 
 
@@ -158,13 +182,13 @@ def test_user_can_ship_order_on_status_4():
     Source Test Case Traceability: 1.4.1, 5.5
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run steps 2-3
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run steps 4-5
-    test_payment_confirmation_scenario()
+    assert payment_confirmation_scenario()
     # Run step 6
-    test_ship_api_request_scenario()
+    assert ship_api_request_scenario()
 
 
 @pytest.mark.order_management
@@ -180,9 +204,9 @@ def test_user_can_not_ship_order_on_status_1():
     Source Test Case Traceability: 1.4.2
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2
-    test_ship_api_request_scenario(status_code=400)
+    assert ship_api_request_scenario(status_code=400)
 
 
 @pytest.mark.order_management
@@ -198,11 +222,11 @@ def test_user_can_not_ship_order_on_status_2():
     Source Test Case Traceability: 1.4.3
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2
     assert Simulator.explicit_status_id_validation(status_id=2, timeout=100)
     # Run step 3
-    test_ship_api_request_scenario(status_code=400)
+    assert ship_api_request_scenario(status_code=400)
     assert Simulator.explicit_status_id_validation(status_id=2, timeout=100)
 
 
@@ -219,11 +243,11 @@ def test_user_can_not_ship_order_on_status_3():
     Source Test Case Traceability: 1.4.4
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2
-    test_catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run step 3
-    test_ship_api_request_scenario(400)
+    assert ship_api_request_scenario(400)
     # Run step 4
     assert Simulator.explicit_status_id_validation(status_id=3, timeout=100)
 
@@ -241,9 +265,9 @@ def test_user_can_not_ship_order_on_status_6():
     Source Test Case Traceability: 1.4.5
     """
     # Run step 1
-    test_order_submission_scenario()
+    assert order_submission_scenario()
     # Run step 2
-    test_cancel_api_request_scenario()
+    assert cancel_api_request_scenario()
     # Run step 3
-    test_ship_api_request_scenario(400)
+    assert ship_api_request_scenario(400)
     assert Simulator.explicit_status_id_validation(status_id=6, timeout=50)

@@ -13,27 +13,6 @@ load_dotenv()
 
 # pytestmark = pytest.mark.skip(reason="Scenario function which meant to serve other tests.")
 
-def order_submission_scenario():
-    # Preparing test environment
-    result = False
-    basket_mock = BasketSimulator()
-    mg = MessageGenerator()
-    basket_to_ordering_msg = mg.basket_to_order()
-
-    # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
-    basket_mock.create_order(basket_to_ordering_msg["input"])
-
-    # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
-    actual_message = basket_mock.get_first_message()['UserId']
-    expected_message = basket_to_ordering_msg["output"]['UserId']
-    if actual_message == expected_message:
-        result = True
-
-    # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
-    if basket_mock.verify_status_id_is_submitted():
-        result = True
-    return result
-
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_order_submission_scenario():
