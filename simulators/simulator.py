@@ -37,13 +37,11 @@ class Simulator(ABC):
             with RabbitMQ() as mq:
                 actual_message = None
                 for i in range(timeout):
-                    time.sleep(1)
                     if actual_message is None:
                         actual_message = mq.read_first_message(self.queue)
+                        time.sleep(1)
                     else:
                         return actual_message
-
-
         except ValueError as v:
             print(v)
         except BaseException as b:

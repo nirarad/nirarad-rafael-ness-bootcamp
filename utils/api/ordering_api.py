@@ -27,7 +27,7 @@ class OrderingAPI:
 
     def ship_order(self, order_number):
         payload = {"orderNumber": order_number}
-        return requests.put(f'{self.base_url}/api/v1/orders/cancel', json=payload,
+        return requests.put(f'{self.base_url}/api/v1/orders/ship', json=payload,
                             headers=self.headers)
 
     def get_order_by_id_invalid_auth(self, order_id):
@@ -51,4 +51,4 @@ class OrderingAPI:
 
 if __name__ == '__main__':
     od = OrderingAPI()
-    print(od.cancel_order(1754))
+    print(od.ship_order(2298))

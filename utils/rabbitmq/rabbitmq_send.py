@@ -37,7 +37,6 @@ class RabbitMQ:
         self.channel.basic_publish(exchange=exchange,
                                    routing_key=routing_key,
                                    body=body)
-        print(f"[{routing_key}] Sent '{body}'")
 
     def consume(self, queue):
         self.channel.basic_consume(queue=queue, on_message_callback=self.add_message_to_list, auto_ack=True)
