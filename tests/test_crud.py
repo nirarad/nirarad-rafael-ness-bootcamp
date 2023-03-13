@@ -28,8 +28,8 @@ class TestCRUD(unittest.TestCase):
         # Ordering API mocker
         cls.oam = OrderingAPI_Mocker()
 
-        # Unique id generator
-        cls.order_uuid = str(uuid.uuid4())
+        # Unique id generator handler
+        cls.order_uuid = None
 
         # Connection to DB
         cls.conn = MSSQLConnector()
@@ -44,7 +44,10 @@ class TestCRUD(unittest.TestCase):
         cls.jdata_orders_responses = JSONDataReader(os.getenv('RESPONSES_PATH'))
 
     def setUp(self) -> None:
+        # Reconnect
         self.conn.__enter__()
+        # Regenerate new unique id for next text
+        self.order_uuid = str(uuid.uuid4())
 
     @classmethod
     def tearDownClass(cls):
@@ -204,7 +207,6 @@ class TestCRUD(unittest.TestCase):
         try:
             # Order creation
             self.test_create_order()
-
             # Cancel via mocker the order in status 1 (submitted)
             # Ordering api sends request to cancel order
             cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
@@ -219,10 +221,10 @@ class TestCRUD(unittest.TestCase):
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(current_order_status, 6)
             self.logger.info(
-                f'{self.test_cancel_order_v1.__doc__}Order status in DB after cancel-> '
+                f'{self.test_cancel_order_v1.__doc__}Order Id {self.new_order_id} status in DB after cancel-> '
                 f'Actual:  {current_order_status} ,Expected:{6}')
         except Exception as e:
-            self.logger.exception(f"\n{self.test_cancel_order_v1.__doc__}{e}")
+            self.logger.exception(f"\n{self.test_cancel_order_v1.__doc__}{e} Order Id {self.new_order_id}")
             raise
 
     # TC005
@@ -261,16 +263,21 @@ class TestCRUD(unittest.TestCase):
             self.logger.info(
                 f'{self.test_cancel_order_v2.__doc__}Response to cancel status -> '
                 f'Actual:  {cancel_response.status_code} , Expected:{200}')
-
+            # start_time = time.time()
+            # while True:
+            #     if time.time() - start_time > 5:
+            #         break
+            #     time.sleep(0.1)
             # Validation status canceled in DB
             # Get current status of the order
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
+
             self.assertEqual(current_order_status, 6)
             self.logger.info(
-                f'{self.test_cancel_order_v2.__doc__}Order status in DB after cancel -> '
+                f'{self.test_cancel_order_v2.__doc__}Order Id {self.new_order_id} status in DB after cancel -> '
                 f'Actual:  {current_order_status} ,Expected:{6}')
         except Exception as e:
-            self.logger.exception(f"\n{self.test_cancel_order_v2.__doc__}{e}")
+            self.logger.exception(f"\n{self.test_cancel_order_v2.__doc__}{e} Order Id {self.new_order_id}")
             raise
 
     # TC_006
@@ -289,8 +296,36 @@ class TestCRUD(unittest.TestCase):
                      6. Validates order status is canceled in DB.
         """
         try:
-            # Order creation
-            self.test_create_order()
+            # Find last order id to compare if getting right order id,will be pre last after creating new order
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            # Message body to send
+            message_body = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
+            # Sending message to RabbitMQ to Ordering queue to create order
+            create_order(message_body)
+            # Wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.info(
+                        f'{self.test_create_order.__doc__}Order Id in DB -> Actual: ID {self.new_order_id} , '
+                        f'Expected: New Order Id')
+                    # Validate status order is 1
+                    current_status = self.conn.get_order_status_from_db(self.new_order_id)
+                    self.assertTrue(current_status, 1)
+                    self.logger.info(
+                        f'{self.test_create_order.__doc__} Order status in DB -> Actual: {current_status} ,'
+                        f' Expected: {1}')
+                    break
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    raise Exception("Record was not created")
+                # Updating timer
+                time.sleep(0.1)
 
             # Updating order status in DB to 3
             self.conn.update_order_db_status(self.new_order_id, 3)
