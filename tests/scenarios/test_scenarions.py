@@ -10,10 +10,10 @@ from utils.messages.messages_generator import MessageGenerator
 
 load_dotenv()
 
-pytestmark = pytest.mark.skip(reason="Scenario function which meant to serve other tests.")
+# pytestmark = pytest.mark.skip(reason="Scenario function which meant to serve other tests.")
 
 
-# @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
+@pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_order_submission_scenario():
     # Preparing test environment
     basket_mock = BasketSimulator()
@@ -32,7 +32,7 @@ def test_order_submission_scenario():
     assert basket_mock.verify_status_id_is_submitted()
 
 
-# @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
+@pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_catalog_stock_confirmation_scenario():
     # Preparing test environment
     catalog_mock = CatalogSimulator()
