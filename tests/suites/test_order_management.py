@@ -1,28 +1,6 @@
 import pytest
 
-from tests.scenarios.scenarios_1 import *
-
-
-@pytest.mark.order_management
-@pytest.mark.main_sucsess_scenario
-def test_mss_1():
-    """
-    Source Test Case Title: Verify the main success scenario for creating order is valid.
-
-    Source Test Case Purpose: Verify that the submitting order functionality of the service is working.
-
-    Source Test Case ID:1
-
-    Source Test Case Traceability: 1.1.1
-    """
-    # Run steps 1-2
-    assert order_submission_scenario()
-    # Run steps 3-5
-    assert catalog_stock_confirmation_scenario()
-    # Run steps 5-6
-    assert payment_confirmation_scenario()
-    # Run step 7
-    assert ship_api_request_scenario()
+from tests.scenarios.scenarios import *
 
 
 @pytest.mark.order_management

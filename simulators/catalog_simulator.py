@@ -37,6 +37,7 @@ class CatalogSimulator(Simulator):
        """
         # The catalog simulator sends to the ordering queue the stock validation failure message.
         self.send_message(body=body, routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])
+        print("Message Route: Catalog -> Ordering. Routing Key: OrderStockRejectedIntegrationEvent")
 
     def verify_status_id_is_awaiting_validation(self, timeout=300):
         print("Verifying Status ID is awaitingvalidation...")

@@ -18,7 +18,7 @@ class MessageGenerator:
         Method to generate order details.
 
         Return:
-            The message that enters to the order queue, and the message that enters to the basket queue.
+             A dictionary with 2 message: the one that the basket queue will receive, and the one that the basket simulator will send to the ordering queue.
         """
         return {"input": {
             # What to send to the ordering queue
@@ -64,9 +64,9 @@ class MessageGenerator:
 
     def catalog_to_order(self, order_id):
         """
-        Method to generate catalog input message to send the ordering queue, and output message to consume from the ordering queue.
+        Method to generate confirmation message from the catalog simulator to the ordering queue.
         Return:
-             A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
+             A dictionary with 2 message: the one that the catalog queue will receive, and the one that the catalog simulator will send to the ordering queue.
         """
         return {
             # What to send to the ordering queue.
@@ -79,11 +79,29 @@ class MessageGenerator:
             "output": {"OrderStatus": "awaitingvalidation"}
         }
 
+    def catalog_rejection_to_order(self, order_id):
+        """
+        Method to generate confirmation message from the catalog simulator to the ordering queue.
+        Return:
+             A dictionary with 2 message: the one that the catalog queue will receive, and the one that the catalog simulator will send to the ordering queue.
+        """
+        return {
+            "OrderId": order_id,
+            "OrderStockItems": [
+                {
+                    "ProductId": 1,
+                    "HasStock": False
+                }
+            ],
+            "Id": self.input_request_id,
+            "CreationDate": "2023-03-05T15:51:11.5458796Z"
+        }
+
     def payment_to_order(self, order_id):
         """
-        Method to generate for the payment simulator, an input message to send the ordering queue, and an output message to consume from the ordering queue.
+        Method to generate confirmation message from the payment simulator to the ordering queue.
         Return:
-            A dictionary with the message that will enter to the order queue, and the message that will enter to the catalog queue.
+             Only the rejection message that the catalog simulator sends to the ordering queue.
         """
         return {
             # What to send to the ordering queue.
@@ -97,7 +115,19 @@ class MessageGenerator:
                 "OrderId": order_id,
                 "OrderStatus": "stockconfirmed",
                 "BuyerName": "alice"
-                }
+            }
         }
 
-
+    def payment_rejection_to_order(self, order_id):
+        """
+        Method to generate rejection message from the payment simulator to the ordering queue.
+        Return:
+             Only the rejection message that the payment simulator sends to the ordering queue.
+        """
+        return {
+            "OrderId": order_id,
+            "OrderStatus": "stockconfirmed",
+            "BuyerName": "alice",
+            "Id": self.input_request_id,
+            "CreationDate": "2023-03-05T17:07:35.6306122Z"
+        }

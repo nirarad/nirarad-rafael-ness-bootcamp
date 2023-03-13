@@ -1,6 +1,6 @@
 import pytest
 
-from tests.scenarios.scenarios_1 import *
+from tests.scenarios.scenarios import *
 
 
 @pytest.mark.order_tracking

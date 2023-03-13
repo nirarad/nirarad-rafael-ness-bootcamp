@@ -1,6 +1,6 @@
 import pytest
 
-from tests.scenarios.scenarios_1 import *
+from tests.scenarios.scenarios import *
 
 
 @pytest.mark.payment_processing
@@ -23,7 +23,7 @@ def test_payment_validation_process():
 
 
 @pytest.mark.payment_processing
-def test_payment_rejection_process(purge_all_queues):
+def test_payment_rejection_process():
     """
     Source Test Case Title: Verify that the order is canceled whenever the payment process has failed.
 
@@ -32,18 +32,19 @@ def test_payment_rejection_process(purge_all_queues):
     Source Test Case ID: 20
 
     Source Test Case Traceability: 3.2
-     """
+    """
     # Run step 1
     assert order_submission_scenario()
     # Run Steps 2-3
     assert catalog_stock_confirmation_scenario()
     # Run Steps 4-5
-    assert payment_confirmation_scenario()
+    assert payment_rejection_scenario()
 
 
+@pytest.mark.skip(reason="Test that could take 1 hour, not for casual test suite executions.")
 @pytest.mark.payment_processing
 @pytest.mark.canceling_order
-def test_payment_process_rejection_caused_by_server_timeout(purge_all_queues):
+def test_payment_process_rejection_caused_by_server_timeout():
     """
     Source Test Case Title: Validate that the service will cancel the ordering process when the service is on ‘confirmstock’ status and the user does not initiate any action for 1 hour.
 
@@ -53,4 +54,8 @@ def test_payment_process_rejection_caused_by_server_timeout(purge_all_queues):
 
     Source Test Case Traceability: 3.3
     """
-    pass
+    # Run step 1
+    assert order_submission_scenario()
+    # Run step 2
+    assert catalog_stock_confirmation_scenario()
+    Simulator.explicit_status_id_validation(status_id=6, timeout=3600)
