@@ -29,6 +29,11 @@ class BasketSimulator(Simulator):
         """
         # The basket simulator sends to the ordering queue the validation for starting to create a new order.
         self.send_message(body=body, routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
+
+        # Wait for the order to enter the db
+        sleep(10)
+
+        # Set the current order id
         Simulator.CURRENT_ORDER_ID = self.get_order_id()
         print(
             f"Message Route: Basket -> Ordering. Routing Key: OrderStockConfirmedIntegrationEvent. Current Order ID is: {Simulator.CURRENT_ORDER_ID}")

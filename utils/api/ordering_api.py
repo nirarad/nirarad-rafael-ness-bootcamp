@@ -51,4 +51,4 @@ class OrderingAPI:
 
 if __name__ == '__main__':
     od = OrderingAPI()
-    print(od.get_card_types().json())
+    print(od.cancel_order(1754))

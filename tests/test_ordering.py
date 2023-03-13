@@ -13,17 +13,28 @@ from utils.messages.messages_generator import MessageGenerator
 load_dotenv()
 
 
+@pytest.fixture
+def purge_all_queues():
+    """
+    Function to purge all messages in each queue, to run before every test.
+    """
+    Simulator.purge_all_queues(
+        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+
+
 # region Scenarios tests
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_order_submission_scenario():
     # Preparing test environment
     basket_mock = BasketSimulator()
-    sleep(2)
     mg = MessageGenerator()
     basket_to_ordering_msg = mg.basket_to_order()
 
-    # Step #1 - Send from the basket mock to the Ordering queue massage to create a new order.
+    # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
     basket_mock.create_order(basket_to_ordering_msg["input"])
+
+    # Wait for the order to enter the db
+    sleep(5)
 
     # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
     expected_message = basket_to_ordering_msg["output"]['UserId']
@@ -45,7 +56,7 @@ def test_catalog_stock_confirmation_scenario():
     # The maximum time to wait for the order status to be updated is 30 seconds
     assert catalog_mock.verify_status_id_is_awaiting_validation(timeout=300)
 
-    # Step #2 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
+    # step 2 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
     catalog_mock.validate_items_in_stock(catalog_to_ordering_msg["input"])
 
     # Expected Result #3 - The OrderStatusID in the orders table has been updated to 3.
@@ -59,7 +70,7 @@ def test_payment_confirmation_scenario():
     messages = MessageGenerator()
     payment_to_ordering_msg = messages.payment_to_order(payment_mock.CURRENT_ORDER_ID)
 
-    # Step #1 - Verify that the payment queue received from the correct message from the ordering service.
+    # step 1 - Verify that the payment queue received from the correct message from the ordering service.
     expected_result = [payment_to_ordering_msg["output"]["OrderId"], payment_to_ordering_msg["output"]["OrderStatus"]]
     message_from_queue = payment_mock.get_first_message()
     actual_result = [message_from_queue["OrderId"], message_from_queue["OrderStatus"]]
@@ -67,7 +78,7 @@ def test_payment_confirmation_scenario():
     # Expected Result #1 - The payment queue received the correct message from the ordering service.
     assert actual_result[0] == expected_result[0] and actual_result[1] == expected_result[1]
 
-    # Step #2 - Send from the payment mock to the Ordering message that confirms the payment process.
+    # step 2 - Send from the payment mock to the Ordering message that confirms the payment process.
     payment_mock.validate_payment(payment_to_ordering_msg["input"])
 
     # Expected Result #2 - The OrderStatusID is updated to 4.
@@ -75,20 +86,21 @@ def test_payment_confirmation_scenario():
 
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
-def test_ship_api_request_scenario(status_code=200):
-    # Step #1 - Send the following API request to ship the order.
+def test_ship_api_request_scenario(status_code=200, id_validation_timeout=300):
+    # step 1 - Send the following API request to ship the order.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
     assert ordering_api.ship_order(Simulator.CURRENT_ORDER_ID).status_code == status_code
 
     # The OrderStatusID in the orders table updated to 5.
-    assert Simulator.implicit_status_id_validation(5)
+    if status_code == 200:
+        assert Simulator.explicit_status_id_validation(5, timeout=id_validation_timeout)
 
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_ship_invalid_auth_api_request_scenario(status_code=401):
-    # Step #1 - Send the following API request to ship the order.
+    # step 1 - Send the following API request to ship the order.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -97,19 +109,19 @@ def test_ship_invalid_auth_api_request_scenario(status_code=401):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_cancel_api_request_scenario(status_code=200):
-    # Step #1 - Send the following API request to cancel the order.
+    # step 1 - Send the following API request to cancel the order.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
     assert ordering_api.cancel_order(Simulator.CURRENT_ORDER_ID).status_code == status_code
 
     # The OrderStatusID in the orders table updated to 6.
-    assert Simulator.implicit_status_id_validation(6)
+    assert Simulator.explicit_status_id_validation(6)
 
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_cancel_invalid_auth_api_request_scenario(status_code=401):
-    # Step #1 - Send the following API request to cancel the order.
+    # step 1 - Send the following API request to cancel the order.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -118,7 +130,7 @@ def test_cancel_invalid_auth_api_request_scenario(status_code=401):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_get_orders_api_request_scenario(status_code=200):
-    # Step #1 - Send the following API request to get all the orders of the user.
+    # step 1 - Send the following API request to get all the orders of the user.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -127,7 +139,7 @@ def test_get_orders_api_request_scenario(status_code=200):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_get_orders_invalid_auth_api_request_scenario(status_code=401):
-    # Step #1 - Send the following API request to get all the orders of the user.
+    # step 1 - Send the following API request to get all the orders of the user.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -136,7 +148,7 @@ def test_get_orders_invalid_auth_api_request_scenario(status_code=401):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_get_order_by_id_api_request_scenario(status_code=200):
-    # Step #1 - Send the following API request to get one of the user orders by its id.
+    # step 1 - Send the following API request to get one of the user orders by its id.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -145,7 +157,7 @@ def test_get_order_by_id_api_request_scenario(status_code=200):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
-    # Step #1 - Send the following API request to get one of the user orders by its id.
+    # step 1 - Send the following API request to get one of the user orders by its id.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -154,7 +166,7 @@ def test_get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_get_card_types_api_request_scenario(status_code=200):
-    # Step #1 - Send the following API request to get all the card types of the user.
+    # step 1 - Send the following API request to get all the card types of the user.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -163,7 +175,7 @@ def test_get_card_types_api_request_scenario(status_code=200):
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
 def test_get_card_types_invalid_auth_api_request_scenario(status_code=401):
-    # Step #1 - Send the following API request to get all the card types of the user.
+    # step 1 - Send the following API request to get all the card types of the user.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
@@ -171,15 +183,6 @@ def test_get_card_types_invalid_auth_api_request_scenario(status_code=401):
 
 
 # endregion
-
-@pytest.fixture
-def purge_all_queues():
-    """
-    Function to purge all messages in each queue, to run before every test.
-    """
-    Simulator.purge_all_queues(
-        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
-
 
 @pytest.mark.order_management
 @pytest.mark.main_sucsess_scenario
@@ -199,7 +202,7 @@ def test_main_success_scenario(purge_all_queues):
     test_catalog_stock_confirmation_scenario()
     # Run steps 5-6
     test_payment_confirmation_scenario()
-    # Run step #7
+    # Run step 7
     test_ship_api_request_scenario()
 
 
@@ -215,6 +218,7 @@ def test_user_can_submit_an_order(purge_all_queues):
 
     Source Test Case Traceability: 1.2.1
     """
+    # Run Step 1
     test_order_submission_scenario()
 
 
@@ -230,9 +234,9 @@ def test_user_can_cancel_order_on_status_1(purge_all_queues):
 
     Source Test Case Traceability: 1.3.1, 5.4
     """
-    # Run Step #1
+    # Run step 1
     test_order_submission_scenario()
-    # Run Step #2
+    # Run step 2
     test_cancel_api_request_scenario()
 
 
@@ -248,17 +252,17 @@ def test_user_can_cancel_order_on_status_2(purge_all_queues):
 
     Source Test Case Traceability: 1.3.2, 5.4
     """
-    # Run Step #1
+    # Run step 1
     test_order_submission_scenario()
-    # Run Step #2 - Verify that the catalog queue received from the ordering service the correct message.
-    assert Simulator.implicit_status_id_validation(status_id=2, timeout=100)
-    # Run Step #3
+    # Run step 2 - Verify that the catalog queue received from the ordering service the correct message.
+    assert Simulator.explicit_status_id_validation(status_id=2, timeout=300)
+    # Run step 3
     test_cancel_api_request_scenario()
 
 
 @pytest.mark.order_management
 @pytest.mark.canceling_order
-def test_user_can_cancel_order_on_status_3():
+def test_user_can_cancel_order_on_status_3(purge_all_queues):
     """
     Source Test Case Title: Verify that the user can cancel his order when the order status is ‘stockconfirmd’.
 
@@ -268,17 +272,17 @@ def test_user_can_cancel_order_on_status_3():
 
     Source Test Case Traceability: 1.3.3, 5.4
     """
-    # Run Step #1
+    # Run step 1
     test_order_submission_scenario()
-    # Run Step #2
+    # Run step 2
     test_catalog_stock_confirmation_scenario()
-    # Run Step #3
+    # Run step 3
     test_cancel_api_request_scenario()
 
 
 @pytest.mark.order_management
 @pytest.mark.canceling_order
-def test_user_can_not_cancel_order_on_status_4():
+def test_user_can_not_cancel_order_on_status_4(purge_all_queues):
     """
     Source Test Case Title:Verify that the user can not cancel his order when the order status is ‘paid’.
 
@@ -288,19 +292,20 @@ def test_user_can_not_cancel_order_on_status_4():
 
     Source Test Case Traceability: 1.3.4
     """
-    # Run Step #1
+    # Run step 1
     test_order_submission_scenario()
     # Run Steps 2-3
     test_catalog_stock_confirmation_scenario()
     # Run Steps 4-5
     test_payment_confirmation_scenario()
-    # Run Step #6
+    # Run step 6
     test_cancel_api_request_scenario(400)
+    assert Simulator.explicit_status_id_validation(status_id=4, timeout=100)
 
 
 @pytest.mark.order_management
 @pytest.mark.canceling_order
-def test_user_can_not_cancel_order_on_status_5():
+def test_user_can_not_cancel_order_on_status_5(purge_all_queues):
     """
     Source Test Case Title: Verify that the user can not cancel his order when the order status is ‘paid’.
 
@@ -310,11 +315,22 @@ def test_user_can_not_cancel_order_on_status_5():
 
     Source Test Case Traceability: 1.3.5
     """
+    # Run step 1
+    test_order_submission_scenario()
+    # Run steps 2-3
+    test_catalog_stock_confirmation_scenario()
+    # Run steps 4-5
+    test_payment_confirmation_scenario()
+    # Run step 6
+    test_ship_api_request_scenario()
+    # Run step 7
+    test_cancel_api_request_scenario(status_code=400)
+    assert Simulator.explicit_status_id_validation(status_id=4, timeout=100)
 
 
 @pytest.mark.order_management
 @pytest.mark.ship_order
-def test_user_can_ship_order_on_status_4():
+def test_user_can_ship_order_on_status_4(purge_all_queues):
     """
     Source Test Case Title: Verify that the service allows updating order status to ‘shipped’ from ‘paid’ status.
 
@@ -324,12 +340,19 @@ def test_user_can_ship_order_on_status_4():
 
     Source Test Case Traceability: 1.4.1,5.5
     """
-    pass
+    # Run step 1
+    test_order_submission_scenario()
+    # Run steps 2-3
+    test_catalog_stock_confirmation_scenario()
+    # Run steps 4-5
+    test_payment_confirmation_scenario()
+    # Run step 6
+    test_ship_api_request_scenario()
 
 
 @pytest.mark.order_management
 @pytest.mark.ship_order
-def test_user_can_not_ship_order_on_status_1():
+def test_user_can_not_ship_order_on_status_1(purge_all_queues):
     """
     Source Test Case Title: Verify that the service does not allow updating the order status to ‘shipped’ from ‘submitted’ status.
 
@@ -339,12 +362,15 @@ def test_user_can_not_ship_order_on_status_1():
 
     Source Test Case Traceability: 1.4.2
     """
-    pass
+    # Run step 1
+    test_order_submission_scenario()
+    # Run step 2
+    test_ship_api_request_scenario(status_code=400)
 
 
 @pytest.mark.order_management
 @pytest.mark.ship_order
-def test_user_can_not_ship_order_on_status_2():
+def test_user_can_not_ship_order_on_status_2(purge_all_queues):
     """
     Source Test Case Title: Verify that the service does not allow updating the order status to ‘shipped’ from ‘awatingvalidation’ status.
 
@@ -354,12 +380,16 @@ def test_user_can_not_ship_order_on_status_2():
 
     Source Test Case Traceability: 1.4.3
     """
-    pass
+    # Run step 1
+    test_order_submission_scenario()
+    # Run step 2
+    assert Simulator.explicit_status_id_validation(status_id=2, timeout=100)
+    test_ship_api_request_scenario(status_code=400)
 
 
 @pytest.mark.order_management
 @pytest.mark.ship_order
-def test_user_can_not_ship_order_on_status_3():
+def test_user_can_not_ship_order_on_status_3(purge_all_queues):
     """
     Source Test Case Title: Verify that the service does not allow updating the order status to  ‘shipped’  from ‘stockconfirmd’ status.
 
@@ -369,12 +399,19 @@ def test_user_can_not_ship_order_on_status_3():
 
     Source Test Case Traceability: 1.4.4
     """
-    pass
+    # Run step 1
+    test_order_submission_scenario()
+    # Run step 2
+    test_catalog_stock_confirmation_scenario()
+    # Run step 3
+    test_ship_api_request_scenario(400)
+    # Run step 4
+    assert Simulator.explicit_status_id_validation(status_id=3, timeout=100)
 
 
 @pytest.mark.order_management
 @pytest.mark.ship_order
-def test_user_can_not_ship_order_on_status_6():
+def test_user_can_not_ship_order_on_status_6(purge_all_queues):
     """
     Source Test Case Title: Verify that the service does not allow updating the order status to  ‘shipped’ from ‘canceled’ status.
 
@@ -388,7 +425,7 @@ def test_user_can_not_ship_order_on_status_6():
 
 
 @pytest.mark.order_tracking
-def test_submitted_order_status_appears_on_correct_state():
+def test_submitted_order_status_appears_on_correct_state(purge_all_queues):
     """
     Source Test Case Title: Verify that the ‘submitted’ order status appears at the correct service state.
 
@@ -402,7 +439,7 @@ def test_submitted_order_status_appears_on_correct_state():
 
 
 @pytest.mark.order_tracking
-def test_awatingvalidation_order_status_appears_on_correct_state():
+def test_awatingvalidation_order_status_appears_on_correct_state(purge_all_queues):
     """
     Source Test Case Title: Verify that the ‘awatingvalidation’ order status appears at the correct service state.
 
@@ -416,7 +453,7 @@ def test_awatingvalidation_order_status_appears_on_correct_state():
 
 
 @pytest.mark.order_tracking
-def test_stockconfirmed_order_status_appears_on_correct_state():
+def test_stockconfirmed_order_status_appears_on_correct_state(purge_all_queues):
     """
     Source Test Case Title: Verify that the ‘stockconfirmd’ order status appears at the correct service state.
 
@@ -430,7 +467,7 @@ def test_stockconfirmed_order_status_appears_on_correct_state():
 
 
 @pytest.mark.order_tracking
-def test_paid_order_status_appears_on_correct_state():
+def test_paid_order_status_appears_on_correct_state(purge_all_queues):
     """
     Source Test Case Title: Verify that the ‘paid’ order status appears at the correct service state.
 
@@ -444,7 +481,7 @@ def test_paid_order_status_appears_on_correct_state():
 
 
 @pytest.mark.order_tracking
-def test_shipped_order_status_appears_on_correct_state():
+def test_shipped_order_status_appears_on_correct_state(purge_all_queues):
     """
      Source Test Case Title: Verify that the ‘shipped’ order status appears at the correct service state.
 
@@ -458,7 +495,7 @@ def test_shipped_order_status_appears_on_correct_state():
 
 
 @pytest.mark.order_tracking
-def test_canceled_order_status_appears_on_correct_state():
+def test_canceled_order_status_appears_on_correct_state(purge_all_queues):
     """
     Source Test Case Title: Verify that the ‘canceled’ order status appears at the correct service state.
 
@@ -472,7 +509,7 @@ def test_canceled_order_status_appears_on_correct_state():
 
 
 @pytest.mark.payment_processing
-def test_payment_validation_process():
+def test_payment_validation_process(purge_all_queues):
     """
     Source Test Case Title: Verify that the order process continues whenever the payment process has succeeded
 
@@ -486,7 +523,7 @@ def test_payment_validation_process():
 
 
 @pytest.mark.payment_processing
-def test_payment_rejection_process():
+def test_payment_rejection_process(purge_all_queues):
     """
     Source Test Case Title: Verify that the order is canceled whenever the payment process has failed.
 
@@ -501,7 +538,7 @@ def test_payment_rejection_process():
 
 @pytest.mark.payment_processing
 @pytest.mark.canceling_order
-def test_payment_process_rejection_caused_by_server_timeout():
+def test_payment_process_rejection_caused_by_server_timeout(purge_all_queues):
     """
     Source Test Case Title: Validate that the service will cancel the ordering process when the service is on ‘confirmstock’ status and the user does not initiate any action for 1 hour.
 
@@ -515,7 +552,7 @@ def test_payment_process_rejection_caused_by_server_timeout():
 
 
 @pytest.mark.ordering_management
-def test_catalog_rejection_process():
+def test_catalog_rejection_process(purge_all_queues):
     """
     Source Test Case Title: Verify that the order is canceled whenever a rejection message has been received from the Catalog service.
 
@@ -530,7 +567,7 @@ def test_catalog_rejection_process():
 
 @pytest.mark.security
 @pytest.mark.api
-def test_authorized_user_orders_access():
+def test_authorized_user_orders_access(purge_all_queues):
     """
     Source Test Case Title: Verify that a signed-in user is only exposed to his own orders.
 
@@ -545,7 +582,7 @@ def test_authorized_user_orders_access():
 
 @pytest.mark.security
 @pytest.mark.api
-def test_authorized_user_order_by_id_access():
+def test_authorized_user_order_by_id_access(purge_all_queues):
     """
     Source Test Case Title: Verify that a signed-in user is only exposed to his own card types.
 
@@ -561,7 +598,7 @@ def test_authorized_user_order_by_id_access():
 @pytest.mark.security
 @pytest.mark.api
 @pytest.mark.canceling_order
-def test_authorized_user_order_canceling():
+def test_authorized_user_order_canceling(purge_all_queues):
     """
     Source Test Case Title: Verify that a signed-in user receives only his own orders when he tries to fetch an order by id.
 
@@ -576,7 +613,7 @@ def test_authorized_user_order_canceling():
 
 @pytest.mark.security
 @pytest.mark.api
-def test_unauthorized_request_for_orders_is_denied():
+def test_unauthorized_request_for_orders_is_denied(purge_all_queues):
     """
     Source Test Case Title: Verify that an unauthorized request to get all orders is denied.
 
@@ -591,7 +628,7 @@ def test_unauthorized_request_for_orders_is_denied():
 
 @pytest.mark.security
 @pytest.mark.api
-def test_unauthorized_request_for_order_by_id_is_denied():
+def test_unauthorized_request_for_order_by_id_is_denied(purge_all_queues):
     """
     Source Test Case Title: VVerify that an unauthorized request to get an order by id is denied.
 

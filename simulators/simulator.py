@@ -99,13 +99,13 @@ class Simulator(ABC):
                 mq.purge_queue(q)
 
     @staticmethod
-    def implicit_status_id_validation(status_id, timeout=300):
+    def explicit_status_id_validation(status_id, timeout=300):
         print(f"Validate id id {status_id}...")
         try:
             with MSSQLConnector() as conn:
                 for i in range(timeout):
                     counter = len(conn.select_query(
-                        # In the below query, we fetch the last user order (max order id), and check if it's OrderStatusID is equals to 1.
+                        # In the below query, we fetch the last user order (max order id), and check if it's OrderStatusID is equals to a given value.
                         "SELECT o.OrderStatusId "
                         "FROM ordering.orders o "
                         f"WHERE o.OrderStatusId = {status_id} "
@@ -114,6 +114,6 @@ class Simulator(ABC):
                         return True
                     else:
                         time.sleep(1)
-                return False
+            return False
         except ConnectionError as c:
             raise f'There were problem to retrieve the status id.\nException is: {c}'
