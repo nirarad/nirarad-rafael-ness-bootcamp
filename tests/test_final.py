@@ -881,10 +881,10 @@ def test_empty_user_id():
             # stop_pre_conditins()
 
 
-@pytest.mark.test_many_requests
-def test_many_requests():
+@pytest.mark.test_many_requests_from_basket
+def test_many_requests_from_basket():
     """
-    This test check scalability when 100 requests
+    This test check scalability when 100 requests from basket
     :param
     """
     # start_pre_conditins()
@@ -898,6 +898,67 @@ def test_many_requests():
                            routing_key=data[0]["RoutingKey"],
                            body=json.dumps(data[0]["Body"]))
                 expected_step_1(mq, sql)
+            # stop_pre_conditins()
+
+
+@pytest.mark.test_many_requests_from_catalog
+def test_many_requests_from_catalog():
+    """
+    This test check scalability when 100 requests from catalog
+    :param
+    """
+    # start_pre_conditins()
+    with RabbitMQ() as mq:
+        with MSSQLConnector() as sql:
+            # step 1
+            for i in range(1, 101):
+                data[0]["Body"]["RequestId"] = str(uuid.uuid4())
+                data[0]["Body"]["Id"] = str(uuid.uuid4())
+                mq.publish(exchange='eshop_event_bus',
+                           routing_key=data[0]["RoutingKey"],
+                           body=json.dumps(data[0]["Body"]))
+            # step 2
+            for i in range(1, 101):
+                data[1]["Body"]["RequestId"] = str(uuid.uuid4())
+                data[1]["Body"]["Id"] = str(uuid.uuid4())
+                mq.publish(exchange='eshop_event_bus',
+                           routing_key=data[0]["RoutingKey"],
+                           body=json.dumps(data[0]["Body"]))
+                expected_step_2(mq, sql)
+            # stop_pre_conditins()
+
+
+@pytest.mark.test_many_requests_from_payment
+def test_many_requests_from_payment():
+    """
+    This test check scalability when 100 requests from payment
+    :param
+    """
+    # start_pre_conditins()
+    with RabbitMQ() as mq:
+        with MSSQLConnector() as sql:
+            # step 1
+            for i in range(1, 101):
+                data[0]["Body"]["RequestId"] = str(uuid.uuid4())
+                data[0]["Body"]["Id"] = str(uuid.uuid4())
+                mq.publish(exchange='eshop_event_bus',
+                           routing_key=data[0]["RoutingKey"],
+                           body=json.dumps(data[0]["Body"]))
+            # step 2
+            for i in range(1, 101):
+                data[1]["Body"]["RequestId"] = str(uuid.uuid4())
+                data[1]["Body"]["Id"] = str(uuid.uuid4())
+                mq.publish(exchange='eshop_event_bus',
+                           routing_key=data[0]["RoutingKey"],
+                           body=json.dumps(data[0]["Body"]))
+            # step 3
+            for i in range(1, 101):
+                data[2]["Body"]["RequestId"] = str(uuid.uuid4())
+                data[2]["Body"]["Id"] = str(uuid.uuid4())
+                mq.publish(exchange='eshop_event_bus',
+                           routing_key=data[0]["RoutingKey"],
+                           body=json.dumps(data[0]["Body"]))
+                expected_step_3(mq, sql)
             # stop_pre_conditins()
 
 
@@ -1012,8 +1073,8 @@ def test_crush_from_basket_start():
             # stop_pre_conditins()
 
 
-@pytest.mark.test_crush_from_catalog_middle
-def test_crush_from_catalog_middle():
+@pytest.mark.test_crush_from_catalog_start
+def test_crush_from_catalog_start():
     """
     This test check reliability service create 10 requests from catalog and crush in the middle
     :param
@@ -1041,8 +1102,8 @@ def test_crush_from_catalog_middle():
             # stop_pre_conditins()
 
 
-@pytest.mark.test_crush_from_payment_middle
-def test_crush_from_payment_middle():
+@pytest.mark.test_crush_from_payment_start
+def test_crush_from_payment_start():
     """
     This test check reliability service create 100 requests from payment and crush in the middle
     :param
