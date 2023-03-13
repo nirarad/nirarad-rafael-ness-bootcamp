@@ -1,19 +1,22 @@
-from pprint import pprint
-
+import time
+from utils.exceptions_loging import Exceptions_logs
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 import uuid
 import json
 
 
-def callback(ch, method, properties, body):
-    #  log it ..
-    pprint(body.decode())
-    pprint(f"[{ch}]\n Method: {method},\n Properties: {properties},\n Body: {body}")
-    # ch.basic_ack(delivery_tag=method.delivery_tag)
+# def callback(ch, method, properties, body):
+#     #  log it ..
+#     pprint(body.decode())
+#     pprint(f"[{ch}]\n Method: {method},\n Properties: {properties},\n Body: {body}")
+#     # ch.basic_ack(delivery_tag=method.delivery_tag)
 
 class Basket(object):
-    def __init__(self, rbt_send: RabbitMQ):
+    def __init__(self, rbt_send: RabbitMQ, log: Exceptions_logs):
         self.rbtMQ = rbt_send
+        self.log = log
+        self.routing_key_basket_get = None
+        self.count = 50
 
     def send_to_queue(self, routing_key):
         body = {
@@ -46,7 +49,7 @@ class Basket(object):
                     }
                 ]
             },
-            "Id": str(uuid.uuid4()),
+            "Id": "e9b80940-c861-4e5b-9d7e-388fd256acef",
             "CreationDate": "2023-03-04T14:20:24.4730559Z"
         }
 
@@ -56,5 +59,17 @@ class Basket(object):
                          body=json.dumps(body))
 
     def consume(self):
-        with self.rbtMQ as rbt:
-            rbt.consume('Basket', callback)
+
+        def callback(ch, method, properties, body):
+            self.log.send(
+                f"\n\n[{ch}]\n\n Method: {method},\n\n Properties: {properties},\n\n Body: {body}\n\n method manipulate {method.routing_key}")
+
+            if len(str(method)) > 0 or self.count == 0:
+                self.routing_key_basket_get = method.routing_key
+                ch.stop_consuming()
+
+            time.sleep(1)
+            self.count -= 1
+
+        with self.rbtMQ as mq:
+            mq.consume(queue='Basket', callback=callback)

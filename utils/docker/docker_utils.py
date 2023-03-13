@@ -26,21 +26,27 @@ class DockerManager:
     def unpause(self, container_name):
         self.containers_dict[container_name].unpause()
 
+    def start_for_tests(self):
+        self.start('eshop/ordering.api:linux-latest')
+        self.start('eshop/ordering.backgroundtasks:linux-latest')
+        self.start('eshop/identity.api:linux-latest')
+        self.start('mcr.microsoft.com/mssql/server:2019-latest')
+        self.start('rabbitmq:3-management-alpine')
+
 
 if __name__ == '__main__':
     dm = DockerManager()
+    dm.start_for_tests()
+    # dm.stop('eshop/ordering.api:linux-latest')
+    # time.sleep(1)
+    # dm.start('eshop/ordering.api:linux-latest')
+    # dm.start('eshop/ordering.backgroundtasks:linux-latest')
+    # dm.start('eshop/identity.api:linux-latest')
+    # dm.start('mcr.microsoft.com/mssql/server:2019-latest')
+    # dm.start('rabbitmq:3-management-alpine')
 
-    #dm.stop('eshop/ordering.api:linux-latest')
-    #time.sleep(1)
-    dm.start('eshop/ordering.api:linux-latest')
-    dm.start('eshop/ordering.backgroundtasks:linux-latest')
-    dm.start('eshop/identity.api:linux-latest')
-    dm.start('mcr.microsoft.com/mssql/server:2019-latest')
-    dm.start('rabbitmq:3-management-alpine')
-
-
-    #dm.pause('eshop/ordering.api:linux-latest')
-    #time.sleep(1)
+    # dm.pause('eshop/ordering.api:linux-latest')
+    # time.sleep(1)
     # dm.unpause('eshop/ordering.api:linux-latest')
     # dm.unpause('eshop/ordering.backgroundtasks:linux-latest')
     # dm.unpause('eshop/identity.api:linux-latest')
