@@ -1,4 +1,4 @@
-from tests.scenarios.test_scenarions import *
+from tests.scenarios.scenarios import *
 
 
 @pytest.mark.order_tracking

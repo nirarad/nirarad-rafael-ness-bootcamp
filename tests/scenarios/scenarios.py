@@ -1,5 +1,3 @@
-from time import sleep
-
 import pytest
 from dotenv import load_dotenv
 
@@ -12,7 +10,29 @@ from utils.messages.messages_generator import MessageGenerator
 
 load_dotenv()
 
-pytestmark = pytest.mark.skip(reason="Scenario function which meant to serve other tests.")
+
+# pytestmark = pytest.mark.skip(reason="Scenario function which meant to serve other tests.")
+
+def order_submission_scenario():
+    # Preparing test environment
+    result = False
+    basket_mock = BasketSimulator()
+    mg = MessageGenerator()
+    basket_to_ordering_msg = mg.basket_to_order()
+
+    # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
+    basket_mock.create_order(basket_to_ordering_msg["input"])
+
+    # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
+    actual_message = basket_mock.get_first_message()['UserId']
+    expected_message = basket_to_ordering_msg["output"]['UserId']
+    if actual_message == expected_message:
+        result = True
+
+    # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
+    if basket_mock.verify_status_id_is_submitted():
+        result = True
+    return result
 
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
@@ -25,12 +45,9 @@ def test_order_submission_scenario():
     # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
     basket_mock.create_order(basket_to_ordering_msg["input"])
 
-    # Wait for the order to enter the db
-    sleep(5)
-
     # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
+    actual_message = basket_mock.get_first_message()['UserId']
     expected_message = basket_to_ordering_msg["output"]['UserId']
-    actual_message = (basket_mock.get_first_message())['UserId']
     assert actual_message == expected_message
 
     # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
@@ -100,15 +117,16 @@ def test_ship_invalid_auth_api_request_scenario(status_code=401):
 
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
-def test_cancel_api_request_scenario(status_code=200):
+def test_cancel_api_request_scenario(status_code=200, timeout=200):
     # step 1 - Send the following API request to cancel the order.
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
     assert ordering_api.cancel_order(Simulator.CURRENT_ORDER_ID).status_code == status_code
 
-    # The OrderStatusID in the orders table updated to 6.
-    assert Simulator.explicit_status_id_validation(6)
+    # In case that the status code is 200, OrderStatusID in the orders table should be updated to 6.
+    if status_code == 200:
+        assert Simulator.explicit_status_id_validation(6, timeout=timeout)
 
 
 @pytest.mark.skip(reason="Scenario function which meant to serve other tests")
@@ -172,3 +190,7 @@ def test_get_card_types_invalid_auth_api_request_scenario(status_code=401):
 
     # Expected Result #1 - 200 HTTP status code should be returned.
     assert ordering_api.get_card_types_invalid_auth().status_code == status_code
+
+
+# Exclude the skip variable from the module, so we can import the all module
+__all__ = [name for name in dir() if not name.startswith('_') and name != 'pytestmark']

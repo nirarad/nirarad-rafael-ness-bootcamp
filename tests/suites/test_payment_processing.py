@@ -1,10 +1,10 @@
-import pytest
+from tests.scenarios.scenarios import *
 
 
 @pytest.mark.payment_processing
-def test_payment_validation_process(purge_all_queues):
+def test_payment_validation_process():
     """
-    Source Test Case Title: Verify that the order process continues whenever the payment process has succeeded
+    Source Test Case Title: Verify that the order process continues whenever the payment process has succeeded.
 
     Source Test Case Purpose: Verify that the integration with the payment service and its queue are working.
 
@@ -12,7 +12,12 @@ def test_payment_validation_process(purge_all_queues):
 
     Source Test Case Traceability: 3.1
      """
-    pass
+    # Run step 1
+    test_order_submission_scenario()
+    # Run Steps 2-3
+    test_catalog_stock_confirmation_scenario()
+    # Run Steps 4-5
+    test_payment_confirmation_scenario()
 
 
 @pytest.mark.payment_processing
@@ -26,7 +31,12 @@ def test_payment_rejection_process(purge_all_queues):
 
     Source Test Case Traceability: 3.2
      """
-    pass
+    # Run step 1
+    test_order_submission_scenario()
+    # Run Steps 2-3
+    test_catalog_stock_confirmation_scenario()
+    # Run Steps 4-5
+    test_payment_confirmation_scenario()
 
 
 @pytest.mark.payment_processing
