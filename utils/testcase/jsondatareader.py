@@ -97,7 +97,6 @@ class JSONDataReader(object):
         return self.item
 
 
-
 if __name__ == '__main__':
     d = JSONDataReader(os.getenv('RESPONSES_PATH'))
     # order = d.get_json_order('alice_normal_order', str(uuid.uuid4()))

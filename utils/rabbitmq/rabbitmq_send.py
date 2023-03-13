@@ -17,9 +17,6 @@ class RabbitMQ:
         self.connect()
         return self
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.connection.close()
-
     def connect(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
         self.channel = self.connection.channel()
@@ -35,10 +32,15 @@ class RabbitMQ:
                                    routing_key=routing_key,
                                    body=body)
         print(f"[{routing_key}] Sent '{body}'")
+        return body
 
     def consume(self, queue, callback):
         self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
         self.channel.start_consuming()
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.connection.close()
+        self.channel.basic_cancel(consumer_tag=None)
 
 
 if __name__ == '__main__':

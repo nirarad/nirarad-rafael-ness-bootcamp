@@ -245,7 +245,7 @@ class TestCRUD(unittest.TestCase):
             self.test_create_order()
 
             # Updating order status in DB to 2 (awaitingvalidation)
-            self.conn.update_order_db_id(self.new_order_id, 2)
+            self.conn.update_order_db_status(self.new_order_id, 2)
             # Validation status changed
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(current_status, 2)
@@ -293,7 +293,7 @@ class TestCRUD(unittest.TestCase):
             self.test_create_order()
 
             # Updating order status in DB to 3
-            self.conn.update_order_db_id(self.new_order_id, 3)
+            self.conn.update_order_db_status(self.new_order_id, 3)
 
             # Validation status changed
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
@@ -342,7 +342,7 @@ class TestCRUD(unittest.TestCase):
             self.test_create_order()
 
             # Updating order status in DB to 4
-            self.conn.update_order_db_id(self.new_order_id, 4)
+            self.conn.update_order_db_status(self.new_order_id, 4)
             # Validation status changed
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(current_status, 4)
@@ -390,7 +390,7 @@ class TestCRUD(unittest.TestCase):
             self.test_create_order()
 
             # Updating order status in DB to 5
-            self.conn.update_order_db_id(self.new_order_id, 5)
+            self.conn.update_order_db_status(self.new_order_id, 5)
 
             # Validation status changed
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
@@ -499,8 +499,8 @@ class TestCRUD(unittest.TestCase):
                                                                                 self.new_order_id)
             self.assertEqual(response_body, response_stub)
             self.logger.info(
-                f'{self.test_get_order_details.__doc__}Response to cancel status -> '
-                f'Actual:  {response_body} , Expected:{response_stub}')
+                f'{self.test_get_order_details.__doc__}Response bodies -> '
+                f'\nActual:  {response_body} ,\nExpected:{response_stub}')
         except Exception as e:
             self.logger.exception(f"\n{self.test_get_order_details.__doc__}{e}")
             raise

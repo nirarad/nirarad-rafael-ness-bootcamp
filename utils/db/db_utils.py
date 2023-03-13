@@ -33,7 +33,7 @@ class MSSQLConnector:
             results.append(dict(zip(columns, row)))
         return results
 
-    def update_order_db_id(self, db_order_id, to_id):
+    def update_order_db_status(self, db_order_id, to_id):
         query = 'Update [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
                 f'set OrderStatusId = {to_id}' \
                 f'where Id = {db_order_id}'
