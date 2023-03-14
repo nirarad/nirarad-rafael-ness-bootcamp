@@ -3,7 +3,7 @@ import pytest
 from tests.scenarios.scenarios import *
 
 
-@pytest.mark.inventory_menagement
+@pytest.mark.inventory_management
 def test_catalog_stock_validation_process():
     """
     Source Test Case Title: Verify that the order process continues whenever a confirmation message has been sent from the catalog service.
@@ -20,7 +20,7 @@ def test_catalog_stock_validation_process():
     assert catalog_stock_confirmation_scenario()
 
 
-@pytest.mark.inventory_menagement
+@pytest.mark.inventory_management
 def test_catalog_stock_rejection_process():
     """
     Source Test Case Title: Verify that the order is canceled whenever a rejection message has been received from the Catalog service.

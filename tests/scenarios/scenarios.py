@@ -11,8 +11,6 @@ load_dotenv()
 
 
 def order_submission_scenario():
-    result = False
-
     # Preparing test environment
     basket_mock = BasketSimulator()
     mg = MessageGenerator()
@@ -135,7 +133,7 @@ def ship_api_request_scenario(status_code=200, id_validation_timeout=300):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.ship_order(Simulator.CURRENT_ORDER_ID).status_code == status_code:
+    if ordering_api.ship_order(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -154,7 +152,7 @@ def ship_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.ship_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code == status_code:
+    if ordering_api.ship_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -186,7 +184,7 @@ def cancel_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.cancel_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code == status_code:
+    if ordering_api.cancel_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -197,11 +195,15 @@ def cancel_invalid_auth_api_request_scenario(status_code=401):
 def get_orders_api_request_scenario(status_code=200):
     # step 1 - Send the following API request to get all the orders of the user.
     ordering_api = OrderingAPI()
+    response = ordering_api.get_orders()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.get_orders().status_code == status_code:
+    if response.status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
+
+    # Test Passed
+    return True
 
 
 def get_orders_invalid_auth_api_request_scenario(status_code=401):
@@ -209,7 +211,7 @@ def get_orders_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.get_orders_invalid_auth().status_code == status_code:
+    if ordering_api.get_orders_invalid_auth().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -219,7 +221,7 @@ def get_order_by_id_api_request_scenario(status_code=200):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.get_order_by_id(Simulator.CURRENT_ORDER_ID).status_code == status_code:
+    if ordering_api.get_order_by_id(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -229,7 +231,7 @@ def get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.get_orders_invalid_auth().status_code == status_code:
+    if ordering_api.get_orders_invalid_auth().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -239,7 +241,7 @@ def get_card_types_api_request_scenario(status_code=200):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.get_card_types().status_code == status_code:
+    if ordering_api.get_card_types().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -249,6 +251,6 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.get_card_types_invalid_auth().status_code == status_code:
+    if ordering_api.get_card_types_invalid_auth().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")

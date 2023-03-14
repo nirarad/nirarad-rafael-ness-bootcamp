@@ -51,4 +51,4 @@ class OrderingAPI:
 
 if __name__ == '__main__':
     od = OrderingAPI()
-    print(od.ship_order(2298))
+    print(od.get_orders().json())

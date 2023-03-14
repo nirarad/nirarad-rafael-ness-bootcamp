@@ -4,7 +4,7 @@ from tests.scenarios.scenarios import *
 
 
 @pytest.mark.order_management
-@pytest.mark.main_sucsess_scenario
+@pytest.mark.main_success_scenario
 def test_mss():
     """
     Source Test Case Title: Verify the main success scenario for creating order is valid.
