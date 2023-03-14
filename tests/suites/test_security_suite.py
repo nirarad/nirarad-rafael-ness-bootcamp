@@ -63,7 +63,7 @@ def test_unauthorized_request_for_orders_is_denied():
 
     Source Test Case Traceability: 5.6
     """
-    pass
+    assert get_orders_invalid_auth_api_request_scenario()
 
 
 @pytest.mark.security
@@ -78,12 +78,12 @@ def test_unauthorized_request_for_order_by_id_is_denied():
 
     Source Test Case Traceability: 5.7
     """
-    pass
+    assert get_order_by_id_invalid_auth_api_request_scenario()
 
 
 @pytest.mark.security
 @pytest.mark.api
-def test_unauthorized_request_for_get_orders_is_denied():
+def test_unauthorized_request_for_get_card_types_is_denied():
     """
     Source Test Case Title: Verify that an unauthorized request to get all card types is denied.
 
@@ -93,7 +93,7 @@ def test_unauthorized_request_for_get_orders_is_denied():
 
     Source Test Case Traceability: 5.8
     """
-    pass
+    assert get_card_types_invalid_auth_api_request_scenario()
 
 
 @pytest.mark.security
@@ -108,7 +108,7 @@ def test_unauthorized_request_for_ship_order_is_denied():
 
     Source Test Case Traceability: 5.9
     """
-    pass
+    assert ship_invalid_auth_api_request_scenario()
 
 
 @pytest.mark.security
@@ -123,15 +123,17 @@ def test_unauthorized_request_for_cancel_order_is_denied():
 
     Source Test Case Traceability: 5.10
     """
-    pass
+    assert cancel_invalid_auth_api_request_scenario()
 
 
+@pytest.mark.skip(reason="Designated for nightly execution.")
 @pytest.mark.security
 @pytest.mark.api
 @pytest.mark.scalability
 @pytest.mark.reliability
 @pytest.mark.loads
-def test_order_creation_while_handling_ddos():
+@pytest.mark.nightly
+def test_order_creation_while_handling_ddos_simulation(ddos_simulation):
     """
     Source Test Case Title: Verify that the service is able to perform 300 orders while DDOS attack is simulated on the service.
 
@@ -141,5 +143,25 @@ def test_order_creation_while_handling_ddos():
 
     Source Test Case Traceability: 5.11
     """
-    pass
+    create_order_thread, get_orders_thread, stop_event = ddos_simulation
 
+    # Save the last order id before the ddos_simulation start.
+    start_order_id = Simulator.get_max_order_id()
+
+    # Start the order creation thread.
+    create_order_thread.start()
+
+    # Start the get orders request thread.
+    get_orders_thread.start()
+
+    # Wait for the 2 threads to finish.
+    create_order_thread.join()
+    get_orders_thread.join()
+
+    end_order_id = Simulator.CURRENT_ORDER_ID
+
+    # Assert that the new orders thread reached the new order's goal number.
+    assert create_order_thread.goal == 2
+
+    # Assert that the excepted number of orders entered to the orders table.
+    assert 1 + end_order_id - start_order_id == 2

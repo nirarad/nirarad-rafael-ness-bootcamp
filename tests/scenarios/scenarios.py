@@ -34,6 +34,16 @@ def order_submission_scenario():
     return True
 
 
+def order_submission_without_response_waiting_scenario():
+    # Preparing test environment
+    basket_mock = BasketSimulator()
+    mg = MessageGenerator()
+    basket_to_ordering_msg = mg.basket_to_order()
+
+    # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
+    basket_mock.create_order(basket_to_ordering_msg["input"])
+
+
 def catalog_stock_confirmation_scenario():
     # Preparing test environment
     catalog_mock = CatalogSimulator()

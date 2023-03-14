@@ -41,7 +41,8 @@ def test_payment_rejection_process():
     assert payment_rejection_scenario()
 
 
-@pytest.mark.skip(reason="Test that could take 1 hour, not for casual test suite executions.")
+@pytest.mark.skip(reason="Designated for nightly execution.")
+@pytest.mark.nightly
 @pytest.mark.payment_processing
 @pytest.mark.canceling_order
 def test_payment_process_rejection_caused_by_server_timeout():

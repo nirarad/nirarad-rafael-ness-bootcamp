@@ -1,9 +1,11 @@
+import threading
 from time import sleep
 
 import pytest
 from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
+from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
 from utils.docker.docker_utils import DockerManager
 
 
@@ -37,6 +39,8 @@ def setup_docker_containers():
         for container_name in mocks_containers:
             dm.stop(container_name)
 
+        sleep(10)
+
 
 @pytest.fixture(autouse=True)
 def purge_all_queues():
@@ -45,3 +49,24 @@ def purge_all_queues():
     """
     Simulator.purge_all_queues(
         ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+
+
+@pytest.fixture(scope="function")
+def ddos_simulation():
+    """
+    Fixture that construct 2 ddos_simulation to simulate ddos attack
+    """
+    # Create the two ddos_simulation
+    stop_event = threading.Event()
+    create_order_thread = CreateOrderThread(goal=2, event=stop_event)
+    request_orders_thread = GetOrdersRequestsThread(event=stop_event)
+
+    # Tear down the services
+    yield create_order_thread, request_orders_thread, stop_event
+
+    # Set the event to stop the create_order thread
+    stop_event.set()
+
+    # Join the ddos_simulation at the end of the test
+    create_order_thread.join()
+    request_orders_thread.join()

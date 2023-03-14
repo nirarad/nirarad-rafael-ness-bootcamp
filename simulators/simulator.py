@@ -88,7 +88,7 @@ class Simulator(ABC):
                         time.sleep(1)
                 return False
         except ConnectionError as c:
-            raise f'There were problem to retrieve the status id.\nException is: {c}'
+            raise ConnectionError(f'There were problem to retrieve the status id.\nException is: {c}')
 
     @staticmethod
     def purge_all_queues(queues_list):
@@ -114,4 +114,31 @@ class Simulator(ABC):
                         time.sleep(1)
             return False
         except ConnectionError as c:
-            raise f'There were problem to retrieve the status id.\nException is: {c}'
+            raise ConnectionError(f'There were problem to retrieve the status id.\nException is: {c}')
+
+    @staticmethod
+    def get_max_order_id():
+        try:
+            with MSSQLConnector() as conn:
+                order_id = conn.select_query(
+                    # In the below query, we fetch the last user order (max order id).
+                    "SELECT MAX(o.Id) FROM ordering.orders o")
+                return order_id[0]['']
+        except ConnectionError as c:
+            raise ConnectionError(f'There were problem to retrieve the order id.\nException is: {c}')
+
+    @staticmethod
+    def get_amount_of_message_in_queue(queue_name):
+        try:
+            with RabbitMQ() as mq:
+                return mq.get_number_of_messages_in_queue(queue_name)
+        except BaseException as c:
+            raise BaseException(f'There were problem to count the number of messages.\nException is: {c}')
+
+    @staticmethod
+    def validate_queue_id_empty(queue_name):
+        try:
+            with RabbitMQ() as mq:
+                return mq.validate_queue_is_empty(queue_name)
+        except BaseException as c:
+            raise BaseException(f'There were problem to count the number of messages.\nException is: {c}')

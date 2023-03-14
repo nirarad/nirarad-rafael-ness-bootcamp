@@ -1,4 +1,9 @@
+from time import sleep
+
 import pytest
+
+from tests.scenarios.scenarios import *
+from utils.docker.docker_utils import DockerManager
 
 
 @pytest.mark.scalability
@@ -14,7 +19,26 @@ def test_valid_message_consumption_rate():
 
     Source Test Case Traceability: 6.1
     """
-    pass
+    # Pre-conditions: Stop the ordering service, and his background task.
+    dm = DockerManager()
+    sleep(5)
+    dm.stop("eshop/ordering.api:linux-latest")
+    dm.stop("eshop/ordering.backgroundtasks:linux-latest")
+    sleep(10)
+
+    # Step 1: Send to the ordering queue x number of messages, there suppose to waiting there, until the service is goes up again.
+    for _ in range(2):
+        order_submission_without_response_waiting_scenario()
+
+    # Steps 2-3: Start the ordering service.
+    dm.start("eshop/ordering.api:linux-latest")
+    dm.start("eshop/ordering.backgroundtasks:linux-latest")
+
+    # Wait for the messages to be consumed.
+    sleep(5)
+
+    # Check if the ordering queue is clear from messages.
+    assert Simulator.validate_queue_id_empty('Ordering')
 
 
 @pytest.mark.scalability

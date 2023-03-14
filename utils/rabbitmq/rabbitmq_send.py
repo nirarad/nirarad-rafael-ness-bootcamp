@@ -65,15 +65,27 @@ class RabbitMQ:
                 raise TimeoutError
         except ValueError as v:
             raise ValueError(
-                f'There was problem with getting the first message, the following exception was received: {v}')
+                f'There was a problem with getting the first message, the following exception was received: {v}')
 
-# if __name__ == '__main__':
-#     bodys = {
-#         "OrderId": 1,
-#         "Id": str(uuid.uuid4()),
-#         "CreationDate": "2023-03-05T15:33:18.1376971Z"
-#     }
-#     with RabbitMQ() as mq:
-#         mq.publish(exchange='eshop_event_bus',
-#                    routing_key='OrderPaymentSucceededIntegrationEvent',
-#                    body=json.dumps(bodys))
+    def get_number_of_messages_in_queue(self, queue_name):
+        try:
+            queue = self.channel.get_queue(queue_name)
+
+            # Return the amount of messages in the queue.
+            return queue.method.message_count
+        except ValueError as v:
+            raise ValueError(
+                f'There a was problem with getting the first message from the {queue_name} queue, the following exception was received: {v}')
+
+    def validate_queue_is_empty(self, queue_name):
+        try:
+            queue = self.channel.queue_declare(queue_name, durable=True)
+            # Validate that the queue is empty.
+            counter = queue.method.message_count
+            while counter > 0:
+                counter = queue.method.message_count
+            else:
+                return True
+        except ValueError as v:
+            raise ValueError(
+                f'There was a problem with getting the first message from the {queue_name} queue, the following exception was received: {v}')
