@@ -43,7 +43,8 @@ class OrderingAPI:
         return res
 
 
+
 if __name__ == '__main__':
     import pprint
-    api = OrderingAPI()
-    pprint.pprint(api.get_order_by_id(1).json())
+    api = OrderingAPI("bob","Pass123%24" )
+    pprint.pprint(api.get_cardtypes().json())

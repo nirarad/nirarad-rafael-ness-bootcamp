@@ -84,8 +84,8 @@ class DockerManager:
 
 if __name__ == '__main__':
     dm = DockerManager()
-    # dm.start_for_tests()
-    dm.stop_not_necceery()
+    dm.start_for_tests()
+    # dm.stop_not_necceery()
     # dm.restart_to_test()
     # dm.stop('eshop/ordering.api:linux-latest')
     # time.sleep(1)
