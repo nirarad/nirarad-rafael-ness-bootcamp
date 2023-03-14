@@ -68,6 +68,8 @@ class PaymentSimulator:
                 raise Exception('ENV in Basket sim in start listen path broken')
             # TEMPORARY INVOKING OF RABBITMQ
             with self.mq:
+                # BIND
+                self.mq.bind('Payment', 'eshop_event_bus', 'OrderStatusChangedToStockConfirmedIntegrationEvent')
                 # INVOKE CONSUME VIA THREAD TO SHUT AFTER TIME
                 self.consume_thread = threading.Thread(target=self.mq.consume,
                                                        args=('Payment', self.payment_succeeded_callback))
@@ -89,6 +91,8 @@ class PaymentSimulator:
                 raise Exception('ENV in Basket sim in start listen path broken')
             # TEMPORARY INVOKING OF RABBITMQ
             with self.mq:
+                # BIND
+                self.mq.bind('Payment', 'eshop_event_bus', 'OrderStatusChangedToStockConfirmedIntegrationEvent')
                 # INVOKE CONSUME VIA THREAD TO SHUT AFTER TIME
                 self.consume_thread = threading.Thread(target=self.mq.consume,
                                                        args=('Payment', self.payment_failed_callback))
@@ -99,7 +103,7 @@ class PaymentSimulator:
 
 
 if __name__ == '__main__':
-    mq = PaymentSimulator(5)
+    mq = PaymentSimulator(10)
     # mq.start_listen('succeeded')
     # mq.start_listen('fail')
     mq.succeed_pay()
