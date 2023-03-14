@@ -82,10 +82,13 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3(docker_manager, rab
         rabbit_mq.purge_queue('Ordering')
     if not rabbit_mq.validate_queue_is_empty('Basket'):
         rabbit_mq.purge_queue('Basket')
+    if not rabbit_mq.validate_queue_is_empty('Catalog'):
+        rabbit_mq.purge_queue('Catalog')
 
     messages_amount_to_send = 3
     for _ in range(3):
         order_submission_without_response_waiting_scenario()
+
     #  When the order status changes to 2, simulate the ordering service crash.
     if Simulator.explicit_status_id_validation(2, 50, Simulator.get_max_order_id()):
         crash_ordering_service_scenario(docker_manager, service_name_list=["eshop/ordering.api:linux-latest",
@@ -111,7 +114,7 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3(docker_manager, rab
 
 
 @pytest.mark.reliability
-def test_valid_data_recovery_on_crash_between_status_3_and_4():
+def test_valid_data_recovery_on_crash_between_status_3_and_4(docker_manager, rabbit_mq, mssql_connector):
     """
     Source Test Case Title: Verify that the service is able to recover the data whenever the service crashes between the ‘stockconfirmed’ and ‘paid’ states.
 
@@ -121,4 +124,53 @@ def test_valid_data_recovery_on_crash_between_status_3_and_4():
 
     Source Test Case Traceability: 7.3
     """
-    pass
+    # Set pre-conditions: Stop the ordering.singlerhub service.
+    crash_ordering_service_scenario(docker_manager, service_name_list=["eshop/ordering.api:linux-latest",
+                                                                       "eshop/ordering.backgroundtasks:linux-latest",
+                                                                       "eshop/ordering.signalrhub:linux-latest"])
+    sleep(5)
+
+    # Verify that both of the queues are empty.
+    if not rabbit_mq.validate_queue_is_empty('Ordering'):
+        rabbit_mq.purge_queue('Ordering')
+    if not rabbit_mq.validate_queue_is_empty('Basket'):
+        rabbit_mq.purge_queue('Basket')
+    if not rabbit_mq.validate_queue_is_empty('Catalog'):
+        rabbit_mq.purge_queue('Catalog')
+
+    # Send the messages for waiting in the ordering queue.
+    messages_amount_to_send = 3
+    for _ in range(messages_amount_to_send):
+        order_submission_without_response_waiting_scenario()
+        docker_manager.start("eshop/ordering.api:linux-latest")
+        docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
+        crash_ordering_service_scenario(docker_manager)
+        catalog_stock_confirmation_without_waiting_for_response_scenario()
+
+    # Start the ordering service (both api and background task services).
+    docker_manager.start("eshop/ordering.api:linux-latest")
+    docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
+
+    # Wait for the id to be 2.
+    if Simulator.explicit_status_id_validation(3, 60, Simulator.get_max_order_id()):
+        #  When the order status changes to 3, simulate the ordering service crash.
+        crash_ordering_service_scenario(docker_manager, service_name_list=["eshop/ordering.api:linux-latest",
+                                                                           "eshop/ordering.backgroundtasks:linux-latest",
+                                                                           "eshop/ordering.signalrhub:linux-latest"])
+    sleep(5)
+
+    # Verify that there are still n messages in the order queue, or in the catalog queue, or distributed in both queues.
+    message_counter = 0
+    for queue in ["Ordering", "Payment"]:
+        message_counter += rabbit_mq.get_number_of_messages_in_queue(queue)
+
+    assert message_counter == messages_amount_to_send
+
+    # Step 6: Start the ordering service (both api and background task services).
+    docker_manager.start("eshop/ordering.api:linux-latest")
+    docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
+
+    # Step 7: Verify that n order entities have been created within the ordering table, with OrderStatusID of 2 or 3.
+    assert Simulator.select_top_n_orders_same_status(
+        mssql_connector=mssql_connector, status_number_1=4,
+        status_number_2=3, amount_of_orders=3, timeout=10)

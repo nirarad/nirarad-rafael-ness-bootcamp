@@ -68,6 +68,25 @@ def catalog_stock_confirmation_scenario():
     return True
 
 
+def catalog_stock_confirmation_without_waiting_for_response_scenario():
+    # Preparing test environment
+    catalog_mock = CatalogSimulator()
+    mg = MessageGenerator()
+    catalog_to_ordering_msg = mg.catalog_to_order(catalog_mock.CURRENT_ORDER_ID)
+
+    # Step/Expected Result 1 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
+    # The maximum time to wait for the order status to be updated is 30 seconds
+    if not catalog_mock.verify_status_id_is_awaiting_validation(timeout=300):
+        raise AssertionError(
+            f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
+
+    # step 2 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
+    catalog_mock.validate_items_in_stock(catalog_to_ordering_msg["input"])
+
+    # Test Passed
+    return True
+
+
 def catalog_stock_rejection_scenario():
     # Preparing test environment
     catalog_mock = CatalogSimulator()
@@ -266,14 +285,17 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
 
-def crash_ordering_service_scenario(docker_manager, service_name_list):
+def crash_ordering_service_scenario(docker_manager, service_name_list=None):
+    if service_name_list is None:
+        service_name_list = ["eshop/ordering.api:linux-latest",
+                             "eshop/ordering.backgroundtasks:linux-latest",
+                             "eshop/ordering.signalrhub:linux-latest"]
     docker_manager.stop("eshop/ordering.api:linux-latest")
     docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
     docker_manager.stop("eshop/ordering.api:linux-latest")
     docker_manager.stop("eshop/ordering.signalrhub:linux-latest")
     docker_manager.stop("eshop/ordering.api:linux-latest")
 
-    for service_name in service_name_list:
-        while docker_manager.get_container_status(service_name) == "Running":
-            docker_manager.stop(service_name)
-
+    # for service_name in service_name_list:
+    #     while docker_manager.get_container_status(service_name) == "Running":
+    #         docker_manager.stop(service_name)
