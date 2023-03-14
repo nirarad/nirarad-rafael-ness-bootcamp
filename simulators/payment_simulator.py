@@ -73,7 +73,6 @@ class PaymentSimulator:
                                                        args=('Payment', self.payment_succeeded_callback))
                 self.consume_thread.start()
                 self.consume_thread.join(self.timeout)
-
         except Exception as e:
             raise e
 
