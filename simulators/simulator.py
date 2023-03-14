@@ -97,7 +97,7 @@ class Simulator(ABC):
                 mq.purge_queue(q)
 
     @staticmethod
-    def explicit_status_id_validation(status_id, timeout=300):
+    def explicit_status_id_validation(status_id, timeout=300, order_id=CURRENT_ORDER_ID):
         print(f"Validate id id {status_id}...")
         try:
             with MSSQLConnector() as conn:
@@ -107,7 +107,7 @@ class Simulator(ABC):
                         "SELECT o.OrderStatusId "
                         "FROM ordering.orders o "
                         f"WHERE o.OrderStatusId = {status_id} "
-                        f"and o.Id = {Simulator.CURRENT_ORDER_ID}"))
+                        f"and o.Id = {order_id}"))
                     if counter > 0:
                         return True
                     else:
@@ -160,7 +160,7 @@ class Simulator(ABC):
     @staticmethod
     def select_top_n_orders_same_status(mssql_connector, status_number_1, status_number_2, amount_of_orders, timeout):
         """
-
+        Method to check if the n top orders are in status of x.
         :param mssql_connector: The MSSQLConnector Object to use.
         :param status_number_1: The status number to check.
         :param status_number_2:
@@ -173,7 +173,6 @@ class Simulator(ABC):
                 sum_of_ids = mssql_connector.select_query(
                     f"SELECT SUM(subquery.OrderStatusId) FROM (SELECT TOP {amount_of_orders} OrderStatusId FROM ordering.orders) AS subquery"
                 )
-                print(type(sum_of_ids[0]['']))
                 if int(sum_of_ids[0]['']) == status_number_2 * amount_of_orders or int(
                         sum_of_ids[0]['']) == status_number_1 * amount_of_orders:
                     return True

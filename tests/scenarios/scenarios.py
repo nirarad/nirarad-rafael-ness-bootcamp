@@ -266,6 +266,14 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
 
-# def service_crash_scenario(docker_manager, service_name):
-#     docker_manager.stop(service_name)
-#     docker_manager.stop(service_name)
+def crash_ordering_service_scenario(docker_manager, service_name_list):
+    docker_manager.stop("eshop/ordering.api:linux-latest")
+    docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
+    docker_manager.stop("eshop/ordering.api:linux-latest")
+    docker_manager.stop("eshop/ordering.signalrhub:linux-latest")
+    docker_manager.stop("eshop/ordering.api:linux-latest")
+
+    for service_name in service_name_list:
+        while docker_manager.get_container_status(service_name) == "Running":
+            docker_manager.stop(service_name)
+

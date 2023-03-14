@@ -25,6 +25,9 @@ class DockerManager:
     def unpause(self, container_name):
         self.containers_dict[container_name].unpause()
 
+    def get_container_status(self, container_name):
+        return self.cli.containers.get(container_name).status()
+
     def start_all_containers(self):
         running_containers_amount = len(self.cli.containers.list())
         all_containers_amount = len(self.cli.containers.list(all=True))
@@ -50,4 +53,3 @@ if __name__ == '__main__':
     # dm.unpause('eshop/ordering.api:linux-latest')
     #
     # dm.restart('eshop/ordering.api:linux-latest')
-
