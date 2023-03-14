@@ -20,12 +20,13 @@ def setup_docker_containers():
     """
     Fixture to start all containers except the containers that have a related simulator.
     """
-    print("Setting up docker session...")
+    print("Setting up docker containers...")
     # Stop the mocks containers
     mocks_containers = ["eshop/catalog.api:linux-latest", "eshop/payment.api:linux-latest",
                         "eshop/basket.api:linux-latest"]
     dm = DockerManager()
-    # Start all containers
+
+    # Start all containers, only if the current running containers amount is not valid
     if len(dm.running_containers) != len(dm.containers) - len(mocks_containers):
         dm.start_all_containers()
         sleep(3)
