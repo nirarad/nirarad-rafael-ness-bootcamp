@@ -1,7 +1,8 @@
 import uuid
 
 import requests
-from bearer_tokenizer import BearerTokenizer
+
+from utils.api.bearer_tokenizer import BearerTokenizer
 
 
 class OrderingAPI:
@@ -24,22 +25,22 @@ class OrderingAPI:
         return cardtypes
 
     def cancel_order(self, order_id):
-        orders = requests.put(
+        res = requests.put(
             f'{self.base_url}/api/v1/orders/cancel',
             json={
                 "orderNumber": order_id
             }, headers=self.headers)
         # pprint(orders.text)
-        return orders
+        return res
 
     def ship_order(self, order_id):
-        orders = requests.put(
+        res = requests.put(
             f'{self.base_url}/api/v1/orders/ship',
             json={
                 "orderNumber": order_id
             }, headers=self.headers)
         # pprint(orders.text)
-        return orders
+        return res
 
 
 if __name__ == '__main__':
