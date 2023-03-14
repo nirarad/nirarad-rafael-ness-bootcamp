@@ -1,5 +1,5 @@
+import os
 import threading
-import time
 
 from dotenv import load_dotenv
 
@@ -16,7 +16,6 @@ class PaymentSimulator:
         self.mq = RabbitMQ()
         # Time to wait
         self.timeout = timeout
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
 
     @staticmethod
     def payment_succeeded_callback(ch, method, properties, body):
@@ -33,8 +32,8 @@ class PaymentSimulator:
         """
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
         dict_body = eval(body)
+        # SENDING SUCCEEDED MESSAGE TO ORDERING QUEUE
         payment_succeeded(dict_body['OrderId'], dict_body['Id'], dict_body['CreationDate'])
-        ch.stop_consuming()
 
     @staticmethod
     def payment_failed_callback(ch, method, properties, body):
@@ -53,48 +52,55 @@ class PaymentSimulator:
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
         # BODY FROM INFO IS STRING NEED TO CONVERT TO DICT TO GET PARAMS
         dict_body = eval(body)
-        # SENDING MESSAGE TO ORDERING QUEUE
+        # SENDING FAILED MESSAGE TO ORDERING QUEUE
         payment_failed(dict_body['OrderId'], dict_body['Id'], dict_body['CreationDate'])
-        # MESSAGE SENT THEN SHUT CONSUMING
-        ch.stop_consuming()
 
-    def start_listen(self, event):
+    def succeed_pay(self):
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: start_listen
         Description: 1. Function invokes RabbitMQ consuming and get message from Payment queue.
-                     2. Sends payment failed or succeeded message to Ordering queue.
-        :param event: event to invoke
+                     2. Invokes payment succeeded message to Ordering queue.
         """
         try:
+            if load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test') is False:
+                raise Exception('ENV in Basket sim in start listen path broken')
             # TEMPORARY INVOKING OF RABBITMQ
             with self.mq:
-                # ROUTING KEY TO BIND IN PAYMENT QUEUE,ORDERING API SENDS MESSAGES TO HIM
-                routing_key = 'OrderStatusChangedToStockConfirmedIntegrationEvent'
-                # BIND ROUTING KEY
-                self.mq.bind('Payment', 'eshop_event_bus', routing_key)
-                # EVENT TO INVOKE
-                if event == 'succeeded':
-                    # INVOKE CONSUME VIA THREAD TO SHUT AFTER TIME
-                    self.consume_thread = threading.Thread(target=self.mq.consume,
-                                                           args=('Payment', self.payment_succeeded_callback))
-                    self.consume_thread.start()
-                    self.consume_thread.join(self.timeout)
+                # INVOKE CONSUME VIA THREAD TO SHUT AFTER TIME
+                self.consume_thread = threading.Thread(target=self.mq.consume,
+                                                       args=('Payment', self.payment_succeeded_callback))
+                self.consume_thread.start()
+                self.consume_thread.join(self.timeout)
 
-                elif event == 'fail':
-                    self.consume_thread = threading.Thread(target=self.mq.consume,
-                                                           args=('Payment', self.payment_failed_callback))
-                    self.consume_thread.start()
-                    self.consume_thread.join(self.timeout)
+        except Exception as e:
+            raise e
 
-                else:
-                    raise Exception("Event invoke name error ,'succeeded' or 'fail' only.")
+    def failed_pay(self):
+        """
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: start_listen
+        Description: 1. Function invokes RabbitMQ consuming and get message from Payment queue.
+                     2. Invokes payment failed message to Ordering queue.
+        """
+        try:
+            if load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test') is False:
+                raise Exception('ENV in Basket sim in start listen path broken')
+            # TEMPORARY INVOKING OF RABBITMQ
+            with self.mq:
+                # INVOKE CONSUME VIA THREAD TO SHUT AFTER TIME
+                self.consume_thread = threading.Thread(target=self.mq.consume,
+                                                       args=('Payment', self.payment_failed_callback))
+                self.consume_thread.start()
+                self.consume_thread.join(self.timeout)
         except Exception as e:
             raise e
 
 
 if __name__ == '__main__':
-    mq = PaymentSimulator()
-    mq.start_listen('succeeded')
+    mq = PaymentSimulator(5)
+    # mq.start_listen('succeeded')
     # mq.start_listen('fail')
+    mq.succeed_pay()

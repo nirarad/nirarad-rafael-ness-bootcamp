@@ -110,7 +110,8 @@ class TestINTEGRATION(unittest.TestCase):
             sent_body = eval(body_after_sending)
             # Getting date created automatically by server in code
 
-            # Payment simulator sends message to Ordering queue that payment succeeded
+            # Payment simulator sends message to Ordering queue that payment
+            self.payment_sim.succeed_pay()
             payment_succeeded(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
 
         except Exception as e:

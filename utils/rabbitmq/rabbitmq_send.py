@@ -42,8 +42,9 @@ class RabbitMQ:
         self.channel.start_consuming()
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.channel.basic_cancel(consumer_tag=None)
-        self.connection.close()
+        self.channel.stop_consuming()
+        if self.connection is not None:
+            self.connection.close()
 
 
 if __name__ == '__main__':
