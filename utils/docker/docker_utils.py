@@ -65,9 +65,27 @@ class DockerManager:
         self.restart('eshop/ordering.signalrhub:linux-latest')
 
 
+    def stop_not_necceery(self):
+        self.stop('eshop/basket.api:linux-latest')
+        self.stop('eshop/payment.api:linux-latest')
+        self.stop('eshop/catalog.api:linux-latest')
+        self.stop('envoyproxy/envoy:v1.11.1')
+        self.stop('eshop/webhooks.api:linux-latest')
+        self.stop('eshop/webmvc:linux-latest')
+        self.stop('eshop/webstatus:linux-latest')
+        self.stop('redis:alpine')
+        self.stop('eshop/mobileshoppingagg:linux-latest')
+        self.stop('eshop/webshoppingagg:linux-latest')
+        self.stop('eshop/webspa:linux-latest')
+        self.stop('eshop/webhooks.client:linux-latest')
+        self.stop('mongo:latest')
+        self.stop('datalust/seq:latest')
+
+
 if __name__ == '__main__':
     dm = DockerManager()
-    dm.start_for_tests()
+    # dm.start_for_tests()
+    dm.stop_not_necceery()
     # dm.restart_to_test()
     # dm.stop('eshop/ordering.api:linux-latest')
     # time.sleep(1)
