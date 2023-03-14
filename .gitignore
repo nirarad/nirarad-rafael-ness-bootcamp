@@ -135,3 +135,5 @@ temp/
 /tests/suites/output.json
 /tests/suites/archive/
 /documents/
+/pytest_html_report.html
+/output.json

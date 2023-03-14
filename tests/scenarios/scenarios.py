@@ -264,3 +264,8 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
     if ordering_api.get_card_types_invalid_auth().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
+
+
+# def service_crash_scenario(docker_manager, service_name):
+#     docker_manager.stop(service_name)
+#     docker_manager.stop(service_name)

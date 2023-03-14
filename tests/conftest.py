@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 
 from simulators.simulator import Simulator
 from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
+from utils.db.db_utils import MSSQLConnector
 from utils.docker.docker_utils import DockerManager
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -17,11 +19,53 @@ def load_env():
     load_dotenv()
 
 
+@pytest.fixture(scope="session")
+def docker_manager():
+    """
+    Fixture to create DockerManager instance.
+    """
+    return DockerManager()
+
+
+@pytest.fixture(scope="session")
+def rabbit_mq():
+    """
+    Fixture to create RabbitMQ instance.
+    """
+    rabbit_mq = RabbitMQ()
+    rabbit_mq.connect()
+    return rabbit_mq
+
+
+@pytest.fixture(scope="session")
+def mssql_connector():
+    """
+    Fixture to create RabbitMQ instance.
+    """
+    mssql_connector = MSSQLConnector()
+    mssql_connector.connect()
+    return mssql_connector
+
+
+@pytest.fixture(autouse=True)
+def purge_all_queues():
+    """
+    Fixture to purge all messages in each queue before every test.
+    """
+    print("purge all for funciton function...")
+    Simulator.purge_all_queues(
+        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+
+
 @pytest.fixture(scope='session', autouse=True)
+@pytest.mark.dependency(depends=["purge_all_queues"])
 def setup_docker_containers():
     """
     Fixture to start all containers except the containers that have a related simulator.
     """
+    print("Purge all queues for session...")
+    Simulator.purge_all_queues(
+        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
     print("Setting up docker containers...")
     # Stop the mocks containers
     mocks_containers = ["eshop/catalog.api:linux-latest", "eshop/payment.api:linux-latest",
@@ -40,15 +84,6 @@ def setup_docker_containers():
             dm.stop(container_name)
 
         sleep(10)
-
-
-@pytest.fixture(autouse=True)
-def purge_all_queues():
-    """
-    Fixture to purge all messages in each queue before every test.
-    """
-    Simulator.purge_all_queues(
-        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
 
 
 @pytest.fixture(scope="function")

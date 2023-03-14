@@ -20,6 +20,10 @@ class MSSQLConnector:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
+    def connect(self):
+        self.conn = pyodbc.connect(self.connection_str)
+        return self
+
     def select_query(self, query):
         """Executes a select query on the database and returns a list of dictionaries per row"""
         cursor = self.conn.cursor()

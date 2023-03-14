@@ -3,13 +3,12 @@ from time import sleep
 import pytest
 
 from tests.scenarios.scenarios import *
-from utils.docker.docker_utils import DockerManager
 
 
 @pytest.mark.scalability
 @pytest.mark.loads
 @pytest.mark.reliability
-def test_valid_message_consumption_rate():
+def test_valid_message_consumption_rate(docker_manager):
     """
     Source Test Case Title: Verify that the service can consume 150 messages that are waiting in the queue in a maximum time of one hour.
 
@@ -20,19 +19,18 @@ def test_valid_message_consumption_rate():
     Source Test Case Traceability: 6.1
     """
     # Pre-conditions: Stop the ordering service, and his background task.
-    dm = DockerManager()
     sleep(5)
-    dm.stop("eshop/ordering.api:linux-latest")
-    dm.stop("eshop/ordering.backgroundtasks:linux-latest")
-    sleep(10)
+    docker_manager.stop("eshop/ordering.api:linux-latest")
+    docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
+    sleep(5)
 
     # Step 1: Send to the ordering queue x number of messages, there suppose to waiting there, until the service is goes up again.
     for _ in range(2):
         order_submission_without_response_waiting_scenario()
 
     # Steps 2-3: Start the ordering service.
-    dm.start("eshop/ordering.api:linux-latest")
-    dm.start("eshop/ordering.backgroundtasks:linux-latest")
+    docker_manager.start("eshop/ordering.api:linux-latest")
+    docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
 
     # Wait for the messages to be consumed.
     sleep(5)

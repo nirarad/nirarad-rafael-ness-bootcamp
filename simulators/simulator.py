@@ -139,7 +139,6 @@ class Simulator(ABC):
     def get_number_of_seconds_to_consume_single_waiting_message(queue_name):
         try:
             counter = 0
-
             with RabbitMQ() as mq:
                 is_empty = mq.validate_queue_is_empty(queue_name)
                 while not is_empty:
@@ -157,3 +156,29 @@ class Simulator(ABC):
                 return mq.validate_queue_is_empty(queue_name)
         except BaseException as c:
             raise BaseException(f'There were problem to count the number of messages.\nException is: {c}')
+
+    @staticmethod
+    def select_top_n_orders_same_status(mssql_connector, status_number_1, status_number_2, amount_of_orders, timeout):
+        """
+
+        :param mssql_connector: The MSSQLConnector Object to use.
+        :param status_number_1: The status number to check.
+        :param status_number_2:
+        :param amount_of_orders: The amount of orders with that status.
+        :param timeout: The max timeout for the operation.
+        :return:
+        """
+        try:
+            for _ in range(timeout):
+                sum_of_ids = mssql_connector.select_query(
+                    f"SELECT SUM(subquery.OrderStatusId) FROM (SELECT TOP {amount_of_orders} OrderStatusId FROM ordering.orders) AS subquery"
+                )
+                print(type(sum_of_ids[0]['']))
+                if int(sum_of_ids[0]['']) == status_number_2 * amount_of_orders or int(
+                        sum_of_ids[0]['']) == status_number_1 * amount_of_orders:
+                    return True
+                else:
+                    time.sleep(1)
+            return False
+        except ConnectionError as c:
+            raise ConnectionError(f'There were problem to retrieve the order id.\nException is: {c}')

@@ -69,7 +69,7 @@ class RabbitMQ:
 
     def get_number_of_messages_in_queue(self, queue_name):
         try:
-            queue = self.channel.get_queue(queue_name)
+            queue = self.channel.queue_declare(queue_name, durable=True)
 
             # Return the amount of messages in the queue.
             return queue.method.message_count
@@ -80,12 +80,11 @@ class RabbitMQ:
     def validate_queue_is_empty(self, queue_name):
         try:
             queue = self.channel.queue_declare(queue_name, durable=True)
+
             # Validate that the queue is empty.
-            counter = queue.method.message_count
-            while counter > 0:
-                counter = queue.method.message_count
-            else:
-                return True
+            return queue.method.message_count == 0
+
+
         except ValueError as v:
             raise ValueError(
                 f'There was a problem with getting the first message from the {queue_name} queue, the following exception was received: {v}')
