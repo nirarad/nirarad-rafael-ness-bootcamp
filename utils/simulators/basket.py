@@ -63,13 +63,15 @@ class Basket(object):
         def callback(ch, method, properties, body):
             self.log.send(
                 f"\n\ncomponent: Basket\n\n[{ch}]\n\n Method: {method},\n\n Properties: {properties},\n\n Body: {body}\n\n ----------------")
-
+            # ch.basic_ack(delivery_tag=method.delivery_tag)
             if len(str(method)) > 0 or self.count == 0:
                 self.routing_key_basket_get = method.routing_key
                 ch.stop_consuming()
+                # self.rbtMQ.close()
 
             time.sleep(1)
             self.count -= 1
 
         with self.rbtMQ as mq:
             mq.consume(queue='Basket', callback=callback)
+            # mq.close()

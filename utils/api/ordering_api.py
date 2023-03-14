@@ -50,4 +50,4 @@ if __name__ == '__main__':
     import pprint
 
     api = OrderingAPI()
-    pprint.pprint(api.get_orders())
+    pprint.pprint(api.get_orders().json())
