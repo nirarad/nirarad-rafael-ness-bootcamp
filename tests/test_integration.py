@@ -10,7 +10,7 @@ from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.eshop_rabbitmq_events import *
 from utils.testcase.jsondatareader import JSONDataReader
 from utils.testcase.logger import Logger
-
+from simulators.payment_simulator import PaymentSimulator
 
 class TestINTEGRATION(unittest.TestCase):
     # Tests of integration with payment,basket,catalog simulators
@@ -45,6 +45,9 @@ class TestINTEGRATION(unittest.TestCase):
 
         # Json Data Order responses handler
         cls.jdata_orders_responses = JSONDataReader(os.getenv('RESPONSES_PATH'))
+
+        # Payment simulator
+        cls.payment_sim = PaymentSimulator()
 
     def setUp(self) -> None:
         self.conn.__enter__()

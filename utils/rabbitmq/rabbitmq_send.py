@@ -21,6 +21,9 @@ class RabbitMQ:
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(self.host))
         self.channel = self.connection.channel()
 
+    def bind(self, queue_name, exchange_name, routing_key):
+        self.channel.queue_bind(queue_name, exchange_name, routing_key)
+
     def declare_queue(self, queue):
         self.channel.queue_declare(queue=queue)
 
@@ -39,8 +42,8 @@ class RabbitMQ:
         self.channel.start_consuming()
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.connection.close()
         self.channel.basic_cancel(consumer_tag=None)
+        self.connection.close()
 
 
 if __name__ == '__main__':
