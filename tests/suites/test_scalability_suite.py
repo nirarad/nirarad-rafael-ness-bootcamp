@@ -54,4 +54,9 @@ def test_valid_pace_of_first_message_consumption():
 
     Source Test Case Traceability: 6.2
     """
-    pass
+
+    # Send to the order queue a single message.
+    order_submission_without_response_waiting_scenario()
+
+    # Validate that the time to consume that message us no longer than 3 seconds.
+    assert Simulator.get_number_of_seconds_to_consume_single_waiting_message('Ordering') <= 3

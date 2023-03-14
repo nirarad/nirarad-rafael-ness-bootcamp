@@ -136,6 +136,21 @@ class Simulator(ABC):
             raise BaseException(f'There were problem to count the number of messages.\nException is: {c}')
 
     @staticmethod
+    def get_number_of_seconds_to_consume_single_waiting_message(queue_name):
+        try:
+            counter = 0
+
+            with RabbitMQ() as mq:
+                is_empty = mq.validate_queue_is_empty(queue_name)
+                while not is_empty:
+                    is_empty = mq.validate_queue_is_empty(queue_name)
+                    counter += 1
+                    time.sleep(1)
+            return counter
+        except BaseException as c:
+            raise BaseException(f'There were problem with accessing the {queue_name} queue.\nException is: {c}')
+
+    @staticmethod
     def validate_queue_id_empty(queue_name):
         try:
             with RabbitMQ() as mq:
