@@ -9,7 +9,7 @@ class MSSQLConnector:
         self.USER = 'sa'
         self.PASSWORD = 'Pass@word'
         self.DATABASE = f'Microsoft.eShopOnContainers.Services.{database}'
-        self.DRIVER = '{ODBC Driver 18 for SQL Server}'
+        self.DRIVER = '{ODBC Driver 17 for SQL Server}'
         self.connection_str = f"Driver={self.DRIVER};Server={self.SERVER};Database={self.DATABASE};UID={self.USER};PWD={self.PASSWORD};TrustServerCertificate=yes"
         self.conn = None
 
