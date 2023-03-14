@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 class MSSQLConnector:
 
     def __init__(self):
-        load_dotenv('../../tests/DATA/.env.test')
+        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
         self.SERVER = str(os.getenv('SERVER'))
         self.USER = os.getenv('USER')
         self.PASSWORD = os.getenv('PASSWORD')

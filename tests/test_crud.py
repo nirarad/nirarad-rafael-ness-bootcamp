@@ -26,7 +26,7 @@ class TestCRUD(unittest.TestCase):
         cls.logger = Logger('test', 'Logs/tests.log').logger
 
         # Ordering API mocker
-        cls.oam = OrderingAPI_Mocker()
+        cls.oam = OrderingAPI_Mocker('alice', 'Pass123%24')
 
         # Unique id generator handler
         cls.order_uuid = None
