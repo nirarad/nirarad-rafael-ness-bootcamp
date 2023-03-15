@@ -5,25 +5,31 @@ from utils.db.db_utils import MSSQLConnector
 class RabbitMessages:
     #with MSSQLConnector() as conn:
         #id = conn.select_query('SELECT MAX(Id) FROM ordering.orders')
-    def usercheckout(self,productid,quantity):
+    def usercheckout(self,productid=1,quantity=1,cardtype=1,username="alice",CardSecurityNumber=123):
+     if username!='alice' or 'bob':
+         userid=str(uuid.uuid4())
+         cardnameholder="john wick"
+     else:
+         userid='b9e5dcdd-dae2-4b1c-a991-f74aae042814'
+         cardnameholder = "Alice Smith"
      body= {
-                "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
-                "UserName": "alice",
+                "UserId": 'b9e5dcdd-dae2-4b1c-a991-f74aae042814',
+                "UserName": username,
                 "OrderNumber": 0,
-                "City": "Redmond",
-                "Street": "15703 NE 61st Ct",
+                "City": "la",
+                "Street": "1599 NE 61st Ct",
                 "State": "WA",
                 "Country": "U.S.",
                 "ZipCode": "98052",
                 "CardNumber": "4012888888881881",
-                "CardHolderName": "Alice Smith",
+                "CardHolderName": cardnameholder,
                 "CardExpiration": "2024-12-31T22:00:00Z",
-                "CardSecurityNumber": "123",
-                "CardTypeId": 1,
+                "CardSecurityNumber": CardSecurityNumber,
+                "CardTypeId": cardtype,
                 "Buyer": 'null',
                 "RequestId": str(uuid.uuid4()),
                 "Basket": {
-                    "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+                    "BuyerId": 'b9e5dcdd-dae2-4b1c-a991-f74aae042814',
                     "Items": [
                         {
                             "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
@@ -90,4 +96,35 @@ class RabbitMessages:
              }
 
         return body
+
+    def respone_of_get_order_by_id(self,id):
+        body={
+                "ordernumber": 68,
+                "date": "2023-03-13T10:47:52.5204089",
+                 "status": "shipped",
+                "description": None,
+                "street": "15703 NE 61st Ct",
+                "city": "Redmond",
+                "zipcode": "98052",
+                "country": "U.S.",
+                "orderitems": [
+                {
+                    "productname": ".NET Black & White Mug",
+                    "units": 1,
+                    "unitprice": 8.5,
+                    "pictureurl": "http://host.docker.internal:5202/c/api/v1/catalog/items/2/pic/"
+                },
+                {
+                     "productname": ".NET Blue Hoodie",
+                     "units": 1,
+                        "unitprice": 12,
+                    "pictureurl": "http://host.docker.internal:5202/c/api/v1/catalog/items/6/pic/"
+                }
+                            ],
+                "total": 20.50
+            }
+        return body
+
+    #def respone_of_get_order_of_diffrent_user(self):
+
 

@@ -41,6 +41,9 @@ class RabbitMQ:
         self.channel.start_consuming()
         return a
 
+    def purge(self,queue):
+        self.channel.queue_purge(queue=queue)
+
 
 if __name__ == '__main__':
     body = {
@@ -54,6 +57,9 @@ if __name__ == '__main__':
         mq.publish(exchange='eshop_event_bus',
                   routing_key='OrderPaymentSucceededIntegrationEvent',
                   body=json.dumps(body))
+
+        #queue='Ordering.signalrhub'
+        #mq.purge(queue)
 
         # mq.publish(exchange='eshop_event_bus',
         #            routing_key='UserCheckoutAcceptedIntegrationEvent',
