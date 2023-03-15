@@ -13,12 +13,11 @@ class PaymentSimulator:
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: payment_succeeded_callback
-        Description: 1. Function getting callback from Payment queue.
-                     2. Sends payment succeeded message to Ordering queue.
+        Description: Function makes and sends payment  succeeded callback to Ordering queue.
         :param ch: RabbitMQ channel info
         :param method: RabbitMQ method info
         :param properties: RabbitMQ properties info
-        :param body: message body (order to pay) from ordering api
+        :param body: message body
         """
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
         dict_body = eval(body)
@@ -31,12 +30,11 @@ class PaymentSimulator:
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: payment_failed_callback
-        Description: 1. Function getting callback from Payment queue.
-                     2. Sends payment failed message to Ordering queue.
+        Description: Function makes and sends payment failed callback to Ordering queue
         :param ch: RabbitMQ channel info
         :param method: RabbitMQ method info
         :param properties: RabbitMQ properties info
-        :param body: message body (order to pay) from ordering api
+        :param body: message body
         """
         # RABBITMQ INFO
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
@@ -50,9 +48,9 @@ class PaymentSimulator:
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: start_listen
+        Function Name: succeed_pay
         Description: 1. Function invokes RabbitMQ consuming and get message from Payment queue.
-                     2. Invokes payment succeeded message to Ordering queue.
+                     2. Invokes callback payment succeeded to send message to Ordering queue.
         """
         try:
             # TEMPORARY INVOKING OF RABBITMQ
@@ -67,9 +65,9 @@ class PaymentSimulator:
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: start_listen
+        Function Name: failed_pay
         Description: 1. Function invokes RabbitMQ consuming and get message from Payment queue.
-                     2. Invokes payment failed message to Ordering queue.
+                     2. Invokes callback payment failed to send message to Ordering queue.
         """
         try:
             # TEMPORARY INVOKING OF RABBITMQ
@@ -82,7 +80,5 @@ class PaymentSimulator:
 
 
 if __name__ == '__main__':
-    mq = PaymentSimulator()
-    # mq.start_listen('succeeded')
-    # mq.start_listen('fail')
-    mq.succeed_pay()
+    ps = PaymentSimulator()
+    ps.succeed_pay()

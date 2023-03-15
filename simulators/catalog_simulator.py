@@ -13,12 +13,11 @@ class CatalogSimulator:
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: in_stock_callback
-        Description: 1. Function getting callback from Catalog queue.
-                     2. Sends in stock message to Ordering queue.
+        Description: Function make and send confirmed stock callback to Ordering queue.
         :param ch: RabbitMQ channel info
         :param method: RabbitMQ method info
         :param properties: RabbitMQ properties info
-        :param body: order body  from ordering api
+        :param body: message body
         """
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
         dict_body = eval(body)
@@ -30,13 +29,12 @@ class CatalogSimulator:
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: payment_failed_callback
-        Description: 1. Function getting callback from Payment queue.
-                     2. Sends payment failed message to Ordering queue.
+        Function Name: not_in_stock_callback
+        Description: Function make and send rejected stock callback to Ordering queue.
         :param ch: RabbitMQ channel info
         :param method: RabbitMQ method info
         :param properties: RabbitMQ properties info
-        :param body: message body (order to pay) from ordering api
+        :param body: message body
         """
         # RABBITMQ INFO
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
@@ -50,9 +48,10 @@ class CatalogSimulator:
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: start_listen
-        Description: 1. Function invokes getting message from Catalog queue.
-                     2. Sending callback message that stock confirmed.
+        Function Name: confirm_stock
+        Description: Function invokes RabbitMQ consume to get message
+                     from Catalog queue and sends confirmed stock callback.
+
         """
         try:
             # TEMPORARY INVOKING OF RABBITMQ
@@ -68,7 +67,8 @@ class CatalogSimulator:
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: start_listen
-        Description: Function invokes RabbitMQ consuming and get message from Catalog queue.
+        Description: Function invokes RabbitMQ consume to get message
+                     from Catalog queue and sends rejected stock callback.
         """
         try:
             # TEMPORARY INVOKING OF RABBITMQ
@@ -82,6 +82,4 @@ class CatalogSimulator:
 
 if __name__ == '__main__':
     cat = CatalogSimulator()
-    # mq.start_listen('succeeded')
-    # mq.start_listen('fail')
     cat.confirm_stock()
