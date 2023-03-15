@@ -102,7 +102,7 @@ class TestScalability(unittest.TestCase):
             self.assertLessEqual(elapsed_time, 100)
             self.logger.info(
                 f'{self.test_order_api_scalability_100_orders.__doc__} '
-                f'Order status in DB -> Actual: {elapsed_time / 360} hours , Expected: < {100} hours')
+                f'Order status in DB -> Actual: {elapsed_time / 3600} hours , Expected: < {100} hours')
         except Exception as e:
             self.logger.exception(f"\n{self.test_order_api_scalability_100_orders.__doc__}Actual {e}")
             raise
