@@ -1,7 +1,6 @@
 import time
 import unittest
 
-from utils.api.ordering_api_mocker import OrderingAPI_Mocker
 from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.eshop_rabbitmq_events import *
 from utils.testcase.jsondatareader import JSONDataReader
@@ -9,7 +8,6 @@ from utils.testcase.logger import Logger
 from simulators.payment_simulator import PaymentSimulator
 from simulators.catalog_simulator import CatalogSimulator
 from simulators.basket_simulator import BasketSimulator
-from utils.testcase.waiter import Waiter
 
 
 class TestIntegration(unittest.TestCase):
@@ -50,11 +48,11 @@ class TestIntegration(unittest.TestCase):
         # Basket simulator
         cls.basket_sim = BasketSimulator()
 
-        # WAITER
-        cls.waiter = Waiter(50)
-
         # Last order created
         cls.last_order = None
+
+        # Timeout
+        cls.timeout = 40
 
     def setUp(self) -> None:
         self.conn.__enter__()
@@ -129,9 +127,11 @@ class TestIntegration(unittest.TestCase):
             self.payment_sim.succeed_pay()
 
             # Wait for ordering service updating order status
-            self.waiter.implicit_wait()
+            time.sleep(self.timeout)
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            # WAIT UPDATING ORDER STATUS IN DB
+            time.sleep(5)
             self.assertEqual(order_status, 4)
             self.logger.info(
                 f'{self.test_integration_with_payment_succeeded.__doc__}Order status in DB -> '
@@ -206,9 +206,11 @@ class TestIntegration(unittest.TestCase):
             self.payment_sim.failed_pay()
 
             # Wait for ordering service updating order status
-            self.waiter.implicit_wait()
+            time.sleep(self.timeout)
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            # WAIT UPDATING ORDER STATUS IN DB
+            time.sleep(5)
             self.assertEqual(order_status, 6)
             self.logger.info(
                 f'{self.test_integration_with_payment_failed.__doc__}Order status in DB -> '
@@ -253,14 +255,14 @@ class TestIntegration(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_integration_with_catalog_in_stock.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
-                        f'Expected: New Order Id')
+                        f'{self.test_integration_with_catalog_in_stock.__doc__}'
+                        f'Order Id in DB -> Actual: ID {self.new_order_id}, Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_integration_with_catalog_in_stock.__doc__} Order status in DB -> Actual: {current_status} ,'
-                        f' Expected: {1}')
+                        f'{self.test_integration_with_catalog_in_stock.__doc__}'
+                        f' Order status in DB -> Actual: {current_status} , Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
@@ -284,10 +286,12 @@ class TestIntegration(unittest.TestCase):
             # Catalog simulator confirms payment succeeded
             self.catalog_sim.confirm_stock()
 
-            # Wait for ordering service updating order status
-            self.waiter.implicit_wait()
+            # Wait for ordering api updating order status
+            time.sleep(self.timeout)
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            # WAIT UPDATING ORDER STATUS IN DB
+            time.sleep(5)
             self.assertEqual(order_status, 3)
             self.logger.info(
                 f'{self.test_integration_with_catalog_in_stock.__doc__}Order status in DB -> '
@@ -331,14 +335,14 @@ class TestIntegration(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_integration_with_catalog_not_in_stock.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
-                        f'Expected: New Order Id')
+                        f'{self.test_integration_with_catalog_not_in_stock.__doc__}'
+                        f'Order Id in DB -> Actual: ID {self.new_order_id},Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_integration_with_catalog_not_in_stock.__doc__} Order status in DB -> Actual: {current_status} ,'
-                        f' Expected: {1}')
+                        f'{self.test_integration_with_catalog_not_in_stock.__doc__} '
+                        f'Order status in DB -> Actual: {current_status} ,Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
@@ -364,9 +368,11 @@ class TestIntegration(unittest.TestCase):
             self.catalog_sim.reject_stock()
 
             # Wait for ordering service updating order status
-            self.waiter.implicit_wait()
+            time.sleep(self.timeout)
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            # WAIT UPDATING ORDER STATUS IN DB
+            time.sleep(5)
             self.assertEqual(order_status, 6)
             self.logger.info(
                 f'{self.test_integration_with_catalog_not_in_stock.__doc__}Order status in DB -> '
@@ -460,29 +466,29 @@ class TestIntegration(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_order_api_integration_with_basket.__doc__}Order Id in DB -> '
+                        f'{self.test_order_api_integration_with_backgroundtasks.__doc__}Order Id in DB -> '
                         f'Actual: ID {self.new_order_id} , Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_order_api_integration_with_basket.__doc__} Order status in DB ->'
+                        f'{self.test_order_api_integration_with_backgroundtasks.__doc__} Order status in DB ->'
                         f' Actual: {current_status} , Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
                     raise Exception("Record was not created")
             # Wait for BackgroundTasks sending message to Ordering api and ordering api updates order status to 2.
-            self.waiter.implicit_wait()
+            time.sleep(self.timeout)
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
             # Assert to status 2 (awaitingvalidation)
-            self.assertNotEqual(current_order_status, 2)
+            self.assertEqual(current_order_status, 2)
             self.logger.info(
-                f'{self.test_order_api_integration_with_basket.__doc__}Message fro Ordering API -> '
-                f'Actual: {self.basket_sim.response_message}, Expected: not None')
+                f'{self.test_order_api_integration_with_backgroundtasks.__doc__}Order status ID in DB -> '
+                f'Actual: {current_order_status}, Expected: {2}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_order_api_integration_with_basket.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_order_api_integration_with_backgroundtasks.__doc__}Actual {e}")
             raise
 
 

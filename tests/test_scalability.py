@@ -8,7 +8,6 @@ from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.eshop_rabbitmq_events import create_order
 from utils.testcase.jsondatareader import JSONDataReader
 from utils.testcase.logger import Logger
-from utils.testcase.waiter import Waiter
 
 
 class TestScalability(unittest.TestCase):
@@ -34,9 +33,6 @@ class TestScalability(unittest.TestCase):
 
         # Json Data Order handler
         cls.jdata_orders = JSONDataReader(os.getenv('ORDERS_PATH'))
-
-        # WAITER
-        cls.waiter = Waiter(50)
 
         # Last order created
         cls.last_order = None
