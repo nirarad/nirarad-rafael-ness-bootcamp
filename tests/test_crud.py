@@ -23,7 +23,7 @@ class TestCRUD(unittest.TestCase):
         load_dotenv('DATA/.env.test')
 
         # Local Logger
-        cls.logger = Logger('test', 'Logs/tests.log').logger
+        cls.logger = Logger('crud_logger', 'Logs/test_crud.log').logger
 
         # Ordering API mocker
         cls.oam = OrderingAPI_Mocker('alice', 'Pass123%24')
