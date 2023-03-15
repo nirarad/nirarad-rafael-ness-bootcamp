@@ -48,16 +48,16 @@ class TestScalability(unittest.TestCase):
     def tearDownClass(cls):
         cls.conn.close()
 
-    # TC016
+    # TC017
     def test_order_api_scalability_100_orders(self):
         """
-        TC_ID: TC016
+        TC_ID: TC017
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: test_integration_with_payment_succeeded
-        Description: 1.Function tests Ordering service integration with Payment simulator.
-                     2.Function creating order.
-                     3.Validates if order is created and with status.
+        Function Name: test_order_api_scalability_100_orders
+        Description: 1.Function tests Ordering api scalability.
+                     2.Function validates all order creation.
+                     3.Function creating 100 orders and counting time of creations.
         """
         try:
             loop_start_time = time.time()
