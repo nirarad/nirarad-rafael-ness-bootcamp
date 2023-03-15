@@ -172,8 +172,8 @@ def ship_api_request_scenario(status_code=200, id_validation_timeout=300):
             raise AssertionError(
                 f"Test failed. Failure reason is: The order status hasn't been changed to the 'shipped' status (status number 5).")
 
-        # Test Passed
-        return True
+    # Test Passed
+    return True
 
 
 def ship_invalid_auth_api_request_scenario(status_code=401):

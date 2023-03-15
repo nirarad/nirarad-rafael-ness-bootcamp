@@ -27,7 +27,7 @@ def docker_manager():
     return DockerManager()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def rabbit_mq():
     """
     Fixture to create RabbitMQ instance.
@@ -49,7 +49,7 @@ def mssql_connector():
     mssql_connector.close()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="function")
 def purge_all_queues():
     """
     Fixture to purge all messages in each queue before every test.
@@ -57,6 +57,7 @@ def purge_all_queues():
     print("purge all queues for function...")
     Simulator.purge_all_queues(
         ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+    sleep(2)
 
 
 @pytest.fixture(scope='session', autouse=True)

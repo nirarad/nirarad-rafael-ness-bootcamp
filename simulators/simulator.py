@@ -97,7 +97,9 @@ class Simulator(ABC):
                 mq.purge_queue(q)
 
     @staticmethod
-    def explicit_status_id_validation(status_id, timeout=300, order_id=CURRENT_ORDER_ID):
+    def explicit_status_id_validation(status_id, timeout=300, order_id=None):
+        if order_id is None:
+            order_id = Simulator.CURRENT_ORDER_ID
         print(f"Validate id id {status_id}...")
         try:
             with MSSQLConnector() as conn:
@@ -107,7 +109,7 @@ class Simulator(ABC):
                         "SELECT o.OrderStatusId "
                         "FROM ordering.orders o "
                         f"WHERE o.OrderStatusId = {status_id} "
-                        f"and o.Id = {order_id}"))
+                        f"and o.Id = {Simulator.CURRENT_ORDER_ID}"))
                     if counter > 0:
                         return True
                     else:
