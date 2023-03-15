@@ -52,8 +52,7 @@ class DockerManager:
         self.stop('mongo:latest')
         self.stop('datalust/seq:latest')
         self.stop('envoyproxy/envoy:v1.11.1')
-
-
+        self.start('eshop/identity.api:linux-latest')
         time.sleep(5)
 
     def restart_to_test(self):
