@@ -31,7 +31,7 @@ class OrderingAPI:
                 "orderNumber": order_id
             }, headers=self.headers)
         # pprint(orders.text)
-        return res
+        return res.status_code
 
     def ship_order(self, order_id):
         res = requests.put(
@@ -43,8 +43,9 @@ class OrderingAPI:
         return res
 
 
-
 if __name__ == '__main__':
     import pprint
-    api = OrderingAPI("bob","Pass123%24" )
-    pprint.pprint(api.get_cardtypes().json())
+
+    api = OrderingAPI()
+    # pprint.pprint(api.get_cardtypes().json())
+    # print(api.cancel_order(2380))
