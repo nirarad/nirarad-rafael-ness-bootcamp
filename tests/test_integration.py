@@ -12,7 +12,7 @@ from simulators.basket_simulator import BasketSimulator
 from utils.testcase.waiter import Waiter
 
 
-class TestINTEGRATION(unittest.TestCase):
+class TestIntegration(unittest.TestCase):
     # Tests of integration with payment,basket,catalog simulators
 
     # Variable of connection to DB
