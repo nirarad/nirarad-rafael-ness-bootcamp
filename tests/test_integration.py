@@ -26,10 +26,7 @@ class TestINTEGRATION(unittest.TestCase):
         load_dotenv('DATA/.env.test')
 
         # Local Logger
-        cls.logger = Logger('test', 'Logs/tests.log').logger
-
-        # Ordering API mocker
-        cls.oam = OrderingAPI_Mocker('alice', 'Pass123%24')
+        cls.logger = Logger('integration_logger', 'Logs/test_integration.log').logger
 
         # Unique id generator
         cls.order_uuid = str(uuid.uuid4())
@@ -55,7 +52,7 @@ class TestINTEGRATION(unittest.TestCase):
         # Basket simulator
         cls.basket_sim = BasketSimulator()
         # WAITER
-        cls.waiter = Waiter(30)
+        cls.waiter = Waiter(50)
 
         # Last order created
         cls.last_order = None
@@ -225,7 +222,7 @@ class TestINTEGRATION(unittest.TestCase):
     # TC013
     def test_integration_with_catalog_in_stock(self):
         """
-        TC_ID: TC012
+        TC_ID: TC013
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_integration_with_catalog_in_stock
@@ -379,9 +376,10 @@ class TestINTEGRATION(unittest.TestCase):
             self.logger.exception(f"\n{self.test_integration_with_catalog_not_in_stock.__doc__}Actual {e}")
             raise
 
+    # TC015
     def test_order_api_integration_with_basket(self):
         """
-        TC_ID: TC013
+        TC_ID: TC015
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_order_not_in_stock_
