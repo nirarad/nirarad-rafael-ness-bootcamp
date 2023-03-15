@@ -20,8 +20,6 @@ class TestIntegration(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        # Init of class TestCRUD
-
         # Env of tests
         load_dotenv('DATA/.env.test')
 
