@@ -8,6 +8,7 @@ from utils.testcase.jsondatareader import JSONDataReader
 from utils.testcase.logger import Logger
 from simulators.payment_simulator import PaymentSimulator
 from simulators.catalog_simulator import CatalogSimulator
+from simulators.basket_simulator import BasketSimulator
 from utils.testcase.waiter import Waiter
 
 
@@ -51,8 +52,13 @@ class TestINTEGRATION(unittest.TestCase):
         # Catalog simulator
         cls.catalog_sim = CatalogSimulator()
 
+        # Basket simulator
+        cls.basket_sim = BasketSimulator()
         # WAITER
         cls.waiter = Waiter(30)
+
+        # Last order created
+        cls.last_order = None
 
     def setUp(self) -> None:
         self.conn.__enter__()
@@ -63,13 +69,13 @@ class TestINTEGRATION(unittest.TestCase):
 
     # PAYMENT
     # TC011
-    def test_order_payment_succeeded(self):
+    def test_integration_with_payment_succeeded(self):
         """
         TC_ID: TC011
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: test_create_order
-        Description: 1.Function tests Ordering service integration whit Payment simulator.
+        Function Name: test_integration_with_payment_succeeded
+        Description: 1.Function tests Ordering service integration with Payment simulator.
                      2.Function creating order.
                      3.Validates if order is created and with status.
                      4.Changes status to stockconfirmed.
@@ -95,14 +101,15 @@ class TestINTEGRATION(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_order_payment_succeeded.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
+                        f'{self.test_integration_with_payment_succeeded.__doc__}'
+                        f'Order Id in DB -> Actual: ID {self.new_order_id}, '
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_order_payment_succeeded.__doc__} Order status in DB -> Actual: {current_status} ,'
-                        f' Expected: {1}')
+                        f'{self.test_integration_with_payment_succeeded.__doc__} '
+                        f'Order status in DB -> Actual: {current_status} , Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
@@ -115,7 +122,7 @@ class TestINTEGRATION(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 3)
             self.logger.info(
-                f'{self.test_order_payment_succeeded.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_payment_succeeded.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
@@ -131,28 +138,28 @@ class TestINTEGRATION(unittest.TestCase):
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(order_status, 4)
             self.logger.info(
-                f'{self.test_order_payment_succeeded.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_payment_succeeded.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {4}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_order_payment_succeeded.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_integration_with_payment_succeeded.__doc__}Actual {e}")
             raise
 
     # TC012
-    def test_order_payment_failed(self):
+    def test_integration_with_payment_failed(self):
         """
         TC_ID: TC012
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: test_order_payment_failed
-        Description: 1.Function tests Ordering service integration whit Payment simulator.
+        Function Name: test_integration_with_payment_failed
+        Description: 1.Function tests Ordering service integration with Payment simulator.
                      2.Function creating order.
                      3.Validates if order is created and with status.
                      4.Changes status to stockconfirmed.
                      5.Validates the status.
                      6.Sends message to Payment queue.
                      7.Sends message to Ordering queue.
-                     8.Validates order status in DB changed to cancel.
+                     8.Validates order status in DB changed to (cancelled).
 
         """
         try:
@@ -172,14 +179,14 @@ class TestINTEGRATION(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_order_payment_failed.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
-                        f'Expected: New Order Id')
+                        f'{self.test_integration_with_payment_failed.__doc__}'
+                        f'Order Id in DB -> Actual: ID {self.new_order_id}, Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_order_payment_failed.__doc__} Order status in DB -> Actual: {current_status} ,'
-                        f' Expected: {1}')
+                        f'{self.test_integration_with_payment_failed.__doc__} '
+                        f'Order status in DB -> Actual: {current_status} , Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
@@ -192,7 +199,7 @@ class TestINTEGRATION(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 3)
             self.logger.info(
-                f'{self.test_order_payment_failed.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_payment_failed.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
@@ -208,28 +215,28 @@ class TestINTEGRATION(unittest.TestCase):
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(order_status, 6)
             self.logger.info(
-                f'{self.test_order_payment_failed.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_payment_failed.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {6}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_order_payment_failed.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_integration_with_payment_failed.__doc__}Actual {e}")
             raise
 
-    # TC012
-    def test_order_in_stock(self):
+    # TC013
+    def test_integration_with_catalog_in_stock(self):
         """
         TC_ID: TC012
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: test_order_stock_confirmed
-        Description: 1.Function tests Ordering service integration whit Catalog simulator.
+        Function Name: test_integration_with_catalog_in_stock
+        Description: 1.Function tests Ordering service integration with Catalog simulator.
                      2.Function creating order.
                      3.Validates if order is created and with status.
                      4.Changes status to awaitingvalidation.
                      5.Validates the status.
                      6.Sends message to Catalog queue.
                      7.Invokes Catalog simulator to send message to Ordering queue.
-                     8.Validates order status in DB changed to stockconfirmed.
+                     8.Validates order status in DB changed to (stockconfirmed).
 
         """
         try:
@@ -249,13 +256,13 @@ class TestINTEGRATION(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_order_in_stock.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
+                        f'{self.test_integration_with_catalog_in_stock.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_order_in_stock.__doc__} Order status in DB -> Actual: {current_status} ,'
+                        f'{self.test_integration_with_catalog_in_stock.__doc__} Order status in DB -> Actual: {current_status} ,'
                         f' Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
@@ -269,7 +276,7 @@ class TestINTEGRATION(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 2)
             self.logger.info(
-                f'{self.test_order_in_stock.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_catalog_in_stock.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {2}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
@@ -286,21 +293,21 @@ class TestINTEGRATION(unittest.TestCase):
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(order_status, 3)
             self.logger.info(
-                f'{self.test_order_in_stock.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_catalog_in_stock.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_order_in_stock.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_integration_with_catalog_in_stock.__doc__}Actual {e}")
             raise
 
-    # TC013
-    def test_order_not_in_stock_(self):
+    # TC014
+    def test_integration_with_catalog_not_in_stock(self):
         """
-        TC_ID: TC013
+        TC_ID: TC014
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_order_not_in_stock_
-        Description: 1.Function tests Ordering service integration whit Catalog simulator.
+        Description: 1.Function tests Ordering service integration with Catalog simulator.
                      2.Function creating order.
                      3.Validates if order is created and with status.
                      4.Changes status to awaitingvalidation.
@@ -327,13 +334,13 @@ class TestINTEGRATION(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_order_not_in_stock_.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
+                        f'{self.test_integration_with_catalog_not_in_stock.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_order_not_in_stock_.__doc__} Order status in DB -> Actual: {current_status} ,'
+                        f'{self.test_integration_with_catalog_not_in_stock.__doc__} Order status in DB -> Actual: {current_status} ,'
                         f' Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
@@ -347,7 +354,7 @@ class TestINTEGRATION(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 2)
             self.logger.info(
-                f'{self.test_order_not_in_stock_.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_catalog_not_in_stock.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {2}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
@@ -365,11 +372,66 @@ class TestINTEGRATION(unittest.TestCase):
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(order_status, 6)
             self.logger.info(
-                f'{self.test_order_not_in_stock_.__doc__}Order status in DB -> '
+                f'{self.test_integration_with_catalog_not_in_stock.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {6}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_order_not_in_stock_.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_integration_with_catalog_not_in_stock.__doc__}Actual {e}")
+            raise
+
+    def test_order_api_integration_with_basket(self):
+        """
+        TC_ID: TC013
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_order_not_in_stock_
+        Description: 1.Function tests Ordering service integration whit Catalog simulator.
+                     2.Function creating order.
+                     3.Validates if order is created and with status.
+                     4.Changes status to awaitingvalidation.
+                     5.Validates the status.
+                     6.Sends message to Catalog queue.
+                     7.Invokes Catalog simulator to send message to Ordering queue.
+                     8.Validates order status in DB changed to cancel.
+
+        """
+        try:
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            order = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
+            self.basket_sim.place_order(order)
+            # Explicit wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.info(
+                        f'{self.test_order_api_integration_with_basket.__doc__}Order Id in DB -> '
+                        f'Actual: ID {self.new_order_id} , Expected: New Order Id')
+                    # Validate status order is 1
+                    current_status = self.conn.get_order_status_from_db(self.new_order_id)
+                    self.assertTrue(current_status, 1)
+                    self.logger.info(
+                        f'{self.test_order_api_integration_with_basket.__doc__} Order status in DB ->'
+                        f' Actual: {current_status} , Expected: {1}')
+                    break
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    raise Exception("Record was not created")
+
+                # Basket consuming for message from Ordering api
+                self.basket_sim.consume()
+                # If message didn't come than something broken in Ordering api
+                self.assertNotEqual(self.basket_sim.response_message, None)
+            self.logger.info(
+                f'{self.test_order_api_integration_with_basket.__doc__}Message fro Ordering API -> '
+                f'Actual: {self.basket_sim.response_message}, Expected: not None')
+
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_order_api_integration_with_basket.__doc__}Actual {e}")
             raise
 
 

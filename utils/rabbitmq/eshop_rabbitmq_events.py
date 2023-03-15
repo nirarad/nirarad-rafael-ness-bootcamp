@@ -25,15 +25,12 @@ def create_order(body_to_send):
     Description: Function of Basket simulator.
                  1.Sends message to RabbitMQ queue Ordering to create order
     :param body_to_send: body to send in message
-    :return:
+    :return: sent body with server date corrected
     """
-    try:
-        if body_to_send is None:
-            raise Exception('Message body is None.')
-        # Sending message to RabbitMQ queue Ordering
-        return rabbit_mq_publish(os.getenv('CREATE_ORDER_ROUTING_KEY'), body_to_send)
-    except Exception:
-        raise
+    if body_to_send is None:
+        raise Exception('Message body is None.')
+    # Sending message to RabbitMQ queue Ordering
+    return rabbit_mq_publish(os.getenv('CREATE_ORDER_ROUTING_KEY'), body_to_send)
 
 
 def confirm_stock(order_id, x_requestid, date):
