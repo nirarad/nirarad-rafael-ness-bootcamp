@@ -1,9 +1,5 @@
-import os
 import time
 import unittest
-import uuid
-
-from dotenv import load_dotenv
 
 from utils.api.ordering_api_mocker import OrderingAPI_Mocker
 from utils.db.db_utils import MSSQLConnector
@@ -11,6 +7,7 @@ from utils.rabbitmq.eshop_rabbitmq_events import *
 from utils.testcase.jsondatareader import JSONDataReader
 from utils.testcase.logger import Logger
 from simulators.payment_simulator import PaymentSimulator
+from simulators.catalog_simulator import CatalogSimulator
 from utils.testcase.waiter import Waiter
 
 
@@ -51,8 +48,11 @@ class TestINTEGRATION(unittest.TestCase):
         # Payment simulator
         cls.payment_sim = PaymentSimulator()
 
+        # Catalog simulator
+        cls.catalog_sim = CatalogSimulator()
+
         # WAITER
-        cls.waiter = Waiter(5)
+        cls.waiter = Waiter(30)
 
     def setUp(self) -> None:
         self.conn.__enter__()
@@ -115,8 +115,8 @@ class TestINTEGRATION(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 3)
             self.logger.info(
-                f'{self.test_order_payment_succeeded.__doc__}Order Id in DB -> '
-                f'Actual: ID {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
+                f'{self.test_order_payment_succeeded.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
             # Getting date created automatically by server in code
@@ -131,8 +131,8 @@ class TestINTEGRATION(unittest.TestCase):
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(order_status, 4)
             self.logger.info(
-                f'{self.test_order_payment_succeeded.__doc__}Order Id in DB -> '
-                f'Actual: ID {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {4}')
+                f'{self.test_order_payment_succeeded.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {4}')
 
         except Exception as e:
             self.logger.exception(f"\n{self.test_order_payment_succeeded.__doc__}Actual {e}")
@@ -172,13 +172,13 @@ class TestINTEGRATION(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_order_payment_succeeded.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
+                        f'{self.test_order_payment_failed.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_order_payment_succeeded.__doc__} Order status in DB -> Actual: {current_status} ,'
+                        f'{self.test_order_payment_failed.__doc__} Order status in DB -> Actual: {current_status} ,'
                         f' Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
@@ -192,8 +192,8 @@ class TestINTEGRATION(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 3)
             self.logger.info(
-                f'{self.test_order_payment_succeeded.__doc__}Order Id in DB -> '
-                f'Actual: ID {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
+                f'{self.test_order_payment_failed.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
             # Getting date created automatically by server in code
@@ -208,11 +208,168 @@ class TestINTEGRATION(unittest.TestCase):
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(order_status, 6)
             self.logger.info(
-                f'{self.test_order_payment_succeeded.__doc__}Order Id in DB -> '
-                f'Actual: ID {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {6}')
+                f'{self.test_order_payment_failed.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {6}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_order_payment_succeeded.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_order_payment_failed.__doc__}Actual {e}")
+            raise
+
+    # TC012
+    def test_order_in_stock(self):
+        """
+        TC_ID: TC012
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_order_stock_confirmed
+        Description: 1.Function tests Ordering service integration whit Catalog simulator.
+                     2.Function creating order.
+                     3.Validates if order is created and with status.
+                     4.Changes status to awaitingvalidation.
+                     5.Validates the status.
+                     6.Sends message to Catalog queue.
+                     7.Invokes Catalog simulator to send message to Ordering queue.
+                     8.Validates order status in DB changed to stockconfirmed.
+
+        """
+        try:
+            # Find last order id to compare if getting right order id,will be pre last after creating new order
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            # Message body to send
+            message_body = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
+            # Sending message to RabbitMQ to Ordering queue to create order and getting body corrected by server
+            body_after_sending = create_order(message_body)
+            # Wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.info(
+                        f'{self.test_order_in_stock.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
+                        f'Expected: New Order Id')
+                    # Validate status order is 1
+                    current_status = self.conn.get_order_status_from_db(self.new_order_id)
+                    self.assertTrue(current_status, 1)
+                    self.logger.info(
+                        f'{self.test_order_in_stock.__doc__} Order status in DB -> Actual: {current_status} ,'
+                        f' Expected: {1}')
+                    break
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    raise Exception("Record was not created")
+                # Updating timer
+                time.sleep(0.1)
+
+            # Updating order status in DB to stockconfirmed
+            self.conn.update_order_db_status(self.new_order_id, 2)
+            # Validating order status in DB
+            self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 2)
+            self.logger.info(
+                f'{self.test_order_in_stock.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {2}')
+            # Return back format of body from str to dict to get creation date
+            sent_body = eval(body_after_sending)
+
+            # Getting date created automatically by server in code
+            # Sending message to Catalog queue that order confirmed in stock
+            status_changed_to_awaitingvalidation(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
+            # Catalog simulator confirms payment succeeded
+            self.catalog_sim.confirm_stock()
+
+            # Wait for ordering service updating order status
+            self.waiter.implicit_wait()
+            # Validating status paid in order in DB
+            order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            self.assertEqual(order_status, 3)
+            self.logger.info(
+                f'{self.test_order_in_stock.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
+
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_order_in_stock.__doc__}Actual {e}")
+            raise
+
+    # TC013
+    def test_order_not_in_stock_(self):
+        """
+        TC_ID: TC013
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_order_not_in_stock_
+        Description: 1.Function tests Ordering service integration whit Catalog simulator.
+                     2.Function creating order.
+                     3.Validates if order is created and with status.
+                     4.Changes status to awaitingvalidation.
+                     5.Validates the status.
+                     6.Sends message to Catalog queue.
+                     7.Invokes Catalog simulator to send message to Ordering queue.
+                     8.Validates order status in DB changed to cancel.
+
+        """
+        try:
+            # Find last order id to compare if getting right order id,will be pre last after creating new order
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            # Message body to send
+            message_body = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
+            # Sending message to RabbitMQ to Ordering queue to create order and getting body corrected by server
+            body_after_sending = create_order(message_body)
+            # Wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.info(
+                        f'{self.test_order_not_in_stock_.__doc__}Order Id in DB -> Actual: ID {self.new_order_id}, '
+                        f'Expected: New Order Id')
+                    # Validate status order is 1
+                    current_status = self.conn.get_order_status_from_db(self.new_order_id)
+                    self.assertTrue(current_status, 1)
+                    self.logger.info(
+                        f'{self.test_order_not_in_stock_.__doc__} Order status in DB -> Actual: {current_status} ,'
+                        f' Expected: {1}')
+                    break
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    raise Exception("Record was not created")
+                # Updating timer
+                time.sleep(0.1)
+
+            # Updating order status in DB to stockconfirmed
+            self.conn.update_order_db_status(self.new_order_id, 2)
+            # Validating order status in DB
+            self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 2)
+            self.logger.info(
+                f'{self.test_order_not_in_stock_.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {2}')
+            # Return back format of body from str to dict to get creation date
+            sent_body = eval(body_after_sending)
+
+            # Getting date created automatically by server in code
+            # Sending message to Catalog queue that order confirmed in stock
+            status_changed_to_awaitingvalidation(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
+
+            # Catalog simulator confirms payment succeeded
+            self.catalog_sim.reject_stock()
+
+            # Wait for ordering service updating order status
+            self.waiter.implicit_wait()
+            # Validating status paid in order in DB
+            order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            self.assertEqual(order_status, 6)
+            self.logger.info(
+                f'{self.test_order_not_in_stock_.__doc__}Order status in DB -> '
+                f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {6}')
+
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_order_not_in_stock_.__doc__}Actual {e}")
             raise
 
 

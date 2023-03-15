@@ -48,7 +48,6 @@ def confirm_stock(order_id, x_requestid, date):
     :param date: server generated date
     :param order_id: autoincremented order id in db
     :param x_requestid: unique id of order generated from outside
-    :return: True
     """
     body = {
         "OrderId": order_id,
@@ -56,7 +55,6 @@ def confirm_stock(order_id, x_requestid, date):
         "CreationDate": date
     }
     rabbit_mq_publish(os.getenv('CONFIRM_STOCK_ROUTING_KEY'), body)
-    return True
 
 
 def reject_stock(order_id, x_requestid, date):
@@ -71,8 +69,8 @@ def reject_stock(order_id, x_requestid, date):
     :param date: server generated date
     :param order_id: autoincremented order id in db
     :param x_requestid: unique id of order generated from outside
-    :return: True
     """
+    load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
     body = {
         "OrderId": order_id,
         "OrderStockItems": [
@@ -85,7 +83,6 @@ def reject_stock(order_id, x_requestid, date):
         "CreationDate": date
     }
     rabbit_mq_publish(os.getenv('REJECT_STOCK_ROUTING_KEY'), body)
-    return True
 
 
 def payment_succeeded(order_id, x_requestid, date):
@@ -159,6 +156,32 @@ def status_changed_to_stock(order_id, x_requestid, date):
         }
 
     rabbit_mq_publish(os.getenv('PAYMENT_BINDING'), body)
+
+
+def status_changed_to_awaitingvalidation(order_id, x_requestid, date):
+    """
+    Name: Artsyom Sharametsieu
+    Date: 05.03.2023
+    Function Name: status_changed_to_stock
+    Description: Function sends to Payment queue message that stock confirmed.
+                 1.Sends message to RabbitMQ queue Ordering that order payment failed.
+    :param date: order date,must be the same as in order,cause live processing
+    :param order_id: autoincremented order id in db
+    :param x_requestid: unique id of order generated from outside
+    :return: True
+    """
+    load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
+    body = \
+        {
+            "OrderId": order_id,
+            "OrderStatus": "awaitingvalidation",
+            "BuyerName": "alice",
+            "Id": x_requestid,
+            "CreationDate": date
+        }
+
+    rabbit_mq_publish(os.getenv('CATALOG_BINDING'), body)
+
 
 # def change_status_awaiting_validation(x_requestid=None, order_number=0):
 #     body = {
