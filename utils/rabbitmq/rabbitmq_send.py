@@ -77,13 +77,27 @@ class RabbitMQ:
             raise ValueError(
                 f'There a was problem with getting the first message from the {queue_name} queue, the following exception was received: {v}')
 
-    def validate_queue_is_empty(self, queue_name):
+    def validate_queue_is_empty_once(self, queue_name):
         try:
             queue = self.channel.queue_declare(queue_name, durable=True)
 
             # Validate that the queue is empty.
             return queue.method.message_count == 0
 
+        except ValueError as v:
+            raise ValueError(
+                f'There was a problem with getting the first message from the {queue_name} queue, the following exception was received: {v}')
+
+    def validate_queue_is_empty_while_clearing(self, queue_name):
+        try:
+            queue = self.channel.queue_declare(queue_name, durable=True)
+            current_messages_amount = queue.method.message_count
+
+            while current_messages_amount > 0:
+                # Validate that the queue is empty.
+                current_messages_amount = queue.method.message_count
+
+            return True
 
         except ValueError as v:
             raise ValueError(

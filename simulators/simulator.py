@@ -142,9 +142,9 @@ class Simulator(ABC):
         try:
             counter = 0
             with RabbitMQ() as mq:
-                is_empty = mq.validate_queue_is_empty(queue_name)
+                is_empty = mq.validate_queue_is_empty_once(queue_name)
                 while not is_empty:
-                    is_empty = mq.validate_queue_is_empty(queue_name)
+                    is_empty = mq.validate_queue_is_empty_once(queue_name)
                     counter += 1
                     time.sleep(1)
             return counter
@@ -155,7 +155,7 @@ class Simulator(ABC):
     def validate_queue_id_empty(queue_name):
         try:
             with RabbitMQ() as mq:
-                return mq.validate_queue_is_empty(queue_name)
+                return mq.validate_queue_is_empty_once(queue_name)
         except BaseException as c:
             raise BaseException(f'There were problem to count the number of messages.\nException is: {c}')
 

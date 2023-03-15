@@ -8,7 +8,7 @@ from tests.scenarios.scenarios import *
 @pytest.mark.scalability
 @pytest.mark.loads
 @pytest.mark.reliability
-def test_valid_message_consumption_rate(docker_manager):
+def test_valid_message_consumption_rate(docker_manager, rabbit_mq):
     """
     Source Test Case Title: Verify that the service can consume 150 messages that are waiting in the queue in a maximum time of one hour.
 
@@ -36,7 +36,7 @@ def test_valid_message_consumption_rate(docker_manager):
     sleep(5)
 
     # Check if the ordering queue is clear from messages.
-    assert Simulator.validate_queue_id_empty('Ordering')
+    assert rabbit_mq.validate_queue_is_empty_while_clearing('Ordering')
 
 
 @pytest.mark.scalability

@@ -24,9 +24,9 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2(docker_manager, rab
     sleep(5)
 
     # Verify that both of the queues are empty
-    if not rabbit_mq.validate_queue_is_empty('Ordering'):
+    if not rabbit_mq.validate_queue_is_empty_once('Ordering'):
         rabbit_mq.purge_queue('Ordering')
-    if not rabbit_mq.validate_queue_is_empty('Basket'):
+    if not rabbit_mq.validate_queue_is_empty_once('Basket'):
         rabbit_mq.purge_queue('Basket')
 
     messages_amount_to_send = 3
@@ -78,11 +78,11 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3(docker_manager, rab
     sleep(5)
 
     # Verify that both of the queues are empty.
-    if not rabbit_mq.validate_queue_is_empty('Ordering'):
+    if not rabbit_mq.validate_queue_is_empty_once('Ordering'):
         rabbit_mq.purge_queue('Ordering')
-    if not rabbit_mq.validate_queue_is_empty('Basket'):
+    if not rabbit_mq.validate_queue_is_empty_once('Basket'):
         rabbit_mq.purge_queue('Basket')
-    if not rabbit_mq.validate_queue_is_empty('Catalog'):
+    if not rabbit_mq.validate_queue_is_empty_once('Catalog'):
         rabbit_mq.purge_queue('Catalog')
 
     messages_amount_to_send = 3
