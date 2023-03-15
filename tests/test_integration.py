@@ -51,6 +51,7 @@ class TestIntegration(unittest.TestCase):
 
         # Basket simulator
         cls.basket_sim = BasketSimulator()
+
         # WAITER
         cls.waiter = Waiter(50)
 
@@ -219,6 +220,7 @@ class TestIntegration(unittest.TestCase):
             self.logger.exception(f"\n{self.test_integration_with_payment_failed.__doc__}Actual {e}")
             raise
 
+    # CATALOG
     # TC013
     def test_integration_with_catalog_in_stock(self):
         """
@@ -376,6 +378,7 @@ class TestIntegration(unittest.TestCase):
             self.logger.exception(f"\n{self.test_integration_with_catalog_not_in_stock.__doc__}Actual {e}")
             raise
 
+    # BASKET
     # TC015
     def test_order_api_integration_with_basket(self):
         """
@@ -424,6 +427,58 @@ class TestIntegration(unittest.TestCase):
                 self.basket_sim.consume()
                 # If message didn't come than something broken in Ordering api
                 self.assertNotEqual(self.basket_sim.response_message, None)
+            self.logger.info(
+                f'{self.test_order_api_integration_with_basket.__doc__}Message fro Ordering API -> '
+                f'Actual: {self.basket_sim.response_message}, Expected: not None')
+
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_order_api_integration_with_basket.__doc__}Actual {e}")
+            raise
+
+    # BackgroundTasks service
+    # TC016
+    def test_order_api_integration_with_backgroundtasks(self):
+        """
+        TC_ID: TC016
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_order_api_integration_with_backgroundtasks
+        Description: 1.Function tests Ordering service integration whit Ordering BackgroundTasks service.
+                     2.Function creating order.
+                     3.Validates if order is created and with status 1.
+                     5.Validates the status 2.
+        """
+        try:
+            last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
+            order = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
+            self.basket_sim.place_order(order)
+            # Explicit wait until ordering creates order in DB
+            start_time = time.time()
+            while True:
+                # Getting last order id
+                x = self.conn.get_last_order_record_id_in_db()
+                # if last order updated so it will be new order
+                if x != last_order_record_in_db:
+                    # To pass into loger Actual
+                    self.new_order_id = x
+                    self.logger.info(
+                        f'{self.test_order_api_integration_with_basket.__doc__}Order Id in DB -> '
+                        f'Actual: ID {self.new_order_id} , Expected: New Order Id')
+                    # Validate status order is 1
+                    current_status = self.conn.get_order_status_from_db(self.new_order_id)
+                    self.assertTrue(current_status, 1)
+                    self.logger.info(
+                        f'{self.test_order_api_integration_with_basket.__doc__} Order status in DB ->'
+                        f' Actual: {current_status} , Expected: {1}')
+                    break
+                # if 10 sec pass no sense to wait
+                elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    raise Exception("Record was not created")
+            # Wait for BackgroundTasks sending message to Ordering api and ordering api updates order status to 2.
+            self.waiter.implicit_wait()
+            current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
+            # Assert to status 2 (awaitingvalidation)
+            self.assertNotEqual(current_order_status, 2)
             self.logger.info(
                 f'{self.test_order_api_integration_with_basket.__doc__}Message fro Ordering API -> '
                 f'Actual: {self.basket_sim.response_message}, Expected: not None')
