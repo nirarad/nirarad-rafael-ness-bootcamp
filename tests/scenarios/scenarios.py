@@ -244,6 +244,9 @@ def get_orders_invalid_auth_api_request_scenario(status_code=401):
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
+    # Test Passed
+    return True
+
 
 def get_order_by_id_api_request_scenario(status_code=200):
     # step 1 - Send the following API request to get one of the user orders by its id.
@@ -253,6 +256,9 @@ def get_order_by_id_api_request_scenario(status_code=200):
     if ordering_api.get_order_by_id(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
+
+    # Test Passed
+    return True
 
 
 def get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
@@ -264,6 +270,9 @@ def get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
+    # Test Passed
+    return True
+
 
 def get_card_types_api_request_scenario(status_code=200):
     # step 1 - Send the following API request to get all the card types of the user.
@@ -274,6 +283,9 @@ def get_card_types_api_request_scenario(status_code=200):
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
+    # Test Passed
+    return True
+
 
 def get_card_types_invalid_auth_api_request_scenario(status_code=401):
     # step 1 - Send the following API request to get all the card types of the user.
@@ -283,6 +295,9 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
     if ordering_api.get_card_types_invalid_auth().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
+
+    # Test Passed
+    return True
 
 
 def crash_ordering_service_scenario(docker_manager, service_name_list=None):
