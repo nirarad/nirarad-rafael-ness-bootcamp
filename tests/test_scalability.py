@@ -21,7 +21,7 @@ class TestScalability(unittest.TestCase):
         load_dotenv('DATA/.env.test')
 
         # Local Logger
-        cls.logger = Logger('integration_logger', 'Logs/test_integration.log').logger
+        cls.logger = Logger('scalability_logger', 'Logs/test_scalability.log').logger
 
         # Unique id generator
         cls.order_uuid = str(uuid.uuid4())
