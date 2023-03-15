@@ -350,7 +350,7 @@ class TestIntegration(unittest.TestCase):
                 # Updating timer
                 time.sleep(0.1)
 
-            # Updating order status in DB to stockconfirmed
+            # Updating order status in DB to 2 (awaitingvalidation)
             self.conn.update_order_db_status(self.new_order_id, 2)
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 2)
