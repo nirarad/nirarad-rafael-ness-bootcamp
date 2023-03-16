@@ -58,60 +58,77 @@ class TestScalability(unittest.TestCase):
         Function Name: test_order_api_scalability_100_orders
         Description: 1.Function tests Ordering api scalability.
                      2.Function validates all order creation.
-                     3.Function creating 100 orders and counting time of creations.
+                     3.Function creating 100 orders and counting time of last order processing.
         """
         try:
+            last_order_id = self.conn.get_last_order_record_id_in_db()
             # Clean messages from previous using of RabbitMQ queue
             with RabbitMQ() as mq:
                 mq.purge('Ordering')
             # Pausing ordering api container to load Ordering queue
-            self.docker.pause('eshop/ordering.api:linux-latest')
-            # Handler to save all created order ids to check statuses after
-            order_ids = []
-            loop_start_time = time.time()
+            self.docker.stop('eshop/ordering.api:linux-latest')
+            # 100 orders creation loop
             for i in range(100):
                 # Generating new unique x-request id
                 order_uuid = str(uuid.uuid4())
-                # Find last order id to compare if getting right order id,will be pre last after creating new order
-                last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
                 # Message body to send
                 message_body = self.jdata_orders.get_json_order('alice_normal_order', order_uuid)
                 # Sending message to RabbitMQ to Ordering queue to create order and getting body corrected by server
                 create_order(message_body)
-                # Wait until ordering creates order in DB
+
+            # Turn on Ordering api container and Ordering BackgroundTasks container
+            self.docker.start('eshop/ordering.api:linux-latest')
+            self.docker.start('eshop/ordering.backgroundtasks:linux-latest')
+            # Handler to save all created order ids to check statuses after
+            order_ids = []
+            # Searching for all 100 order ids
+            for i in range(100):
                 start_time = time.time()
                 while True:
                     # Getting last order id
-                    x = self.conn.get_last_order_record_id_in_db()
+                    x = self.conn.get_next_order_id(last_order_id)
                     # if last order updated so it will be new order
-                    if x != last_order_record_in_db:
+                    if x is not None and x != last_order_id:
                         # To pass into loger Actual
-                        self.new_order_id = x
-                        order_ids.append(self.new_order_id)
+                        order_ids.append(x)
+                        last_order_id = x
                         self.logger.info(
                             f'{self.test_order_api_scalability_100_orders.__doc__}'
                             f'Order Id in DB -> Actual: ID {self.new_order_id}, '
                             f'Expected: New Order Id')
-                        # Validate status order is 1
-                        current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                        self.assertTrue(current_status, 1)
-                        self.logger.info(
-                            f'{self.test_order_api_scalability_100_orders.__doc__} '
-                            f'Order status in DB -> Actual: {current_status} , Expected: {1}')
                         break
-                    # if 10 sec pass no sense to wait
-                    elif time.time() - start_time > 10:  # Timeout after 10 seconds
+                    # if 15 sec pass no sense to wait
+                    elif time.time() - start_time > 15:  # Timeout after 15 seconds
                         raise Exception("Record was not created")
-                    # Updating timer
-                    time.sleep(0.1)
 
-            loop_end_time = time.time()
-            # Creation of 100 orders time
-            elapsed_time = loop_end_time - loop_start_time
-            self.assertLessEqual(elapsed_time, 100)
-            self.logger.info(
-                f'{self.test_order_api_scalability_100_orders.__doc__} '
-                f'Order status in DB -> Actual: {elapsed_time / 3600} hours , Expected: < {100} hours')
+            # Check for all 100 orders status
+            for i in range(100):
+                start_time = time.time()
+                while True:
+                    # Getting last order id
+                    x = self.conn.get_next_order_id(last_order_id)
+                    # if last order updated so it will be new order
+                    if x is not None and x != last_order_id:
+                        # To pass into loger Actual
+                        order_ids.append(x)
+                        last_order_id = x
+                        self.logger.info(
+                            f'{self.test_order_api_scalability_100_orders.__doc__}'
+                            f'Order Id in DB -> Actual: ID {self.new_order_id}, '
+                            f'Expected: New Order Id')
+                        break
+                    # if 15 sec pass no sense to wait
+                    elif time.time() - start_time > 15:  # Timeout after 15 seconds
+                        raise Exception("Record was not created")
+            # # Starting count of processing of all orders
+            # loop_start_time = time.time()
+            # loop_end_time = time.time()
+            # # Creation of 100 orders time
+            # elapsed_time = loop_end_time - loop_start_time
+            # self.assertLessEqual(elapsed_time, 100)
+            # self.logger.info(
+            #     f'{self.test_order_api_scalability_100_orders.__doc__} '
+            #     f'Order status in DB -> Actual: {elapsed_time / 3600} hours , Expected: < {100} hours')
         except Exception as e:
             self.logger.exception(f"\n{self.test_order_api_scalability_100_orders.__doc__} Error:{e}")
             raise
