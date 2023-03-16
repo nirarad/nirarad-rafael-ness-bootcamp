@@ -1,11 +1,10 @@
 import docker
-import time
 
 
 class DockerManager:
     def __init__(self):
         self.cli = docker.from_env()
-        self.containers = self.cli.containers.list()
+        self.containers = self.cli.containers.list(all=True)
         self.containers_dict = {c.image.tags[0]: c for c in self.containers}
 
     def start(self, container_name):
@@ -26,12 +25,13 @@ class DockerManager:
 
 if __name__ == '__main__':
     dm = DockerManager()
-    dm.stop('eshop/ordering.api:linux-latest')
-    time.sleep(1)
-    dm.start('eshop/ordering.api:linux-latest')
-
-    dm.pause('eshop/ordering.api:linux-latest')
-    time.sleep(1)
-    dm.unpause('eshop/ordering.api:linux-latest')
-
-    dm.restart('eshop/ordering.api:linux-latest')
+    # dm.stop('eshop/ordering.api:linux-latest')
+    # time.sleep(1)
+    dm.start('eshop/ordering.backgroundtasks:linux-latest')
+    #
+    # dm.pause('eshop/ordering.api:linux-latest')
+    # time.sleep(1)
+    # dm.unpause('eshop/ordering.api:linux-latest')
+    #
+    # dm.restart('eshop/ordering.api:linux-latest')
+    print(dm.containers)
