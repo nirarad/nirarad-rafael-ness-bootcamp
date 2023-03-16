@@ -1,0 +1,6 @@
+
+name: Meni Rotblat.
+date: 2023-03-13 01:22:20.456855. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: assert False
+ +  where False = status_waiting(2).
+                     

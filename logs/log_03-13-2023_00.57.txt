@@ -1,0 +1,5 @@
+
+name: Meni Rotblat.
+date: 2023-03-13 00:57:20.282910. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: 'NoneType' object has no attribute 'basic_consume'.
+                     

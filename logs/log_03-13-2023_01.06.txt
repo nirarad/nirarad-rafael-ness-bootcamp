@@ -1,0 +1,5 @@
+
+name: Meni Rotblat.
+date: 2023-03-13 01:06:43.520911. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: (406, 'PRECONDITION_FAILED - unknown delivery tag 1').
+                     
