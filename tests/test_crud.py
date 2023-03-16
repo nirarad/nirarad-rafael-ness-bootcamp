@@ -9,7 +9,7 @@ from utils.db.db_utils import MSSQLConnector
 from utils.testcase.jsondatareader import JSONDataReader
 
 
-class TestCRUD(unittest.TestCase):
+class TestCrud(unittest.TestCase):
     # Tests of creation,cancel and getting order
 
     # Variable of connection to DB
@@ -26,7 +26,7 @@ class TestCRUD(unittest.TestCase):
         cls.logger = Logger('crud_logger', 'Logs/test_crud.log').logger
 
         # Ordering API mocker
-        cls.oam = OrderingAPI_Mocker('alice', 'Pass123%24')
+        cls.oam = OrderingAPI_Mocker()
 
         # Unique id generator handler
         cls.order_uuid = None
@@ -536,3 +536,42 @@ class TestCRUD(unittest.TestCase):
         except Exception as e:
             self.logger.exception(f"\n{self.test_get_order_details.__doc__}{e}")
             raise
+
+    # TC011
+    def test_ship_order(self):
+        """
+        TC_ID: TC011
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: test_ship_order
+        Description: Function tests Ordering api sends request to ship order.
+                     1. Sends message to RabbitMQ queue to create order.
+                     2. Validates order creation in DB with status 1.
+                     3. Updates status to 4(paid).
+                     4. Cancels order in DB.
+                     5. Validates response status 400.
+        """
+        try:
+
+            # Order creation
+            self.test_create_order()
+
+            # Updating status to 4 (paid) via sql query
+            self.conn.update_order_db_status(self.new_order_id, 4)
+            # Getting amd checking order status
+            current_status = self.conn.get_order_status_from_db(self.new_order_id)
+            self.assertEqual(current_status, self.new_order_id)
+            # Logging
+            self.logger.info(
+                f'{self.test_ship_order.__doc__}Order status in DB -> '
+                f'Actual:  {current_status} , Expected: {4}')
+
+            # Ordering api sends request to ship order
+            cancel_response = self.oam.ship_order(self.new_order_id, self.order_uuid)
+            # Response validation must be 200
+            self.assertEqual(cancel_response.status_code, 200)
+            self.logger.info(
+                f'{self.test_cancel_order_v6.__doc__}Response to ship order -> '
+                f'Actual:  {cancel_response.status_code} , Expected:{200}')
+        except Exception as e:
+            self.logger.exception(f"\n{self.test_ship_order.__doc__}{e}")

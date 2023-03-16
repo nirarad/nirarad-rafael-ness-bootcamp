@@ -1,5 +1,3 @@
-import json
-
 import requests
 from utils.api.bearer_tokenizer import BearerTokenizer
 

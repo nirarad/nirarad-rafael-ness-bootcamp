@@ -1,4 +1,4 @@
-from utils.rabbitmq.eshop_rabbitmq_events import confirm_stock,reject_stock
+from utils.rabbitmq.eshop_rabbitmq_events import confirm_stock, reject_stock
 from utils.rabbitmq.rabbitmq_receive import RabbitMQ
 
 
