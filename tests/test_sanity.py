@@ -1,12 +1,12 @@
 import time
 import unittest
-from dotenv import load_dotenv
 
 from utils.testcase.logger import Logger
 from utils.api.ordering_api_mocker import OrderingAPI_Mocker
 from utils.rabbitmq.eshop_rabbitmq_events import *
 from utils.db.db_utils import MSSQLConnector
 from utils.testcase.jsondatareader import JSONDataReader
+from dotenv import load_dotenv
 
 
 class TestSanity(unittest.TestCase):
@@ -309,4 +309,3 @@ class TestSanity(unittest.TestCase):
         except Exception as e:
             self.logger.exception(f"\n{self.test_get_order_details.__doc__}{e}")
             raise
-
