@@ -10,6 +10,8 @@ from utils.testcase.jsondatareader import JSONDataReader
 from utils.testcase.logger import Logger
 from utils.docker.docker_utils import DockerManager
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
+from simulators.payment_simulator import PaymentSimulator
+from simulators.catalog_simulator import CatalogSimulator
 
 
 class TestScalability(unittest.TestCase):
@@ -41,6 +43,12 @@ class TestScalability(unittest.TestCase):
 
         # Docker manager
         cls.docker = DockerManager()
+
+        # Payment simulator
+        cls.payment_sim = PaymentSimulator()
+
+        # Catalog simulator
+        cls.catalog_sim = CatalogSimulator()
 
     def setUp(self) -> None:
         self.conn.__enter__()
@@ -101,10 +109,15 @@ class TestScalability(unittest.TestCase):
                     elif time.time() - start_time > 15:  # Timeout after 15 seconds
                         raise Exception("Record was not created")
 
-            # Check for all 100 orders status
+            # Including simulators to creation of order flow
             for i in range(100):
+                self.catalog_sim.consume_to_confirm_stock()
+                self.payment_sim.succeed_pay()
+
+            # Check for all 100 orders status
+            for order in order_ids:
                 start_time = time.time()
-                while True:
+                while self.conn.get_order_status_from_db(order):
                     # Getting last order id
                     x = self.conn.get_next_order_id(last_order_id)
                     # if last order updated so it will be new order
