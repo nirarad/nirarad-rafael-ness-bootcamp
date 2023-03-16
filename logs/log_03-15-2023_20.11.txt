@@ -1,0 +1,21 @@
+
+name: Meni Rotblat.
+date: 2023-03-15 20:11:38.195705. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000025934F1B050> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.0ca2e1b9d4274a90968112e0122594a4', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToSubmittedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 2383,\n  "OrderStatus": "submitted",\n  "BuyerName": "alice",\n  "Id": "0d222e38-3128-422b-a8f9-33d24413133c",\n  "CreationDate": "2023-03-15T18:11:33.1512362Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 20:11:39.199770. 
+description: test pass => function: test_reporting params: UserCheckoutAcceptedIntegrationEvent details: OrderStatusChangedToSubmittedIntegrationEvent.
+                     

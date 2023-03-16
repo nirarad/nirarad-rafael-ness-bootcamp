@@ -1,3 +1,4 @@
+import time
 from pprint import pprint
 import logging
 import pika
@@ -39,11 +40,18 @@ class RabbitMQ:
                                    properties=pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE)
 
                                    )
-        # pprint(f"[{routing_key}]\n\n Sent '{body}'")
+
+    def number_of_massages_in_queue(self, queue):
+        self.connect()
+        return self.channel.queue_declare(queue=queue, passive=True).method.message_count
 
     def consume(self, queue, callback):
         self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
         self.channel.start_consuming()
+
+    def delete_msg_on_queue(self, queue):
+        self.connect()
+        self.channel.queue_purge(queue=queue)
 
 
 if __name__ == '__main__':
@@ -85,7 +93,7 @@ if __name__ == '__main__':
 
     }
 
-    with RabbitMQ() as mq:
-        mq.publish(exchange='eshop_event_bus',
-                   routing_key='UserCheckoutAcceptedIntegrationEvent',
-                   body=json.dumps(body))
+    # with RabbitMQ() as mq:
+    #     mq.publish(exchange='eshop_event_bus',
+    #                routing_key='UserCheckoutAcceptedIntegrationEvent',
+    #                body=json.dumps(body))

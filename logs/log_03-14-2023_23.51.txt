@@ -1,0 +1,17 @@
+
+name: Meni Rotblat.
+date: 2023-03-14 23:51:02.080882. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000267006DC6D0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.daf04372087644f099c390c695c468a4', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToSubmittedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 1702,\n  "OrderStatus": "submitted",\n  "BuyerName": "alice",\n  "Id": "870f69a5-da71-402d-acd4-0d8be504a584",\n  "CreationDate": "2023-03-14T21:51:02.042273Z"\n}'
+
+ ----------------.
+                     

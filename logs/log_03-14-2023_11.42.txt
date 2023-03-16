@@ -1,0 +1,113 @@
+
+name: Meni Rotblat.
+date: 2023-03-14 11:42:10.852799. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000171B40AFE90> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.e73fb87c20d546cdbc1bc063f3f0904b', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "96f61f9b-7c90-4c5e-a898-98ad217bcf7d",\n  "CreationDate": "2023-03-14T09:42:10.7919808Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:17.311390. 
+description: 
+
+component: Catalog
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000171B40837D0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.05b6675e9260414cadab60309da63db0', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToAwaitingValidationIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 1128,\n  "OrderStatus": "awaitingvalidation",\n  "BuyerName": "alice",\n  "OrderStockItems": [\n    {\n      "ProductId": 1,\n      "Units": 1\n    }\n  ],\n  "Id": "878ceea6-cafd-4008-bcb8-b4f2081b2533",\n  "CreationDate": "2023-03-14T09:43:17.2892583Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:18.391824. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000171B411DA10> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.63f8dd57d5d14ccd80f9f109e7806c97', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=True', 'routing_key=OrderStatusChangedToCancelledIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 1127,\n  "OrderStatus": "cancelled",\n  "BuyerName": "alice",\n  "Id": "1ca68118-fd86-44fa-a62c-c69c4e7bda4c",\n  "CreationDate": "2023-03-14T09:40:18.4758017Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:55.602160. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000171B40F09D0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.2c7df505a28448219e10baeacf1033b6', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToStockConfirmedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 1128,\n  "OrderStatus": "stockconfirmed",\n  "BuyerName": "alice",\n  "Id": "0a6f1827-9d71-48ee-93ad-55c82c508df1",\n  "CreationDate": "2023-03-14T09:43:35.5501513Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:56.614168. 
+description: test pass => function: test_payment_failed params: OrderStockConfirmedIntegrationEvent details: 3.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:56.614749. 
+description: test pass => function: test_payment_failed params: OrderStockConfirmedIntegrationEvent details: OrderStatusChangedToAwaitingValidationIntegrationEvent.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:56.614749. 
+description: test pass => function: test_payment_failed params: OrderStatusChangedToSubmittedIntegrationEvent details: OrderStatusChangedToStockConfirmedIntegrationEvent.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:43:56.683158. 
+description: 
+
+component: Payment
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000171B411CE50> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.9fed7bf62e174f0aa29e0922014bd8eb', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToStockConfirmedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 1128,\n  "OrderStatus": "stockconfirmed",\n  "BuyerName": "alice",\n  "Id": "0a6f1827-9d71-48ee-93ad-55c82c508df1",\n  "CreationDate": "2023-03-14T09:43:35.5501513Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:44:27.810510. 
+description: test pass => function: test_payment_failed params: OrderPaymentFailedIntegrationEvent details: 6.
+                     
+name: Meni Rotblat.
+date: 2023-03-14 11:44:27.863998. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000171B411F210> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.9ebd13b5b97a4e8dbaac957eb30b0569', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToCancelledIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 1128,\n  "OrderStatus": "cancelled",\n  "BuyerName": "alice",\n  "Id": "3d0bb01f-9a6c-4d66-aa11-0a5110c1089b",\n  "CreationDate": "2023-03-14T09:43:57.8123127Z"\n}'
+
+ ----------------.
+                     

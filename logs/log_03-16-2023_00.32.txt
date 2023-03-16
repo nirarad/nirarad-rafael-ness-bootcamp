@@ -1,0 +1,216 @@
+
+name: Meni Rotblat.
+date: 2023-03-16 00:32:49.546180. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F3FBD0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.65c703f71d7c4b848c970b7b5dfdf5d0', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "a0050494-0033-4e92-813d-9d7e91aa15e9",\n  "CreationDate": "2023-03-15T22:32:48.4865792Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:32:50.569669. 
+description: test pass => function: test_submit_order params: UserCheckoutAcceptedIntegrationEvent details: 1.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:32:50.570193. 
+description: test pass => function: test_submit_order params: UserCheckoutAcceptedIntegrationEvent details: OrderStartedIntegrationEvent.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:33:05.186900. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F43410> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.ee122bd056fe4702aa0c3044c69624de', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "116e8b66-853c-4dde-bead-537910692d2d",\n  "CreationDate": "2023-03-15T22:33:05.1382615Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:33:06.253801. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F0ED90> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.6328e9aab8f143efa3997ce19ddb1f57', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToSubmittedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3225,\n  "OrderStatus": "submitted",\n  "BuyerName": "alice",\n  "Id": "38c81667-ed41-4293-b979-74036b68c74c",\n  "CreationDate": "2023-03-15T22:33:05.1442923Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:33:21.994927. 
+description: 
+
+component: Catalog
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D081B110> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.9ead55afd6144e1c95556150b8e12edd', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToAwaitingValidationIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3224,\n  "OrderStatus": "awaitingvalidation",\n  "BuyerName": "alice",\n  "OrderStockItems": [\n    {\n      "ProductId": 1,\n      "Units": 1\n    }\n  ],\n  "Id": "962fd604-0c21-4b88-be01-f986d0e693d6",\n  "CreationDate": "2023-03-15T22:33:21.9745824Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:34:13.368855. 
+description: test fail => function: test_items_in_stock params: UserCheckoutAcceptedIntegrationEvent details: assert False
+ +  where False = status_waiting(2).
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:34:19.005026. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F40A50> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.bcb7473a3c0441f999863b307f142b8c', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "6acfd846-dfcf-4c3d-8fc8-af5ff0dd2f13",\n  "CreationDate": "2023-03-15T22:34:18.9576881Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:34:21.994392. 
+description: 
+
+component: Catalog
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F41DD0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.c3d459b75d8d48339eb40648102b03a6', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToAwaitingValidationIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3225,\n  "OrderStatus": "awaitingvalidation",\n  "BuyerName": "alice",\n  "OrderStockItems": [\n    {\n      "ProductId": 1,\n      "Units": 1\n    }\n  ],\n  "Id": "9585bb23-72cd-4727-bfec-07aa6e5977ae",\n  "CreationDate": "2023-03-15T22:34:21.9891084Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:35:13.632424. 
+description: test fail => function: test_items_not_in_stock params: OrderStockRejectedIntegrationEvent details: assert False
+ +  where False = status_waiting(2).
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:35:18.214811. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F32D50> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.c53518ab5bf547fa865f4fa4f9a4f10d', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "13694ebc-7d6f-4c95-8cad-b3a226435557",\n  "CreationDate": "2023-03-15T22:35:18.1675983Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:35:22.010565. 
+description: 
+
+component: Catalog
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F33590> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.225b38e84bde495795ff115e092c8092', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToAwaitingValidationIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3226,\n  "OrderStatus": "awaitingvalidation",\n  "BuyerName": "alice",\n  "OrderStockItems": [\n    {\n      "ProductId": 1,\n      "Units": 1\n    }\n  ],\n  "Id": "c0a4b064-d96d-49ff-976b-49403558ce4c",\n  "CreationDate": "2023-03-15T22:35:22.0061636Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:35:23.089228. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F4E850> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.de96b213e2364895aa404fddbe7844af', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToSubmittedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3227,\n  "OrderStatus": "submitted",\n  "BuyerName": "alice",\n  "Id": "87048d88-1a76-4178-8cfc-9d2b93dc40b4",\n  "CreationDate": "2023-03-15T22:35:18.17737Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:36:14.499712. 
+description: test fail => function: test_payment_success params: OrderStockRejectedIntegrationEvent details: assert False
+ +  where False = status_waiting(2).
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:36:20.109480. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F42050> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.69476039023f432c8e86356a5ae337db', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "70f9d355-5aab-4666-9d36-7d13d13f1ee3",\n  "CreationDate": "2023-03-15T22:36:20.0663124Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:36:22.031929. 
+description: 
+
+component: Catalog
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D088BB10> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.2ff08a42fea143a891f50b9cdda580f6', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToAwaitingValidationIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3227,\n  "OrderStatus": "awaitingvalidation",\n  "BuyerName": "alice",\n  "OrderStockItems": [\n    {\n      "ProductId": 1,\n      "Units": 1\n    }\n  ],\n  "Id": "73edd0f6-76a9-4532-b7ae-55a561103a12",\n  "CreationDate": "2023-03-15T22:36:22.0201159Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:36:23.096364. 
+description: 
+
+component: Signalrhub
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000266D0F3D010> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.6cc2c0322ae449d7af649d4812991461', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToSubmittedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3228,\n  "OrderStatus": "submitted",\n  "BuyerName": "alice",\n  "Id": "bdef1704-54d6-470e-822c-22110f065663",\n  "CreationDate": "2023-03-15T22:36:20.0725637Z"\n}'
+
+ ----------------.
+                     

@@ -1,0 +1,5 @@
+
+name: Meni Rotblat.
+date: 2023-03-14 20:54:26.957574. 
+description: test fail => function: test_scalability params: UserCheckoutAcceptedIntegrationEvent details: (404, "NOT_FOUND - no queue 'ordering-api-1' in vhost '/'").
+                     

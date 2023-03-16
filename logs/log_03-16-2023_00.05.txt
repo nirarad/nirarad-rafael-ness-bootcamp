@@ -1,0 +1,13 @@
+
+name: Meni Rotblat.
+date: 2023-03-16 00:05:56.938638. 
+description: test pass => function: test_api params: get_orders details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:05:56.949646. 
+description: test pass => function: test_api params: get_order_by_id details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-16 00:05:56.956975. 
+description: test pass => function: test_api params: get_cardtypes details: <Response [200]>.
+                     

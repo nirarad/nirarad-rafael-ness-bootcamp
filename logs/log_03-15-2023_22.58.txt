@@ -1,0 +1,5 @@
+
+name: Meni Rotblat.
+date: 2023-03-15 22:58:32.994731. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: assert <Response [200]> == 200.
+                     

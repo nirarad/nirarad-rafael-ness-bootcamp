@@ -1,0 +1,17 @@
+
+name: Meni Rotblat.
+date: 2023-03-15 22:54:48.076222. 
+description: test pass => function: test_api params: get_orders details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 22:54:48.339387. 
+description: test pass => function: test_api params: get_order_by_id details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 22:54:48.366955. 
+description: test pass => function: test_api params: get_cardtypes details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 22:54:48.455364. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: 'int' object has no attribute 'status_code'.
+                     

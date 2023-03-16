@@ -1,0 +1,54 @@
+
+name: Meni Rotblat.
+date: 2023-03-15 23:40:33.150036. 
+description: test pass => function: test_api params: get_orders details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:40:33.158232. 
+description: test pass => function: test_api params: get_order_by_id details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:40:33.165706. 
+description: test pass => function: test_api params: get_cardtypes details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:40:39.351141. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001C3998E7BD0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.6278219c23d94cd299f493591d82848d', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "ca37ed43-950d-440a-bb3f-eacf7213738f",\n  "CreationDate": "2023-03-15T21:40:27.069871Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:40:40.422283. 
+description: test pass => function: test_api params: cancel_order details: 200.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:41:22.377678. 
+description: 
+
+component: Catalog
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001C3998E48D0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.f3f4b452bfa448538caed33d9875683c', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStatusChangedToAwaitingValidationIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "OrderId": 3097,\n  "OrderStatus": "awaitingvalidation",\n  "BuyerName": "alice",\n  "OrderStockItems": [\n    {\n      "ProductId": 1,\n      "Units": 1\n    }\n  ],\n  "Id": "222ee519-d656-43f3-94a3-d9ba2077dd04",\n  "CreationDate": "2023-03-15T21:41:22.3581115Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:41:43.531082. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: assert 400 == 200
+ +  where 400 = <Response [400]>.status_code.
+                     

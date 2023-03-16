@@ -10,10 +10,10 @@ class Exceptions_logs(object):
 
     def send(self, e):
         try:
-            os.chdir("C:/ness bootcamp/finalProject/ServiceTest/rafael-ness-bootcamp/logs")
+            os.chdir("C:/finalProject/ServiceTest/rafael-ness-bootcamp/logs")
             self.f = open(f'log_{self.name}.txt', 'a')
             if self.f.tell() > (1000 * 1024):
-                self.f = open(f'../log_{time.strftime("%m-%d-%Y_%H:%M", time.localtime())}.txt', 'a')
+                self.f = open(f'log_{self.name}.txt', 'a')
                 raise ValueError(f'file is up to 1000kb {self.f.tell()}, open new file')
             else:
                 date = datetime.datetime.now()
@@ -26,4 +26,3 @@ description: {e}.
                 self.f.close()
         except Exception as e:
             print(e)
-

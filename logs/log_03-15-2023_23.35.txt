@@ -1,0 +1,38 @@
+
+name: Meni Rotblat.
+date: 2023-03-15 23:35:14.214155. 
+description: test pass => function: test_api params: get_orders details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:35:14.220595. 
+description: test pass => function: test_api params: get_order_by_id details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:35:14.228570. 
+description: test pass => function: test_api params: get_cardtypes details: <Response [200]>.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:35:20.392070. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000023571F12990> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.12b7c5a6752f499db7293d766f7d8ebc', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "705fc60d-3ced-4a38-9612-358480f563ff",\n  "CreationDate": "2023-03-15T21:35:08.1810673Z"\n}'
+
+ ----------------.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:35:21.443758. 
+description: test pass => function: test_api params: cancel_order details: 200.
+                     
+name: Meni Rotblat.
+date: 2023-03-15 23:35:21.708283. 
+description: test fail => function: test_api params: UserCheckoutAcceptedIntegrationEvent details: assert 400 == 200
+ +  where 400 = <Response [400]>.status_code.
+                     
