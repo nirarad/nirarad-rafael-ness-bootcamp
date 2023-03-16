@@ -8,6 +8,7 @@ from utils.testcase.logger import Logger
 from simulators.payment_simulator import PaymentSimulator
 from simulators.catalog_simulator import CatalogSimulator
 from simulators.basket_simulator import BasketSimulator
+from dotenv import load_dotenv
 
 
 class TestIntegration(unittest.TestCase):
@@ -284,7 +285,7 @@ class TestIntegration(unittest.TestCase):
             # Sending message to Catalog queue that order confirmed in stock
             status_changed_to_awaitingvalidation(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
             # Catalog simulator confirms payment succeeded
-            self.catalog_sim.confirm_stock()
+            self.catalog_sim.consume_to_confirm_stock()
 
             # Wait for ordering api updating order status
             time.sleep(self.timeout)
