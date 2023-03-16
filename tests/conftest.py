@@ -8,6 +8,7 @@ from utils.db.db_utils import MSSQLConnector
 from utils.docker.docker_utils import DockerManager
 from utils.exceptions_loging import Exceptions_logs
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
+from utils.rabbitmq.rabbitmq_utils import clear_all_queues_msg
 from utils.signalrhub import Signalrhub
 from utils.simulators.basket import Basket
 from utils.simulators.catalog import Catalog
@@ -22,6 +23,7 @@ def setup(request):
     # dm.start_for_tests()
     # time.sleep(5)
     rbtMQ = RabbitMQ()
+    clear_all_queues_msg()
     if MSSQLConnector().conn is None:
         db = MSSQLConnector()
     config = dotenv.dotenv_values(
@@ -32,9 +34,7 @@ def setup(request):
     catalog = Catalog(rbtMQ, log)
     payment = Payment(rbtMQ, log)
     signalrhub = Signalrhub(rbtMQ, log)
-    api = OrderingAPI()
-    # logging.basicConfig(filename='../logs/eSohp.log', datefmt='%m/%d/%y %I:%M:%S %p', filemode='a', encoding='utf-8', level=logging.DEBUG)
-
+    api = OrderingAPI(username='alice', password='Pass123%24')
     request.cls.dm = dm
     request.cls.rbtMQ = rbtMQ
     request.cls.db = db
@@ -44,9 +44,7 @@ def setup(request):
     request.cls.payment = payment
     request.cls.api = api
     request.cls.signalrhub = signalrhub
-    # request.cls.log = logging.getLogger("../logs/eSohp.log")
     request.cls.log = log
     yield  # tear down
-    # logging.shutdown()
     if MSSQLConnector().conn is not None:
         db.close()

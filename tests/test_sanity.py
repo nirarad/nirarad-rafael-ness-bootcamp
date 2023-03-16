@@ -4,13 +4,16 @@ from pprint import pprint
 import pytest
 import requests
 
+from utils.api.ordering_api import OrderingAPI
 from utils.db.db_queries import DbQueries
+from utils.rabbitmq.rabbitmq_utils import clear_all_queues_msg
 from utils.simulators.util_funcs import status_waiting, id_waiting
 
 
 @pytest.mark.usefixtures("setup")
 class TestSanity:
 
+    @pytest.mark.api_test
     def test_api(self):
         """
         Name: menahem rotblat\n
@@ -20,10 +23,13 @@ class TestSanity:
         Date: 12/3/23\n
         """
         try:
+            clear_all_queues_msg()
             # creating new order
             self.basket.send_to_queue("UserCheckoutAcceptedIntegrationEvent")
+            self.basket.consume()
+            self.catalog.consume()
             # get the OrderStatusId how just created
-            lastID = DbQueries().last_id()
+            id_under_test = id_waiting()
 
             #  get all orders
             all_orders = self.api.get_orders()
@@ -31,82 +37,97 @@ class TestSanity:
             self.log.send(self.config["TEST_PASS"].format("test_api", "get_orders", all_orders))
 
             #  get order by id
-            res = self.api.get_order_by_id(lastID)
+            res = self.api.get_order_by_id(id_under_test)
             assert res.status_code == 200
             self.log.send(self.config["TEST_PASS"].format("test_api", "get_order_by_id", res))
 
-            # get card types from server
+            # get card types from db
             res = self.api.get_cardtypes()
             assert res.status_code == 200
             self.log.send(self.config["TEST_PASS"].format("test_api", "get_cardtypes", res))
-
-            # move the item to "cancel order" => id = 6"
-            #  we can only do it with OrderStatusId is between 1-3
-            res = self.api.cancel_order(lastID - 1)
-            assert res.status_code == 200
-            self.log.send(self.config["TEST_PASS"].format("test_api", "cancel_order", res))
-
             # move the item to "item in stock => id = 3"
-            self.catalog.send_to_queue("OrderStockConfirmedIntegrationEvent", lastID)
+            self.catalog.send_to_queue("OrderStockConfirmedIntegrationEvent", id_under_test)
+            time.sleep(10)
             # move the item to "payment succeeded" => id = 4"
-            self.payment.send_to_queue("OrderPaymentSucceededIntegrationEvent", lastID)
-
+            self.payment.send_to_queue("OrderPaymentSucceededIntegrationEvent", id_under_test)
+            time.sleep(10)
             #  move the item to "shipped" => id = 5"
-            res = self.api.ship_order(lastID)
+            res = self.api.ship_order(id_under_test)
             assert res.status_code == 200
             self.log.send(self.config["TEST_PASS"].format("test_api", "ship_order", res))
 
-
+            self.basket.send_to_queue("UserCheckoutAcceptedIntegrationEvent")
+            id_cancel_test = id_waiting()
+            self.basket.consume()
+            # move item to "cancel order" => id = 6"
+            #  we can only do it with OrderStatusId is between 1-3
+            res = self.api.cancel_order(id_cancel_test)
+            assert res == 200
+            self.log.send(self.config["TEST_PASS"].format("test_api", "cancel_order", res))
 
         except AssertionError as ae:
             self.log.send(self.config["ASSERT_FAIL"].format("test_api", "UserCheckoutAcceptedIntegrationEvent", ae))
+            assert False
         except Exception as e:
             self.log.send(self.config["TEST_FAIL"].format("test_api", "UserCheckoutAcceptedIntegrationEvent", e))
-    @pytest.mark.mms
-    def test_successful_flow_mms(self):
+            assert False
+
+    @pytest.mark.mss
+    def test_successful_flow_mss(self):
         """
-        Name: menahem rotblat\n
-        Description: tests Orders flow (successfully)\n
-        Date: 12/3/23\n
+        Name: menahem rotblat.\n
+        Description: tests Orders flow (successfully) mss. so in the end DB contain order
+        with the field - OrderStatusId with status 4 (paid) \n
+        Date: 12/3/23.\n
         """
         try:
+            clear_all_queues_msg()
+            self.dm.containers_dict["eshop/ordering.signalrhub:linux-latest"].stop()
+            time.sleep(5)
             # creating new order => basket simulator send msg. status need to be: 1 and then 2
-
             self.basket.send_to_queue("UserCheckoutAcceptedIntegrationEvent")
             time.sleep(1)
             self.basket.consume()
             self.catalog.consume()
+            self.signalrhub.consume()
+            assert self.signalrhub.routing_key_srh_get == "OrderStatusChangedToSubmittedIntegrationEvent" \
+                   or "OrderStatusChangedToAwaitingValidationIntegrationEvent"
             # awaiting function, if there is positive results for status change on db (to number 2)
             # return True and so assertion, otherwise False
             assert status_waiting(2)
             self.log.send(
                 self.config["TEST_PASS"].format("test_successful_flow_mms", "UserCheckoutAcceptedIntegrationEvent",
-                                                self.basket.routing_key_basket_get))
-
+                                                "status: 2"))
             #  catalog approve that item in stock => catalog simulator send msg. status need to be: 3
+
             last_id = id_waiting()
             self.catalog.send_to_queue("OrderStockConfirmedIntegrationEvent", last_id)
             time.sleep(1)
             assert status_waiting(3)
             self.log.send(
                 self.config["TEST_PASS"].format("test_successful_flow_mms", "OrderStockConfirmedIntegrationEvent",
-                                                self.catalog.routing_key_catalog_get))
-
+                                                "status: 3"))
             #  payment approve that item paid => payment simulator send msg. status need to be: 4
 
+            self.signalrhub.consume()
+            assert self.signalrhub.routing_key_srh_get == "OrderStatusChangedToStockConfirmedIntegrationEvent"
             self.payment.send_to_queue("OrderPaymentSucceededIntegrationEvent", last_id)
             time.sleep(1)
             assert status_waiting(4)
             self.log.send(
                 self.config["TEST_PASS"].format("test_successful_flow_mms", "OrderPaymentSucceededIntegrationEvent",
-                                                self.payment.routing_key_payment_get))
-
+                                                "status: 4"))
             # orders send a message to catalog, payment and webhook that paid confirmed, we consume
             # them (except webhook)
-            self.catalog.consume()
-            self.payment.consume()
 
+            self.signalrhub.consume()
+            assert self.signalrhub.routing_key_srh_get == "OrderStatusChangedToPaidIntegrationEvent"
+            self.catalog.consume()
         except AssertionError as ae:
             self.log.send(self.config["ASSERT_FAIL"].format("test_successful_flow_mms", "None", ae))
+            assert False
         except Exception as e:
             self.log.send(self.config["TEST_FAIL"].format("test_successful_flow_mms", "None", e))
+            assert False
+        finally:
+            self.dm.containers_dict["eshop/ordering.signalrhub:linux-latest"].start()
