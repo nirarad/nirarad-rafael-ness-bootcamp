@@ -34,6 +34,7 @@ class MSSQLConnector:
         return results
 
     def update_order_db_status(self, db_order_id, to_id):
+        """ Executes an update query to update order by id"""
         query = 'Update [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
                 f'set OrderStatusId = {to_id}' \
                 f'where Id = {db_order_id}'
@@ -43,6 +44,7 @@ class MSSQLConnector:
         return True
 
     def get_order_status_from_db(self, order_id):
+        """ Executes a  fast select query to find status id of order by order id"""
         query = 'select o.OrderStatusId from [Microsoft.eShopOnContainers.Services.OrderingDb].ordering.orders as o ' \
                 f'where Id = {order_id}'
         cursor = self.conn.cursor()
@@ -51,6 +53,7 @@ class MSSQLConnector:
         return order_status[0][0]
 
     def get_last_order_record_id_in_db(self):
+        """ Executes a  fast select query to find last order id"""
         query = 'select TOP 1 o.Id from [Microsoft.eShopOnContainers.Services.OrderingDb].ordering.orders as o order ' \
                 'by Id desc'
         cursor = self.conn.cursor()
@@ -61,13 +64,27 @@ class MSSQLConnector:
         else:
             return -1
 
-    def delete_order_in_db(self,db_order_id):
+    def delete_order_in_db(self, db_order_id):
+        """ Executes a  fast deleting query to delete order"""
         query = f'delete FROM [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders]' \
                 f' where Id = {db_order_id}'
         cursor = self.conn.cursor()
         cursor.execute(query)
         cursor.commit()
         return True
+
+    def get_next_order_id(self, start_order_id):
+        """ Executes a  fast deleting query to delete order"""
+        query = 'SELECT TOP 1 Id FROM [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
+                f'Group By Id  Having Id > {start_order_id} Order by Id'
+
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        order_id = cursor.fetchall()
+        if len(order_id) > 0:
+            return order_id[0][0]
+        else:
+            return None
 
     def close(self):
         self.conn.close()
@@ -84,4 +101,5 @@ if __name__ == '__main__':
         # p(conn.get_order_status_from_db(151))
         # conn.update_order_db_id(161, 1)
         # p(conn.get_order_status_from_db(151))
-        p(conn.get_last_order_record_id_in_db())
+        # p(conn.get_last_order_record_id_in_db())
+        print(conn.get_next_order_id(1800))
