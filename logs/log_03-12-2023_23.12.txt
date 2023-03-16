@@ -1,0 +1,5 @@
+
+name: Meni Rotblat.
+date: 2023-03-12 23:12:54.928683. 
+description: test pass => function: test_successful_flow_mms params: UserCheckoutAcceptedIntegrationEvent details: 23.
+                     
