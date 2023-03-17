@@ -27,48 +27,12 @@ def docker_manager():
     return DockerManager()
 
 
-@pytest.fixture(scope="session")
-def rabbit_mq():
-    """
-    Fixture to create RabbitMQ instance.
-    """
-    rabbit_mq = RabbitMQ()
-    rabbit_mq.connect()
-    yield rabbit_mq
-    rabbit_mq.close()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def mssql_connector():
-    """
-    Fixture to create MSSQLConnector instance.
-    """
-    mssql_connector = MSSQLConnector()
-    mssql_connector.connect()
-    yield mssql_connector
-    mssql_connector.close()
-
-
-@pytest.fixture(autouse=True, scope="function")
-def purge_all_queues():
-    """
-    Fixture to purge all messages in each queue before every test.
-    """
-    print("purge all queues for function...")
-    Simulator.purge_all_queues(
-        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
-    sleep(2)
-
-
 @pytest.fixture(scope='session', autouse=True)
 # @pytest.mark.dependency(depends=["docker_manager"])
 def setup_docker_containers(docker_manager):
     """
     Fixture to start all containers except the containers that have a related simulator.
     """
-    print("Purge all queues for session...")
-    Simulator.purge_all_queues(
-        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
     print("Setting up docker containers...")
     # Stop the mocks containers
     mocks_containers = ["eshop/catalog.api:linux-latest", "eshop/payment.api:linux-latest",
@@ -86,6 +50,42 @@ def setup_docker_containers(docker_manager):
             docker_manager.stop(container_name)
 
         sleep(10)
+
+
+@pytest.fixture(scope="function")
+def rabbit_mq():
+    """
+    Fixture to create RabbitMQ instance.
+    """
+    rabbit_mq = RabbitMQ()
+    rabbit_mq.connect()
+    yield rabbit_mq
+    rabbit_mq.close()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def mssql_connector():
+    """
+    Fixture to create MSSQLConnector instance.
+    """
+    mssql_connector = MSSQLConnector()
+    mssql_connector.connect()
+    yield mssql_connector
+    mssql_connector.close()
+
+
+@pytest.fixture(autouse=True)
+def purge_all_queues():
+    """
+    Fixture to purge all messages in each queue before every test.
+    """
+    print("purge all queues for function...")
+    Simulator.purge_all_queues(
+        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+    sleep(2)
+    Simulator.purge_all_queues(
+        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+    sleep(1)
 
 
 @pytest.fixture(scope="function")

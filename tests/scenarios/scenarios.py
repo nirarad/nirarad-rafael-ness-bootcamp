@@ -16,7 +16,7 @@ def order_submission_scenario():
     mg = MessageGenerator()
     basket_to_ordering_msg = mg.basket_to_order()
 
-    # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
+    # Step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
     basket_mock.create_order(basket_to_ordering_msg["input"])
 
     # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
