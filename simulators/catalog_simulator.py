@@ -12,6 +12,7 @@ class CatalogSimulator:
         # RabbitMQ
         self.mq = RabbitMQ()
         self.time_limit = time_limit
+        self.timeout_flag = False
         load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
 
     def confirm_stock(self, order_id, x_requestid, date):
@@ -104,23 +105,22 @@ class CatalogSimulator:
                      from Catalog queue and sends confirmed stock callback.
 
         """
-        try:
-            # TEMPORARY INVOKING OF RABBITMQ
-            with self.mq:
-                # BIND
-                self.mq.bind('Catalog', 'eshop_event_bus', 'OrderStatusChangedToAwaitingValidationIntegrationEvent')
-                # Set up a consumer with the callback function
-                self.mq.channel.basic_consume(queue='Catalog', on_message_callback=self.in_stock_callback,
-                                              auto_ack=True)
-                # Start consuming messages until getting message or time limit end
-                start_time = time.time()
-                while True:
-                    self.mq.channel.connection.process_data_events()
-                    if time.time() - start_time >= self.time_limit:  # Time limit
-                        self.mq.channel.stop_consuming()
-                        break
-        except Exception as e:
-            raise e
+        # TEMPORARY INVOKING OF RABBITMQ
+        with self.mq:
+            # BIND
+            self.mq.bind('Catalog', 'eshop_event_bus', 'OrderStatusChangedToAwaitingValidationIntegrationEvent')
+            # Set up a consumer with the callback function
+            self.mq.channel.basic_consume(queue='Catalog', on_message_callback=self.in_stock_callback,
+                                          auto_ack=True)
+            # Start consuming messages until getting message or time limit end
+            start_time = time.time()
+            while True:
+                self.mq.channel.connection.process_data_events()
+                if time.time() - start_time >= self.time_limit:  # Time limit
+                    self.mq.channel.stop_consuming()
+                    self.timeout_flag = True
+                    break
+            return self.timeout_flag
 
     def consume_to_reject_stock(self):
         """
@@ -130,22 +130,21 @@ class CatalogSimulator:
         Description: Function invokes RabbitMQ consume to get message
                      from Catalog queue and sends rejected stock callback.
         """
-        try:
-            # TEMPORARY INVOKING OF RABBITMQ
-            with self.mq:
-                # BIND
-                self.mq.bind('Catalog', 'eshop_event_bus', 'OrderStatusChangedToAwaitingValidationIntegrationEvent')
-                self.mq.channel.basic_consume(queue='Catalog', on_message_callback=self.not_in_stock_callback,
-                                              auto_ack=True)
-                # Start consuming messages until getting message or time limit end
-                start_time = time.time()
-                while True:
-                    self.mq.channel.connection.process_data_events()
-                    if time.time() - start_time >= self.time_limit:  # Time limit
-                        self.mq.channel.stop_consuming()
-                        break
-        except Exception as e:
-            raise e
+
+        # TEMPORARY INVOKING OF RABBITMQ
+        with self.mq:
+            # BIND
+            self.mq.bind('Catalog', 'eshop_event_bus', 'OrderStatusChangedToAwaitingValidationIntegrationEvent')
+            self.mq.channel.basic_consume(queue='Catalog', on_message_callback=self.not_in_stock_callback,
+                                          auto_ack=True)
+            # Start consuming messages until getting message or time limit end
+            start_time = time.time()
+            while True:
+                self.mq.channel.connection.process_data_events()
+                if time.time() - start_time >= self.time_limit:  # Time limit
+                    self.timeout_flag = True
+                    break
+        return self.timeout_flag
 
 
 if __name__ == '__main__':
