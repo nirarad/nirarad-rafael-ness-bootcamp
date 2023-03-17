@@ -1,7 +1,7 @@
-from pprint import pprint
-
+import json
 import docker
 import time
+import dotenv
 
 
 class DockerManager:
@@ -10,6 +10,8 @@ class DockerManager:
         self.cli = docker.from_env()
         self.containers = self.cli.containers.list(all=True)
         self.containers_dict = {c.image.tags[0]: c for c in self.containers}
+        self.config = dotenv.dotenv_values(dotenv_path=dotenv.find_dotenv("../../.env"))
+        self.containers = json.load(open(self.config["CONTAINERS"]))
 
     def start(self, container_name):
         self.containers_dict[container_name].start()
@@ -37,69 +39,26 @@ class DockerManager:
 
         time.sleep(5)
 
-        self.stop('eshop/basket.api:linux-latest')
-        self.stop('eshop/payment.api:linux-latest')
-        self.stop('eshop/catalog.api:linux-latest')
-        self.stop('envoyproxy/envoy:v1.11.1')
-        self.stop('eshop/webhooks.api:linux-latest')
-        self.stop('eshop/webmvc:linux-latest')
-        self.stop('eshop/webstatus:linux-latest')
-        self.stop('redis:alpine')
-        self.stop('eshop/mobileshoppingagg:linux-latest')
-        self.stop('eshop/webshoppingagg:linux-latest')
-        self.stop('eshop/webspa:linux-latest')
-        self.stop('eshop/webhooks.client:linux-latest')
-        self.stop('mongo:latest')
-        self.stop('datalust/seq:latest')
-        self.stop('envoyproxy/envoy:v1.11.1')
-        self.start('eshop/identity.api:linux-latest')
+        self.stop(self.containers["basket"])
+        self.stop(self.containers["payment"])
+        self.stop(self.containers["catalog"])
+        self.stop(self.containers["env"])
+        self.stop(self.containers["webhook_api"])
+        self.stop(self.containers["mvc"])
+        self.stop(self.containers["web_status"])
+        self.stop(self.containers["redis"])
+        self.stop(self.containers["mobile"])
+        self.stop(self.containers["web"])
+        self.stop(self.containers["webspa"])
+        self.stop(self.containers["webhook_client"])
+        self.stop(self.containers["mongodb"])
+        self.stop(self.containers["seq"])
+        self.stop(self.containers["env"])
+        self.stop(self.containers["identity"])
         time.sleep(5)
-
-    def restart_to_test(self):
-        self.restart('eshop/ordering.api:linux-latest')
-        self.restart('eshop/ordering.backgroundtasks:linux-latest')
-        self.restart('eshop/identity.api:linux-latest')
-        self.restart('mcr.microsoft.com/mssql/server:2019-latest')
-        self.restart('rabbitmq:3-management-alpine')
-        self.restart('eshop/ordering.signalrhub:linux-latest')
-
-
-    def stop_not_necceery(self):
-        self.stop('eshop/basket.api:linux-latest')
-        self.stop('eshop/payment.api:linux-latest')
-        self.stop('eshop/catalog.api:linux-latest')
-        self.stop('envoyproxy/envoy:v1.11.1')
-        self.stop('eshop/webhooks.api:linux-latest')
-        self.stop('eshop/webmvc:linux-latest')
-        self.stop('eshop/webstatus:linux-latest')
-        self.stop('redis:alpine')
-        self.stop('eshop/mobileshoppingagg:linux-latest')
-        self.stop('eshop/webshoppingagg:linux-latest')
-        self.stop('eshop/webspa:linux-latest')
-        self.stop('eshop/webhooks.client:linux-latest')
-        self.stop('mongo:latest')
-        self.stop('datalust/seq:latest')
 
 
 if __name__ == '__main__':
     dm = DockerManager()
     dm.start_for_tests()
-    # dm.stop_not_necceery()
-    # dm.restart_to_test()
-    # dm.stop('eshop/ordering.api:linux-latest')
-    # time.sleep(1)
-    # dm.start('eshop/ordering.api:linux-latest')
-    # dm.start('eshop/ordering.backgroundtasks:linux-latest')
-    # dm.start('eshop/identity.api:linux-latest')
-    # dm.start('mcr.microsoft.com/mssql/server:2019-latest')
-    # dm.start('rabbitmq:3-management-alpine')
 
-    # dm.pause('eshop/ordering.api:linux-latest')
-    # time.sleep(1)
-    # dm.unpause('eshop/ordering.api:linux-latest')
-    # dm.unpause('eshop/ordering.backgroundtasks:linux-latest')
-    # dm.unpause('eshop/identity.api:linux-latest')
-    # dm.unpause('mcr.microsoft.com/mssql/server:2019-latest')
-    # dm.unpause('rabbitmq:3-management-alpine')
-
-    # dm.restart('rabbitmq:3-management-alpine')

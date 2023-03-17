@@ -1,0 +1,26 @@
+{
+  "sending": {
+    "basket": "UserCheckoutAcceptedIntegrationEvent",
+    "catalog": {
+      "confirmed": "OrderStockConfirmedIntegrationEvent",
+      "rejected": "OrderStockRejectedIntegrationEvent"
+    },
+    "payment": {
+      "succeeded": "OrderPaymentSucceededIntegrationEvent",
+      "failed": "OrderPaymentFailedIntegrationEvent"
+    }
+  },
+  "receive": {
+    "basket": "OrderStartedIntegrationEvent",
+    "catalog": "OrderStatusChangedToAwaitingValidationIntegrationEvent",
+    "signalrhub": {
+      "submit": "OrderStatusChangedToSubmittedIntegrationEvent",
+      "waiting": "OrderStatusChangedToAwaitingValidationIntegrationEvent",
+      "stock_confirmed": "OrderStatusChangedToStockConfirmedIntegrationEvent",
+      "paid": "OrderStatusChangedToPaidIntegrationEvent",
+      "shipped": "OrderStatusChangedToShippedIntegrationEvent",
+      "cancelled": "OrderStatusChangedToCancelledIntegrationEvent"
+    },
+
+  }
+}

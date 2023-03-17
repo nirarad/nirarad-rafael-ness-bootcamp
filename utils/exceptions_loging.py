@@ -10,7 +10,7 @@ class Exceptions_logs(object):
 
     def send(self, e):
         try:
-            os.chdir("C:/finalProject/ServiceTest/rafael-ness-bootcamp/logs")
+            os.chdir("../logs")
             self.f = open(f'log_{self.name}.txt', 'a')
             if self.f.tell() > (1000 * 1024):
                 self.f = open(f'log_{self.name}.txt', 'a')

@@ -1,15 +1,9 @@
-import logging
 import time
 from pprint import pprint
 import pytest
-import requests
 
-from utils.api.ordering_api import OrderingAPI
-from utils.db.db_queries import DbQueries
 from utils.rabbitmq.rabbitmq_utils import clear_all_queues_msg
 from utils.simulators.util_funcs import status_waiting, id_waiting
-from utils.db.db_queries import DbQueries
-from utils.simulators.util_funcs import waiting_and_return_bool
 
 
 @pytest.mark.usefixtures("setup")
@@ -85,7 +79,6 @@ class TestSanity:
         try:
             clear_all_queues_msg()
             self.dm.containers_dict["eshop/ordering.signalrhub:linux-latest"].stop()
-            time.sleep(5)
             # creating new order => basket simulator send msg. status need to be: 1 and then 2
             self.basket.send_to_queue("UserCheckoutAcceptedIntegrationEvent")
             time.sleep(1)

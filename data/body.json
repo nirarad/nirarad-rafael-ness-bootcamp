@@ -1,0 +1,67 @@
+{
+  "basket": {
+    "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+    "UserName": "alice",
+    "OrderNumber": 0,
+    "City": "Redmond",
+    "Street": "15703 NE 61st Ct",
+    "State": "WA",
+    "Country": "U.S.",
+    "ZipCode": "98052",
+    "CardNumber": "4012888888881881",
+    "CardHolderName": "Alice Smith",
+    "CardExpiration": "2024-12-31T22:00:00Z",
+    "CardSecurityNumber": "123",
+    "CardTypeId": 1,
+    "Buyer": "None",
+    "RequestId": "",
+    "Basket": {
+      "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+      "Items": [
+        {
+          "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+          "ProductId": 1,
+          "ProductName": ".NET Bot Black Hoodie",
+          "UnitPrice": 19.5,
+          "OldUnitPrice": 0,
+          "Quantity": 1,
+          "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+        }
+      ]
+    },
+    "Id": "e9b80940-c861-4e5b-9d7e-388fd256acef",
+    "CreationDate": "2023-03-04T14:20:24.4730559Z"
+  },
+  "catalog": {
+    "confirmed": {
+      "OrderId": "",
+      "Id": "",
+      "CreationDate": "2023-03-07T09:52:56.6412897Z"
+    },
+    "Rejected": {
+      "OrderId": "",
+      "OrderStockItems": [
+        {
+          "ProductId": 1,
+          "HasStock": false
+        }
+      ],
+      "Id": "",
+      "CreationDate": "2023-03-05T15:51:11.5458796Z"
+    }
+  },
+  "payment": {
+    "succeeded": {
+      "OrderId": "",
+      "Id": "",
+      "CreationDate": "2023-03-07T09:52:56.6412897Z"
+    },
+    "failed": {
+      "OrderId": "",
+      "OrderStatus": "stockconfirmed",
+      "BuyerName": "alice",
+      "Id": "",
+      "CreationDate": "2023-03-05T17:07:35.6306122Z"
+    }
+  }
+}

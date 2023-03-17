@@ -1,4 +1,7 @@
+import json
 import time
+
+import dotenv
 
 from utils.exceptions_loging import Exceptions_logs
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
@@ -10,6 +13,8 @@ class Signalrhub(object):
         self.log = log
         self.routing_key_srh_get = None
         self.rbtMQ = rbt_send
+        self.config = dotenv.dotenv_values(dotenv_path=dotenv.find_dotenv("../../.env"))
+        self.queues = json.load(open(self.config["QUEUE"]))
 
     def consume(self):
         def callback(ch, method, properties, body):
@@ -24,5 +29,5 @@ class Signalrhub(object):
             self.count -= 1
 
         with self.rbtMQ as mq:
-            mq.consume(queue='Ordering.signalrhub', callback=callback)
+            mq.consume(queue=self.queues["signalrhub"], callback=callback)
 

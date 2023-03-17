@@ -2,6 +2,8 @@ import json
 import time
 import uuid
 
+import dotenv
+
 from utils.exceptions_loging import Exceptions_logs
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
@@ -17,10 +19,15 @@ class Payment(object):
         self.log = log
         self.routing_key_payment_get = None
         self.count = 50
+        self.config = dotenv.dotenv_values(dotenv_path=dotenv.find_dotenv("../../.env"))
+        self.queues = json.load(open(self.config["QUEUE"]))
+        self.r_key = json.load(open(self.config["R_KEY"]))
+        self.exch = json.load(open(self.config["EXCH"]))
+        self.body_obj = json.load(open(self.config["BODY"]))
 
     def send_to_queue(self, routing_key, order_id):
         with self.rbtMQ as send:
-            send.publish(exchange='eshop_event_bus',
+            send.publish(exchange=self.exch["exchange"],
                          routing_key=routing_key,
                          body=json.dumps(self.body(routing_key, order_id)))
 
@@ -37,21 +44,15 @@ class Payment(object):
             self.count -= 1
 
         with self.rbtMQ as mq:
-            mq.consume(queue='Payment', callback=callback)
+            mq.consume(queue=self.queues["payment"], callback=callback)
             # mq.close()
 
     def body(self, routing_key, order_id):
-        if routing_key == "OrderPaymentSucceededIntegrationEvent":
-            return {
-                "OrderId": order_id,
-                "Id": str(uuid.uuid4()),
-                "CreationDate": "2023-03-07T09:52:56.6412897Z"
-            }
-        if routing_key == "OrderPaymentFailedIntegrationEvent":
-            return {
-                "OrderId": order_id,
-                "OrderStatus": "stockconfirmed",
-                "BuyerName": "alice",
-                "Id": str(uuid.uuid4()),
-                "CreationDate": "2023-03-05T17:07:35.6306122Z"
-            }
+        if routing_key == self.r_key["sending"]["payment"]["succeeded"]:
+            self.body_obj["payment"]["succeeded"]["OrderId"] = order_id
+            self.body_obj["payment"]["succeeded"]["Id"] = str(uuid.uuid4())
+            return self.body_obj["payment"]["succeeded"]
+        if routing_key == self.r_key["sending"]["payment"]["failed"]:
+            self.body_obj["payment"]["failed"]["OrderId"] = order_id
+            self.body_obj["payment"]["failed"]["Id"] = str(uuid.uuid4())
+            return self.body_obj["payment"]["failed"]

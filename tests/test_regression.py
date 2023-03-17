@@ -72,7 +72,6 @@ class TestRegression:
             time.sleep(5)
             # shutdown the "ordering-signalrhub-1", ordering sub-service, to accept massage logs from orders
             self.dm.containers_dict["eshop/ordering.signalrhub:linux-latest"].stop()
-            time.sleep(5)
             # basket simulator send msg
             self.basket.send_to_queue("UserCheckoutAcceptedIntegrationEvent")
             self.basket.consume()
@@ -159,7 +158,6 @@ class TestRegression:
             time.sleep(2)
             # shutdown the "ordering-signalrhub-1", ordering sub-service, to accept the massage logs from orders
             self.dm.containers_dict["eshop/ordering.signalrhub:linux-latest"].stop()
-            time.sleep(2)
             # basket simulator send msg
             self.basket.send_to_queue("UserCheckoutAcceptedIntegrationEvent")
             # OrderStartedIntegrationEvent
@@ -412,7 +410,6 @@ class TestRegression:
         """
         try:
             clear_all_queues_msg()
-            time.sleep(5)
             # shutdown the "ordering-signalrhub-1", ordering sub-service, to accept the massage logs from orders
             self.dm.containers_dict["eshop/ordering.signalrhub:linux-latest"].stop()
 

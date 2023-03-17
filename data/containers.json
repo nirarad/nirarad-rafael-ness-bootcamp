@@ -1,0 +1,22 @@
+{
+  "basket": "eshop/basket.api:linux-latest",
+  "payment": "eshop/payment.api:linux-latest",
+  "catalog": "eshop/catalog.api:linux-latest",
+  "mongodb": "mongo:latest",
+  "ordering_api": "eshop/ordering.api:linux-latest",
+  "ordering_bg": "eshop/ordering.backgroundtasks:linux-latest",
+  "identity": "eshop/identity.api:linux-latest",
+  "mssql": "mcr.microsoft.com/mssql/server:2019-latest",
+  "rabbitmq": "rabbitmq:3-management-alpine",
+  "signalrhub": "eshop/ordering.signalrhub:linux-latest",
+  "env": "envoyproxy/envoy:v1.11.1",
+  "webhook_api": "eshop/webhooks.api:linux-latest",
+  "mvc": "eshop/webmvc:linux-latest",
+  "web_status": "eshop/webstatus:linux-latest",
+  "redis": "redis:alpine",
+  "mobile": "eshop/mobileshoppingagg:linux-latest",
+  "web": "eshop/webshoppingagg:linux-latest",
+  "webspa": "eshop/webspa:linux-latest",
+  "webhook_client": "eshop/webhooks.client:linux-latest",
+  "seq": "datalust/seq:latest"
+}
