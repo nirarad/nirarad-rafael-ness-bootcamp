@@ -2,7 +2,6 @@
 # Download https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
 import pyodbc
 
-
 class MSSQLConnector:
     def __init__(self, database='OrderingDb'):
         self.SERVER = '127.0.0.1,5433'
@@ -33,8 +32,15 @@ class MSSQLConnector:
     def close(self):
         self.conn.close()
 
+    def orderStatusid(self, id):
+        with MSSQLConnector() as conn:
+            return conn.select_query(f'SELECT orderStatusid from ordering.orders where id={id}')[0]['orderStatusid']
 
+    def get_last_id(self):
+        with MSSQLConnector() as conn:
+            return conn.select_query('SELECT max(id) from ordering.orders')[0]['']
 if __name__ == '__main__':
     import pprint
     with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+        pprint.pprint(conn.orderStatusid(1))
+
