@@ -1,4 +1,5 @@
 import os
+import threading
 import time
 import unittest
 import uuid
@@ -45,10 +46,10 @@ class TestScalability(unittest.TestCase):
         cls.docker = DockerManager()
 
         # Payment simulator
-        cls.payment_sim = PaymentSimulator()
+        cls.payment_sim = PaymentSimulator(time_limit=300)
 
         # Catalog simulator
-        cls.catalog_sim = CatalogSimulator()
+        cls.catalog_sim = CatalogSimulator(time_limit=300)
 
     def setUp(self) -> None:
         self.conn.__enter__()
@@ -69,14 +70,22 @@ class TestScalability(unittest.TestCase):
                      3.Function creating 100 orders and counting time of last order processing.
         """
         try:
+            # Amount of orders to create and check
+            order_amount = 100
+            # Pausing ordering api container to load Ordering queue
+            self.docker.stop('eshop/ordering.api:linux-latest')
+            self.docker.stop('eshop/ordering.backgroundtasks:linux-latest')
+
+            # Need to know which ids is new
             last_order_id = self.conn.get_last_order_record_id_in_db()
+
             # Clean messages from previous using of RabbitMQ queue
             with RabbitMQ() as mq:
                 mq.purge('Ordering')
-            # Pausing ordering api container to load Ordering queue
-            self.docker.stop('eshop/ordering.api:linux-latest')
+                mq.purge('Catalog')
+                mq.purge('Payment')
             # 100 orders creation loop
-            for i in range(100):
+            for i in range(order_amount):
                 # Generating new unique x-request id
                 order_uuid = str(uuid.uuid4())
                 # Message body to send
@@ -87,10 +96,12 @@ class TestScalability(unittest.TestCase):
             # Turn on Ordering api container and Ordering BackgroundTasks container
             self.docker.start('eshop/ordering.api:linux-latest')
             self.docker.start('eshop/ordering.backgroundtasks:linux-latest')
-            # Handler to save all created order ids to check statuses after
+            # Handler to save all created orders id to check statuses after
             order_ids = []
-            # Searching for all 100 order ids
-            for i in range(100):
+            # Start time of full order creation (to status 4 (paid))
+            process_start_time = time.time()
+            # Searching for all 100 order ids in DB
+            for i in range(order_amount):
                 start_time = time.time()
                 while True:
                     # Getting last order id
@@ -100,27 +111,29 @@ class TestScalability(unittest.TestCase):
                         # To pass into loger Actual
                         order_ids.append(x)
                         last_order_id = x
+                        i = i + 1
                         self.logger.info(
                             f'{self.test_order_api_scalability_100_orders.__doc__}'
                             f'Order Id in DB -> Actual: ID {self.new_order_id}, '
                             f'Expected: New Order Id')
                         break
                     # if 15 sec pass no sense to wait
-                    elif time.time() - start_time > 15:  # Timeout after 15 seconds
-                        raise Exception("Record was not created")
+                    elif time.time() - start_time > 60:  # Timeout after 60 seconds
+                        raise Exception("Order was not created")
 
-            # Including simulators to creation of order flow
-            for i in range(100):
-                self.catalog_sim.consume_to_confirm_stock()
-                self.payment_sim.succeed_pay()
-
+            # INCLUDING SIMULATORS TO FULL ORDER CREATION FLOW
+            # Threads will close by self after time (not does not affect on order creation time)
+            catalog_thread = threading.Thread(target=self.catalog_sim.consume_to_confirm_stock)
+            payment_thread = threading.Thread(target=self.payment_sim.consume_to_succeed_payment)
+            catalog_thread.start()
+            payment_thread.start()
             # Check for all 100 orders status
             for order in order_ids:
                 start_time = time.time()
-                while self.conn.get_order_status_from_db(order):
+                while self.conn.get_order_status_from_db(order) != 4:
                     # Getting last order id
                     x = self.conn.get_next_order_id(last_order_id)
-                    # if last order updated so it will be new order
+                    # if last order updated, so it will be new order
                     if x is not None and x != last_order_id:
                         # To pass into loger Actual
                         order_ids.append(x)
@@ -131,17 +144,16 @@ class TestScalability(unittest.TestCase):
                             f'Expected: New Order Id')
                         break
                     # if 15 sec pass no sense to wait
-                    elif time.time() - start_time > 15:  # Timeout after 15 seconds
-                        raise Exception("Record was not created")
-            # # Starting count of processing of all orders
-            # loop_start_time = time.time()
-            # loop_end_time = time.time()
-            # # Creation of 100 orders time
-            # elapsed_time = loop_end_time - loop_start_time
-            # self.assertLessEqual(elapsed_time, 100)
-            # self.logger.info(
-            #     f'{self.test_order_api_scalability_100_orders.__doc__} '
-            #     f'Order status in DB -> Actual: {elapsed_time / 3600} hours , Expected: < {100} hours')
+                    elif time.time() - start_time > 400:  # Timeout after 15 seconds
+                        raise Exception("Order status not changed,timeout.")
+            # End time of full order creation (to status 4 (paid))
+            process_end_time = time.time()
+            # Elapsed time of full order creation (to status 4 (paid))
+            elapsed_time = process_end_time - process_start_time
+            self.assertLessEqual(elapsed_time / 3600, 100)
+            self.logger.info(
+                f'{self.test_order_api_scalability_100_orders.__doc__} '
+                f'Order status in DB -> Actual: {elapsed_time / 3600} hours , Expected: < {100} hours')
         except Exception as e:
             self.logger.exception(f"\n{self.test_order_api_scalability_100_orders.__doc__} Error:{e}")
             raise
@@ -175,7 +187,7 @@ class TestScalability(unittest.TestCase):
             create_order(message_body)
             # Running order api docker container
             self.docker.start('eshop/ordering.api:linux-latest')
-            # Wait for creation of order,exit when be found or timeout
+            # Wait until order status changed
             start_time = time.time()
             while True:
                 # Getting last order id
@@ -195,9 +207,9 @@ class TestScalability(unittest.TestCase):
                         f'{self.test_order_api_reliability.__doc__} '
                         f'Order status in DB -> Actual: {current_status} , Expected: {1}')
                     break
-                # if 10 sec pass no sense to wait
-                elif time.time() - start_time > 15:  # Timeout after 15 seconds
-                    raise Exception("Record was not created")
+                # if 60 sec pass no sense to wait
+                elif time.time() - start_time > 60:  # Timeout after 15 seconds
+                    raise Exception("Time to changing status ended,order status not changed")
         except Exception as e:
             self.logger.exception(f"\n{self.test_order_api_reliability.__doc__} Error:{e}")
             raise
