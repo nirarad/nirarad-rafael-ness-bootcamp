@@ -1,11 +1,13 @@
 import time
+from data import config
 
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 def clear_all_queues_msg():
-    queues = ["BackgroundTasks", "Basket", "Catalog", "Ordering", "Ordering.signalrhub", "Payment", "Webhooks"]
+    print(config.queues)
     rbtMQ = RabbitMQ()
-    for i in queues:
-        rbtMQ.delete_msg_on_queue(i)
+    for k, v in config.queues.items():
+        rbtMQ.delete_msg_on_queue(v)
+        print(v)
     time.sleep(3)
