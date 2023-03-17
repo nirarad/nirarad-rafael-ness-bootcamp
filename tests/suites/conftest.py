@@ -91,9 +91,9 @@ def purge_all_queues():
 @pytest.fixture(scope="function")
 def ddos_simulation():
     """
-    Fixture that construct 2 ddos_simulation to simulate ddos attack
+    Fixture that construct 2 ddos_simulation threads to simulate a ddos attack.
     """
-    # Create the two ddos_simulation
+    # Create the two ddos_simulation threads
     stop_event = threading.Event()
     create_order_thread = CreateOrderThread(goal=2, event=stop_event)
     request_orders_thread = GetOrdersRequestsThread(event=stop_event)
