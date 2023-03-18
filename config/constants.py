@@ -1,5 +1,4 @@
 # RabbitMQ Queues
-
 BASKET_QUEUE_NAME = "Basket"
 CATALOG_QUEUE_NAME = "Catalog"
 PAYMENT_QUEUE_NAME = "Payment"
@@ -27,15 +26,9 @@ CANCELED_STATUS = 6
 
 # Routing Keys and Exchanges
 EXCHANGE = "eshop_event_bus"
-
-# Basket Simulator Data
 BASKET_TO_ORDER_ROUTING_KEY = 'UserCheckoutAcceptedIntegrationEvent'
 BASKET_TO_ORDER_ROUTING_KEY_INVALID = 'OrderStockRejectedIntegrationEvent'
-
-# Catalog Simulator Data
 CATALOG_TO_ORDER_ROUTING_KEY_VALID = 'OrderStockConfirmedIntegrationEvent'
 CATALOG_TO_ORDER_ROUTING_KEY_INVALID = 'OrderStockRejectedIntegrationEvent'
-
-# Payment Simulator Data
 PAYMENT_TO_ORDER_ROUTING_KEY_VALID = 'OrderPaymentSucceededIntegrationEvent'
 PAYMENT_TO_ORDER_ROUTING_KEY_INVALID = 'OrderPaymentFailedIntegrationEvent'

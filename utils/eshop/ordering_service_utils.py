@@ -62,7 +62,9 @@ class OrderingServiceUtils:
 
                 # If the query result is equal for the amount of order multiply the order status id value,
                 # return true.
-                if int(sum_of_ids[0]['']) == status_number_2 * amount_of_orders or int(
+                if int(sum_of_ids[0]['']) == status_number_2 * amount_of_orders:
+                    return True
+                if int(
                         sum_of_ids[0]['']) == status_number_1 * amount_of_orders:
                     return True
                 else:

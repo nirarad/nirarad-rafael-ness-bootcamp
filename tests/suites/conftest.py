@@ -34,10 +34,10 @@ def setup_docker_containers():
             representative_simulators_containers):
         docker_manager.start_all_containers()
         sleep(3)
-        # Verify all containers are up and running
+        # Verify all containers are up and running.
         docker_manager.start_all_containers()
 
-        # Stop all containers that have a related simulator
+        # Stop all containers that should replace a simulator.
         for container_name in representative_simulators_containers:
             docker_manager.stop(container_name)
 

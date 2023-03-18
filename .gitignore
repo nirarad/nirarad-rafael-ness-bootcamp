@@ -128,13 +128,3 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
-
-# Temp folder
-temp/
-/tests/suites/pytest_html_report.html
-/tests/suites/output.json
-/tests/suites/archive/
-/documents/
-/pytest_html_report.html
-/output.json
-/reports/

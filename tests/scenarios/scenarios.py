@@ -220,7 +220,7 @@ def payment_rejection_scenario():
     # Preparing test environment
     payment_mock = PaymentSimulator()
     messages = MessageGenerator()
-    payment_to_ordering_invalid_msg = messages.payment_rejection_to_order(payment_mock.CURRENT_ORDER_ID)
+    payment_to_ordering_invalid_msg = messages.payment_rejection_to_ordering(payment_mock.CURRENT_ORDER_ID)
 
     # step 1 - Send from the payment mock to the Ordering message that rejects the payment process.
     payment_mock.send_rejection_message(payment_to_ordering_invalid_msg)

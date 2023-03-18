@@ -39,7 +39,7 @@ def test_valid_message_consumption_rate():
         sleep(5)
 
         # Check if the ordering queue is clear from messages.
-        assert rabbit_mq.validate_queue_is_empty_while_clearing(ORDERING_QUEUE_NAME)
+        assert rabbit_mq.clear_queue_chronologically(ORDERING_QUEUE_NAME)
 
 
 @pytest.mark.scalability

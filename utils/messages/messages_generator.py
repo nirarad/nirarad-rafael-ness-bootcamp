@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 
 
 class MessageGenerator:
+    """
+    Class to generate dynamic test data.
+    """
     load_dotenv()
 
     def __init__(self):
@@ -16,7 +19,6 @@ class MessageGenerator:
     def basket_to_ordering(self):
         """
         Method to generate order details.
-
         Return:
              A dictionary with 2 message: the one that the basket queue will receive, and the one that the basket simulator will send to the ordering queue.
         """
@@ -118,7 +120,7 @@ class MessageGenerator:
             }
         }
 
-    def payment_rejection_to_order(self, order_id=1):
+    def payment_rejection_to_ordering(self, order_id=1):
         """
         Method to generate rejection message from the payment simulator to the ordering queue.
         Return:
