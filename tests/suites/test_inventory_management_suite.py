@@ -1,7 +1,7 @@
 import pytest
 
 from tests.scenarios.scenarios import *
-from constants import *
+from config.constants import *
 
 
 @pytest.mark.inventory_management

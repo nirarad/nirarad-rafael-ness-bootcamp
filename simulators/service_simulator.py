@@ -1,10 +1,10 @@
 import json
-import os
+
 import time
 
 from dotenv import load_dotenv
 
-from constants import *
+from config.constants import *
 from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
@@ -20,7 +20,7 @@ class ServiceSimulator:
     # Will update according to the current id of the processed order.
     CURRENT_ORDER_ID = 0
 
-    def __init__(self, queue, confirm_routing_key="", reject_routing_key="", exchange=os.environ["EXCHANGE"]):
+    def __init__(self, queue, confirm_routing_key="", reject_routing_key="", exchange=EXCHANGE):
         """
         Service simulator class initializer.
         Parameters:

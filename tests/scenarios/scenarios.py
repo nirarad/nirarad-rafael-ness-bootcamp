@@ -2,7 +2,7 @@ from time import sleep
 
 from dotenv import load_dotenv
 
-from constants import *
+from config.constants import *
 from simulators.basket_simulator import BasketSimulator
 from simulators.catalog_simulator import CatalogSimulator
 from simulators.payment_simulator import PaymentSimulator

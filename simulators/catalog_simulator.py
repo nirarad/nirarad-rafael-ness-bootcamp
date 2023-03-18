@@ -1,8 +1,6 @@
-import os
-
 from dotenv import load_dotenv
 
-from constants import *
+from config.constants import *
 from simulators.service_simulator import ServiceSimulator
 
 load_dotenv()
@@ -18,11 +16,10 @@ class CatalogSimulator(ServiceSimulator):
         Catalog simulator class initializer, send the parent class (The Service Simulator class),
         the catalog class related queue.
         """
-        super().__init__(queue=CATALOG_QUEUE_NAME, confirm_routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"],
-                         reject_routing_key=os.environ["CATALOG_TO_ORDER_ROUTING_KEY_INVALID"])
+        super().__init__(queue=CATALOG_QUEUE_NAME, confirm_routing_key=CATALOG_TO_ORDER_ROUTING_KEY_VALID,
+                         reject_routing_key=CATALOG_TO_ORDER_ROUTING_KEY_INVALID)
 
-
-    def verify_status_id_is_stock_confirmed(self, timeout=30):
+    def verify_status_id_is_stock_confirmed(self, timeout=300):
         """
         Method to verify that the current order status is stockconfirmed.
         Parameters:

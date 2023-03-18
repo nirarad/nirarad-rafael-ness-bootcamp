@@ -4,8 +4,7 @@ from time import sleep
 import pytest
 from dotenv import load_dotenv
 
-from constants import *
-from simulators.service_simulator import ServiceSimulator
+from config.constants import *
 from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
 from utils.docker.docker_utils import DockerManager
 from utils.eshop.eshop_system_utils import EShopSystem

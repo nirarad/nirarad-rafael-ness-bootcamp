@@ -1,6 +1,5 @@
 import pytest
 
-from constants import *
 from tests.scenarios.scenarios import *
 
 

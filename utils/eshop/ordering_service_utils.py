@@ -2,7 +2,7 @@ import time
 
 from dotenv import load_dotenv
 
-from constants import *
+from config.constants import *
 from utils.db.db_utils import MSSQLConnector
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
