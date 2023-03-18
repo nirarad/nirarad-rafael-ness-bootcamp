@@ -4,11 +4,8 @@ import requests
 from utils.api.bearer_tokenizer import BearerTokenizer
 
 class OrderingAPI:
-    def __init__(self,username,password):
-        self.base_url = 'http://localhost:5102'
-        self.bearer_token = BearerTokenizer(username,password).bearer_token
 
-    def __init__(self, username='alice', password='Pass123%24'):
+    def __init__(self, username, password):
         self.base_url = 'http://localhost:5102'
         self.bearer_token = BearerTokenizer(username, password).bearer_token
         self.headers = {"Authorization": f"Bearer {self.bearer_token}"}
@@ -43,7 +40,7 @@ class OrderingAPI:
         order = requests.put(f'{self.base_url}/api/v1/orders/ship', headers=headers, json=body)
         return order
 
-if __name__ == '__main__':
+if __name__== '_main_':
     import pprint
     api = OrderingAPI()
 
@@ -53,4 +50,3 @@ if __name__ == '__main__':
     #pprint.pprint(api.post_orders_draft().json())
     #pprint.pprint(api.change_status_to_shipped(1055).json())
     pprint.pprint(api.change_status_to_shipped(1111))
-

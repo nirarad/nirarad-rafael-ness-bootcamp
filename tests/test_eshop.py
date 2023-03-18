@@ -1142,8 +1142,8 @@ def test_system_recovery_success_flow_3():
     dm.start('eshop/ordering.api:linux-latest')
 
     time.sleep(int(os.getenv('long_sleep_time')))
-    # assert catalog.last_msg_method.routing_key == os.getenv('routing_key_paid')
-    # assert MSSQLConnector().orderStatusid(order_id) == int(os.getenv('status_id_four'))
+    assert catalog.last_msg_method.routing_key == os.getenv('routing_key_paid')
+    assert MSSQLConnector().orderStatusid(order_id) == int(os.getenv('status_id_four'))
 #works
 @pytest.mark.security
 def test_authentication_success_flow_1_bob_user(api_bob):

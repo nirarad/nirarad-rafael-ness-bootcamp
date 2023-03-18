@@ -1,7 +1,7 @@
 import requests
 
 class BearerTokenizer:
-    def _init_(self, username, password):
+    def __init__(self, username, password):
         self.username = username
         self.password = password
         self.bearer_token = self.create_bearer_token()
