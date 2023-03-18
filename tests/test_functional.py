@@ -16,6 +16,7 @@ class TestFunctional(unittest.TestCase):
     # Tests of functionality of ordering api with payment,basket,catalog simulators
 
     # Handler of connection to DB
+    docker = None
     conn = None
 
     @classmethod
@@ -46,6 +47,15 @@ class TestFunctional(unittest.TestCase):
         cls.last_order = None
         # Timeout
         cls.timeout = 360
+        # Run common containers
+        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
+        # Clean messages from previous using of RabbitMQ queues
+        with RabbitMQ() as mq:
+            mq.purge_all()
 
     def setUp(self) -> None:
         # Run common containers
@@ -102,7 +112,7 @@ class TestFunctional(unittest.TestCase):
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertEqual(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f"{self.test_order_payment_succeeded.__doc__} "
                         f"Order status in DB -> Actual: {current_status} , "
@@ -114,7 +124,7 @@ class TestFunctional(unittest.TestCase):
             # Updating order status in DB to 3 (stockconfirmed)
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('STOCKCONFIRMED')))
             # Validating order status in DB
-            self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), int(os.getenv('STOCKCONFIRMED')))
+            self.assertEqual(int(os.getenv('STOCKCONFIRMED')), self.conn.get_order_status_from_db(self.new_order_id))
             self.logger.info(
                 f"{self.test_order_payment_succeeded.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, "
@@ -136,7 +146,7 @@ class TestFunctional(unittest.TestCase):
                     raise Exception("Order status is not updated")
             # Validating status 4 (paid) in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(order_status, int(os.getenv('PAID')))
+            self.assertEqual(int(os.getenv('PAID')), order_status)
             self.logger.info(
                 f"{self.test_order_payment_succeeded.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {int(os.getenv('PAID'))}")
@@ -182,7 +192,7 @@ class TestFunctional(unittest.TestCase):
                         f'Expected: New Order Id')
                     # Validate status order is 1 (submitted)
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertEqual(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f"{self.test_order_payment_failed.__doc__} "
                         f"Order status in DB -> Actual: {current_status} , "
@@ -195,7 +205,7 @@ class TestFunctional(unittest.TestCase):
             # Updating order status in DB to 3 (stockconfirmed)
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('STOCKCONFIRMED')))
             # Validating order status in DB
-            self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), int(os.getenv('STOCKCONFIRMED')))
+            self.assertEqual(int(os.getenv('STOCKCONFIRMED')), self.conn.get_order_status_from_db(self.new_order_id))
             self.logger.info(
                 f"{self.test_order_payment_failed.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)},"
@@ -217,7 +227,7 @@ class TestFunctional(unittest.TestCase):
                     raise Exception("Order status is not updated")
             # Validating status 6 (cancelled) in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(order_status, int(os.getenv('CANCELLED')))
+            self.assertEqual(int(os.getenv('CANCELLED')), order_status)
             self.logger.info(
                 f"{self.test_order_payment_failed.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)},"
@@ -265,7 +275,7 @@ class TestFunctional(unittest.TestCase):
                         f'Order Id in DB -> Actual: ID {self.new_order_id}, Expected: New Order Id')
                     # Validate status order is 1 (submitted)
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertEqual(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f'{self.test_order_in_stock.__doc__} '
                         f"Order status in DB -> Actual: {current_status} , Expected: {int(os.getenv('SUBMITTED'))}")
@@ -276,8 +286,8 @@ class TestFunctional(unittest.TestCase):
             # Updating order status in DB to 2 (awaitingvalidation)
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('AWAITINGVALIDATION')))
             # Validating order status in DB
-            self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id),
-                             int(os.getenv('AWAITINGVALIDATION')))
+            self.assertEqual(int(os.getenv('AWAITINGVALIDATION')),
+                             self.conn.get_order_status_from_db(self.new_order_id))
             self.logger.info(
                 f"{self.test_order_in_stock.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, "
@@ -297,7 +307,7 @@ class TestFunctional(unittest.TestCase):
                     raise Exception("Order status is not updated")
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(order_status, int(os.getenv('STOCKCONFIRMED')))
+            self.assertEqual(int(os.getenv('STOCKCONFIRMED')), order_status)
             self.logger.info(
                 f"{self.test_order_in_stock.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, "
@@ -344,7 +354,7 @@ class TestFunctional(unittest.TestCase):
                         f'Order Id in DB -> Actual: ID {self.new_order_id},Expected: New Order Id')
                     # Validate status order is 1 (submitted)
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertEqual(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f"{self.test_order_not_in_stock.__doc__} "
                         f"Order status in DB -> Actual: {current_status} , Expected: {int(os.getenv('SUBMITTED'))}")
@@ -355,8 +365,8 @@ class TestFunctional(unittest.TestCase):
             # Updating order status in DB to 2 (awaitingvalidation)
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('AWAITINGVALIDATION')))
             # Validating order status in DB
-            self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id),
-                             int(os.getenv('AWAITINGVALIDATION')))
+            self.assertEqual(int(os.getenv('AWAITINGVALIDATION')),
+                             self.conn.get_order_status_from_db(self.new_order_id))
             self.logger.info(
                 f"{self.test_order_not_in_stock.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, "
@@ -376,7 +386,7 @@ class TestFunctional(unittest.TestCase):
                     raise Exception("Order status is not updated")
             # Validating status 6 (cancelled) in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(order_status, int(os.getenv('CANCELLED')))
+            self.assertEqual(int(os.getenv('CANCELLED')), order_status)
             self.logger.info(
                 f"{self.test_order_not_in_stock.__doc__}Order status in DB -> "
                 f"Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, "
@@ -418,7 +428,7 @@ class TestFunctional(unittest.TestCase):
                         f'Actual: ID {self.new_order_id} , Expected: New Order Id')
                     # Validate status order is 1 (submitted)
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertEqual(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f"{self.test_backgroundtasks_searching_new_order.__doc__} "
                         f"Order status in DB -> Actual: {current_status} , "
@@ -435,7 +445,7 @@ class TestFunctional(unittest.TestCase):
                 if time.time() - start_time > self.timeout:
                     raise Exception("Order status is not updated")
             # Assert to status 2 (awaitingvalidation)
-            self.assertEqual(current_status, int(os.getenv('AWAITINGVALIDATION')))
+            self.assertEqual(int(os.getenv('AWAITINGVALIDATION')), current_status)
             self.logger.info(
                 f"{self.test_backgroundtasks_searching_new_order.__doc__}Order status ID in DB -> "
                 f"Actual: {current_status}, Expected: {int(os.getenv('AWAITINGVALIDATION'))}")

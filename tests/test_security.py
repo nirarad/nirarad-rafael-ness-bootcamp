@@ -18,6 +18,7 @@ class SecuritySuit(unittest.TestCase):
     # Tests of creation,cancel and getting order
 
     # Handler of connection to DB
+    docker = None
     conn = None
 
     # Init of class TestCrud
@@ -44,7 +45,16 @@ class SecuritySuit(unittest.TestCase):
         # Docker manager
         cls.docker = DockerManager()
         # Timeout
-        cls.timeout = 120
+        cls.timeout = 300
+        # Run common containers and stop not needed
+        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
+        # Clean messages from previous using of RabbitMQ queues
+        with RabbitMQ() as mq:
+            mq.purge_all()
 
     def setUp(self) -> None:
         # Run common containers

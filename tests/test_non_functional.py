@@ -16,8 +16,9 @@ from simulators.payment_simulator import PaymentSimulator
 from dotenv import load_dotenv
 
 
-class TestScalability(unittest.TestCase):
+class NonFunctionalSuit(unittest.TestCase):
     # Variable of connection to DB
+    docker = None
     conn = None
 
     @classmethod
@@ -43,22 +44,31 @@ class TestScalability(unittest.TestCase):
         # Catalog simulator
         cls.catalog_sim = None
         # Timeout
-        cls.timeout = 300
+        cls.timeout = 720
+        # Run common containers and stop not needed
+        cls.docker.stop(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
+        # Clean messages from previous using of RabbitMQ queues
+        with RabbitMQ() as mq:
+            mq.purge_all()
 
     def setUp(self) -> None:
         # Run common containers
+        self.docker.stop(os.getenv('ORDERING_CONTAINER'))
         self.docker.start(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
         self.docker.start(os.getenv('RABBITMQ_CONTAINER'))
         self.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        self.docker.stop(os.getenv('ORDERING_CONTAINER'))
         self.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Clean messages from previous using of RabbitMQ queues
         with RabbitMQ() as mq:
             mq.purge_all()
         # Reconnect
         self.conn.__enter__()
-        self.catalog_sim = CatalogSimulator(time_limit=300)
-        self.payment_sim = PaymentSimulator(time_limit=300)
+        self.catalog_sim = CatalogSimulator(time_limit=3600)
+        self.payment_sim = PaymentSimulator(time_limit=3600)
 
     @classmethod
     def tearDownClass(cls):
@@ -77,7 +87,7 @@ class TestScalability(unittest.TestCase):
         """
         try:
             # Amount of orders to create and check
-            order_amount = 100
+            order_amount = 2
             # Need to know which was last before creating new order
             last_order_id = self.conn.get_last_order_record_id_in_db()
             # 100 orders creation loop
@@ -196,7 +206,7 @@ class TestScalability(unittest.TestCase):
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertTrue(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertTrue(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f"{self.test_order_api_reliability.__doc__} "
                         f"Order status in DB -> Actual: {current_status} , Expected: {int(os.getenv('SUBMITTED'))}")

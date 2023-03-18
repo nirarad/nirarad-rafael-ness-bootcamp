@@ -11,10 +11,11 @@ from simulators.basket_simulator import BasketSimulator
 from dotenv import load_dotenv
 
 
-class TestSanity(unittest.TestCase):
+class SanitySuit(unittest.TestCase):
     # Tests of Sanity
 
     # Handler of connection to DB
+    docker = None
     conn = None
 
     # Init of class TestSanity
@@ -23,7 +24,7 @@ class TestSanity(unittest.TestCase):
         # Env of tests
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
         # Local Logger
-        cls.logger = Logger('crud_logger', 'Logs/test_crud.log').logger
+        cls.logger = Logger('sanity_logger', 'Logs/test_sanity.log').logger
         # Ordering API mocker
         cls.oam = OrderingAPI_Mocker()
         # Unique id generator handler
@@ -42,6 +43,15 @@ class TestSanity(unittest.TestCase):
         cls.docker = DockerManager()
         # Timeout
         cls.timeout = 10
+        # Run common containers and stop not needed
+        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
+        # Clean messages from previous using of RabbitMQ queues
+        with RabbitMQ() as mq:
+            mq.purge_all()
 
     def setUp(self) -> None:
         # Run common containers
@@ -98,7 +108,7 @@ class TestSanity(unittest.TestCase):
                         f'Expected: New Order Id')
                     # Validate status order is 1 (submitted)
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
-                    self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
+                    self.assertEqual(int(os.getenv('SUBMITTED')), current_status)
                     self.logger.info(
                         f'{self.test_create_order.__doc__} '
                         f"Order status in DB -> Actual: {current_status} , Expected: {int(os.getenv('SUBMITTED'))}")
@@ -132,7 +142,7 @@ class TestSanity(unittest.TestCase):
             cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
             # Wait sec
             # Response validation must be 200
-            self.assertEqual(cancel_response.status_code, 200)
+            self.assertEqual(200, cancel_response.status_code)
             self.logger.info(
                 f'{self.test_cancel_order_v1.__doc__}Response to cancel status -> '
                 f'Actual:  {cancel_response.status_code} , Expected:{200}')
@@ -140,7 +150,7 @@ class TestSanity(unittest.TestCase):
             # Validation status canceled in DB
             # Get current status of the order
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(current_order_status, int(os.getenv('CANCELLED')))
+            self.assertEqual(int(os.getenv('CANCELLED')), current_order_status)
             self.logger.info(
                 f"{self.test_cancel_order_v1.__doc__}Order Id {self.new_order_id} status in DB after cancel-> "
                 f"Actual:  {current_order_status} ,Expected:{int(os.getenv('CANCELLED'))}")
@@ -171,7 +181,7 @@ class TestSanity(unittest.TestCase):
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('AWAITINGVALIDATION')))
             # Validation status changed
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(current_status, int(os.getenv('AWAITINGVALIDATION')))
+            self.assertEqual(int(os.getenv('AWAITINGVALIDATION')), current_status)
             self.logger.info(
                 f"{self.test_cancel_order_v2.__doc__}Updating Order status in DB -> "
                 f"Actual:  {current_status} ,Expected:{int(os.getenv('AWAITINGVALIDATION'))}")
@@ -179,14 +189,14 @@ class TestSanity(unittest.TestCase):
             # Ordering api sends request to cancel order
             cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
             # Response validation must be 200
-            self.assertEqual(cancel_response.status_code, 200)
+            self.assertEqual(200, cancel_response.status_code)
             self.logger.info(
                 f'{self.test_cancel_order_v2.__doc__}Response to cancel status -> '
                 f'Actual:  {cancel_response.status_code} , Expected:{200}')
             # Validation status canceled in DB
             # Get current status of the order
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(current_order_status, int(os.getenv('CANCELLED')))
+            self.assertEqual(int(os.getenv('CANCELLED')), current_order_status)
             self.logger.info(
                 f"{self.test_cancel_order_v2.__doc__}Order Id {self.new_order_id} status in DB after cancel -> "
                 f"Actual:  {current_order_status} ,Expected:{int(os.getenv('CANCELLED'))}")
@@ -217,7 +227,7 @@ class TestSanity(unittest.TestCase):
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('STOCKCONFIRMED')))
             # Validation status changed
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(current_status, int(os.getenv('STOCKCONFIRMED')))
+            self.assertEqual(int(os.getenv('STOCKCONFIRMED')), current_status)
             self.logger.info(
                 f'{self.test_cancel_order_v3.__doc__}Updating Order status in DB ->'
                 f"Actual:  {current_status} , Expected:{int(os.getenv('STOCKCONFIRMED'))}")
@@ -225,14 +235,14 @@ class TestSanity(unittest.TestCase):
             # Ordering api sends request to cancel order
             cancel_response = self.oam.cancel_order(self.new_order_id, self.order_uuid)
             # Response validation must be 200
-            self.assertEqual(cancel_response.status_code, 200)
+            self.assertEqual(200, cancel_response.status_code)
             self.logger.info(
                 f'{self.test_cancel_order_v3.__doc__}Request to cancel status -> '
                 f'Actual:  {cancel_response.status_code} , Expected:{200}')
             # Validation status canceled in DB
             # Get current status of the order
             current_order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            self.assertEqual(current_order_status, int(os.getenv('CANCELLED')))
+            self.assertEqual(int(os.getenv('CANCELLED')), current_order_status)
             self.logger.info(
                 f"{self.test_cancel_order_v3.__doc__}Order status in DB after cancel-> "
                 f"Actual:  {current_order_status} ,Expected:{int(os.getenv('CANCELLED'))}")
@@ -261,7 +271,7 @@ class TestSanity(unittest.TestCase):
             # Get order via Ordering API Mock
             order = self.oam.get_order_by_id(self.new_order_id)
             # Validating response status code
-            self.assertEqual(order.status_code, 200)
+            self.assertEqual(200, order.status_code)
             self.logger.info(
                 f'{self.test_get_order_details.__doc__}Response to cancel status -> '
                 f'Actual:  {order.status_code} , Expected:{200}')
@@ -273,7 +283,7 @@ class TestSanity(unittest.TestCase):
             # Loading stub response for that order
             response_stub = self.jdata_orders_responses.get_json_order_response('alice_normal_order_response',
                                                                                 self.new_order_id)
-            self.assertEqual(response_body, response_stub)
+            self.assertEqual(response_stub, response_body)
             self.logger.info(
                 f'{self.test_get_order_details.__doc__}Response bodies -> '
                 f'\nActual:  {response_body} ,\nExpected:{response_stub}')
