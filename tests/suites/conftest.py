@@ -63,7 +63,7 @@ def rabbit_mq():
     rabbit_mq.close()
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 def mssql_connector():
     """
     Fixture to create MSSQLConnector instance.
@@ -95,13 +95,13 @@ def ddos_simulation():
     """
     # Create the two ddos_simulation threads
     stop_event = threading.Event()
-    create_order_thread = CreateOrderThread(goal=2, event=stop_event)
-    request_orders_thread = GetOrdersRequestsThread(event=stop_event)
+    create_order_thread = CreateOrderThread(goal=2, flag=stop_event)
+    request_orders_thread = GetOrdersRequestsThread(flag=stop_event)
 
     # Tear down the services
     yield create_order_thread, request_orders_thread, stop_event
 
-    # Set the event to stop the create_order thread
+    # Set the event to stop the send_message_to_create_an_order thread
     stop_event.set()
 
     # Join the ddos_simulation at the end of the test

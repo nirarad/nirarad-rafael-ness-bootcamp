@@ -11,13 +11,22 @@ load_dotenv()
 
 
 def order_submission_scenario():
+    """
+    Method to simulate the order submission scenario, by sending message to create a new order entity
+    from the basket simulator to the ordering queue, and by receiving the output message from the ordering service to the basket queue.
+    Returns:
+            Returns True only if the basket queue receive and send the correct messages,
+            and in the end of the process, the order status id is 1 (submitted).
+    Raises:
+        AssertionError: Raised if the basket queue has not received or sent the correct messages, or in a case that in the end of the process, the order status id is not 1 (submitted).
+    """
     # Preparing test environment
     basket_mock = BasketSimulator()
     mg = MessageGenerator()
     basket_to_ordering_msg = mg.basket_to_order()
 
     # Step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
-    basket_mock.create_order(basket_to_ordering_msg["input"])
+    basket_mock.send_message_to_create_an_order(basket_to_ordering_msg["input"])
 
     # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
     actual_message = basket_mock.get_first_message()['UserId']
@@ -35,16 +44,29 @@ def order_submission_scenario():
 
 
 def order_submission_without_response_waiting_scenario():
+    """
+    Function to simulate the order submission scenario, by sending a message to create a new order entity
+    from the basket simulator to the ordering queue.
+    This function do not verify a valid response from the ordering service.
+    """
     # Preparing test environment
     basket_mock = BasketSimulator()
     mg = MessageGenerator()
     basket_to_ordering_msg = mg.basket_to_order()
 
     # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
-    basket_mock.create_order(basket_to_ordering_msg["input"])
+    basket_mock.send_message_to_create_an_order(basket_to_ordering_msg["input"])
 
 
 def catalog_stock_confirmation_scenario():
+    """
+    Function to simulate the catalog stock confirmation scenario, by sending message to validate that the order items in stock.
+    Returns:
+            Returns True only if before sending the message the order status is awaitingvalidation (2),
+            and in the end of the process, the order status id is 3 (stockconfirmed).
+    Raises:
+        AssertionError: Raised if before sending the message the order status is not awaitingvalidation (2), or in case that in the end of the process, the order status is not 3 (stockconfirmed).
+    """
     # Preparing test environment
     catalog_mock = CatalogSimulator()
     mg = MessageGenerator()
@@ -57,7 +79,7 @@ def catalog_stock_confirmation_scenario():
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
 
     # step 2 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
-    catalog_mock.validate_items_in_stock(catalog_to_ordering_msg["input"])
+    catalog_mock.send_message_to_validate_items_in_stock(catalog_to_ordering_msg["input"])
 
     # Expected Result #3 - The OrderStatusID in the orders table has been updated to 3.
     if not catalog_mock.verify_status_id_is_stock_confirmed(timeout=300):
@@ -69,6 +91,13 @@ def catalog_stock_confirmation_scenario():
 
 
 def catalog_stock_confirmation_without_waiting_for_response_scenario():
+    """
+    Function to simulate the catalog stock confirmation scenario, by sending message to validate that the order items in stock.
+    Returns:
+            Returns True only if the order status is awaitingvalidation (2).
+    Raises:
+        AssertionError: Raised if before sending the message the order status is not awaitingvalidation (2).
+    """
     # Preparing test environment
     catalog_mock = CatalogSimulator()
     mg = MessageGenerator()
@@ -81,13 +110,21 @@ def catalog_stock_confirmation_without_waiting_for_response_scenario():
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
 
     # step 2 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
-    catalog_mock.validate_items_in_stock(catalog_to_ordering_msg["input"])
+    catalog_mock.send_message_to_validate_items_in_stock(catalog_to_ordering_msg["input"])
 
     # Test Passed
     return True
 
 
 def catalog_stock_rejection_scenario():
+    """
+    Function to simulate the catalog stock rejection scenario, by sending message to inform that one or more order items out of stock.
+    Returns:
+            Returns True only if before sending the message the order status is awaitingvalidation (2),
+            and in the end of the process, the order status id is 6 (canceled).
+    Raises:
+        AssertionError: Raised if before sending the message the order status is not awaitingvalidation (2), or in case that in the end of the process, the order status is not 6 (canceled).
+    """
     # Preparing test environment
     catalog_mock = CatalogSimulator()
     mg = MessageGenerator()
@@ -100,7 +137,7 @@ def catalog_stock_rejection_scenario():
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
 
     # step 2 - Send from the catalog mock to the Ordering queue the massage to change status to 'stockconfirmed'.
-    catalog_mock.inform_items_not_in_stock(catalog_to_ordering_invalid_msg)
+    catalog_mock.send_message_to_inform_items_not_in_stock(catalog_to_ordering_invalid_msg)
 
     # Expected Result #2 - The OrderStatusID is updated to 6.
     if not Simulator.explicit_status_id_validation(6):
@@ -112,6 +149,14 @@ def catalog_stock_rejection_scenario():
 
 
 def payment_confirmation_scenario():
+    """
+    Function to simulate the payment process confirmation scenario, by sending message to validate that the payment process succeeded.
+    Returns:
+            Returns True only if the payment queue received and send the correct messages,
+            and in the end of the process, the order status id is 4 (paid).
+    Raises:
+        AssertionError: Raised if the payment queue has not received or sent the correct messages, or in a case that in the end of the process, the order status id is not 4 (paid).
+    """
     # Preparing test environment
     payment_mock = PaymentSimulator()
     messages = MessageGenerator()
@@ -128,7 +173,7 @@ def payment_confirmation_scenario():
             f"Test failed. Failure reason is: {actual_result[0]} != {expected_result[0]} or {actual_result[1]} != {expected_result[1]} ")
 
     # step 2 - Send from the payment mock to the Ordering message that confirms the payment process.
-    payment_mock.validate_payment(payment_to_ordering_msg["input"])
+    payment_mock.send_message_to_validate_payment(payment_to_ordering_msg["input"])
 
     # Expected Result #2 - The OrderStatusID is updated to 4.
     if not payment_mock.verify_status_id_is_paid(400):
@@ -140,6 +185,13 @@ def payment_confirmation_scenario():
 
 
 def payment_rejection_scenario():
+    """
+     Function to simulate the payment process rejection scenario, by sending message to inform that the payment process has failed.
+     Returns:
+             Returns True only if before sending the message the order status is canceled (6).
+     Raises:
+         AssertionError: Raised in case that in the end of the process, the order status is not 6 (canceled).
+     """
     # Preparing test environment
     payment_mock = PaymentSimulator()
     messages = MessageGenerator()
@@ -158,6 +210,16 @@ def payment_rejection_scenario():
 
 
 def ship_api_request_scenario(status_code=200, id_validation_timeout=300):
+    """
+    Function to simulate an 'order shipping' request that have been sent to the  Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+        id_validation_timeout: The max number of seconds to validate the id.
+    Returns:
+        True only if the returned status code is equal to 200 and the id in the end of the process is 5.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned, or the order status is not 5.
+    """
     # step 1 - Send the following API request to ship the order.
     ordering_api = OrderingAPI()
 
@@ -177,10 +239,19 @@ def ship_api_request_scenario(status_code=200, id_validation_timeout=300):
 
 
 def ship_invalid_auth_api_request_scenario(status_code=401):
+    """
+    Function to simulate a scenario of an unauthorized 'order shipping' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 401.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
     # step 1 - Send the following API request to ship the order.
     ordering_api = OrderingAPI()
 
-    # Expected Result #1 - 200 HTTP status code should be returned.
+    # Expected Result #1 - 401 HTTP status code should be returned.
     if ordering_api.ship_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
@@ -190,6 +261,16 @@ def ship_invalid_auth_api_request_scenario(status_code=401):
 
 
 def cancel_api_request_scenario(status_code=200, timeout=200):
+    """
+    Function to simulate a scenario of an 'order canceling' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+        timeout: The max number of seconds to validate the id.
+    Returns:
+        True only if the returned status code is equal to 200 and the id in the end of the process is 6
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned, or the order status is not 6.
+    """
     # step 1 - Send the following API request to cancel the order.
     ordering_api = OrderingAPI()
 
@@ -209,10 +290,20 @@ def cancel_api_request_scenario(status_code=200, timeout=200):
 
 
 def cancel_invalid_auth_api_request_scenario(status_code=401):
+    """
+    Function to simulate a scenario of an unauthorized 'order canceling' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 401.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to cancel the order.
     ordering_api = OrderingAPI()
 
-    # Expected Result #1 - 200 HTTP status code should be returned.
+    # Expected Result #1 - 401 HTTP status code should be returned.
     if ordering_api.cancel_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
@@ -222,6 +313,16 @@ def cancel_invalid_auth_api_request_scenario(status_code=401):
 
 
 def get_orders_api_request_scenario(status_code=200):
+    """
+    Function to simulate a scenario of a 'get all orders' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 200.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to get all the orders of the user.
     ordering_api = OrderingAPI()
     response = ordering_api.get_orders()
@@ -236,10 +337,20 @@ def get_orders_api_request_scenario(status_code=200):
 
 
 def get_orders_invalid_auth_api_request_scenario(status_code=401):
+    """
+    Function to simulate a scenario of an unauthorized request to 'get all orders' that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 401.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to get all the orders of the user.
     ordering_api = OrderingAPI()
 
-    # Expected Result #1 - 200 HTTP status code should be returned.
+    # Expected Result #1 - 401 status code should be returned.
     if ordering_api.get_orders_invalid_auth().status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
@@ -249,6 +360,16 @@ def get_orders_invalid_auth_api_request_scenario(status_code=401):
 
 
 def get_order_by_id_api_request_scenario(status_code=200):
+    """
+    Function to simulate a scenario of a 'get order by id' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 200.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to get one of the user orders by its id.
     ordering_api = OrderingAPI()
 
@@ -262,6 +383,16 @@ def get_order_by_id_api_request_scenario(status_code=200):
 
 
 def get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
+    """
+    Function to simulate a scenario of an unauthorized 'get order by id' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 401.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to get one of the user orders by its id.
     ordering_api = OrderingAPI()
 
@@ -275,6 +406,16 @@ def get_order_by_id_invalid_auth_api_request_scenario(status_code=401):
 
 
 def get_card_types_api_request_scenario(status_code=200):
+    """
+    Function to simulate a scenario of a 'get card types' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 200.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to get all the card types of the user.
     ordering_api = OrderingAPI()
 
@@ -288,6 +429,16 @@ def get_card_types_api_request_scenario(status_code=200):
 
 
 def get_card_types_invalid_auth_api_request_scenario(status_code=401):
+    """
+    Function to simulate a scenario of an unauthorized 'get order card types' request that have been sent to the Ordering API.
+    Parameters:
+        status_code: The expected status code to be returned.
+    Returns:
+        True only if the returned status code is equal to 401.
+     Raises:
+         AssertionError: Raised in case that The expected status code hasn't been returned.
+    """
+
     # step 1 - Send the following API request to get all the card types of the user.
     ordering_api = OrderingAPI()
 
@@ -301,16 +452,20 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
 
 
 def crash_ordering_service_scenario(docker_manager, service_name_list=None):
+    """
+    Function to simulate a service crash scenario.
+    Parameters:
+        docker_manager: The docker manager to use.
+        service_name_list: Ths services to crash.
+    """
     if service_name_list is None:
         service_name_list = ["eshop/ordering.api:linux-latest",
                              "eshop/ordering.backgroundtasks:linux-latest",
                              "eshop/ordering.signalrhub:linux-latest"]
+
+    # Stop all the mentioned services.
     docker_manager.stop("eshop/ordering.api:linux-latest")
     docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
     docker_manager.stop("eshop/ordering.api:linux-latest")
     docker_manager.stop("eshop/ordering.signalrhub:linux-latest")
     docker_manager.stop("eshop/ordering.api:linux-latest")
-
-    # for service_name in service_name_list:
-    #     while docker_manager.get_container_status(service_name) == "Running":
-    #         docker_manager.stop(service_name)

@@ -56,7 +56,7 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2(docker_manager, rab
     docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
 
     # Step 7: Verify that 5 order entities have been created within the ordering table, with OrderStatusID of 1 or 2.
-    assert Simulator.select_top_n_orders_same_status(
+    assert Simulator.select_top_n_orders_with_same_status(
         mssql_connector=mssql_connector, status_number_1=1,
         status_number_2=2, amount_of_orders=3, timeout=10)
 
@@ -108,6 +108,6 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3(docker_manager, rab
     docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
 
     # Step 7: Verify that n order entities have been created within the ordering table, with OrderStatusID of 2 or 3.
-    assert Simulator.select_top_n_orders_same_status(
+    assert Simulator.select_top_n_orders_with_same_status(
         mssql_connector=mssql_connector, status_number_1=3,
         status_number_2=2, amount_of_orders=3, timeout=10)

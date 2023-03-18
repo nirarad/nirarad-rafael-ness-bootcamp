@@ -17,11 +17,11 @@ class BasketSimulator(Simulator):
     def __init__(self):
         """
         Basket simulator class initializer, send the parent class (The Simulator class),
-        the basket class related queue.
+        the basket class related queue name.
         """
         super().__init__("Basket")
 
-    def create_order(self, body):
+    def send_message_to_create_an_order(self, body):
         """
         Method to start the ordering process, by sending a confirmation message from the basket simulator to the ordering queue.
         Parameters:
@@ -39,10 +39,20 @@ class BasketSimulator(Simulator):
             f"Message Route: Basket -> Ordering. Routing Key: OrderStockConfirmedIntegrationEvent. Current Order ID is: {Simulator.CURRENT_ORDER_ID}")
 
     def verify_status_id_is_submitted(self):
+        """
+        Method to verify that the current order status is submitted.
+        Returns:
+            True if the current order status is submitted and False otherwise.
+        """
         print("Verifying Status ID is submitted...")
         return self.verify_state_status_id()
 
     def get_order_id(self):
+        """
+        Method to get the current order id, by fetching the last order id that has been entered to the table.
+        Returns:
+            The current order id.
+        """
         try:
             with MSSQLConnector() as conn:
                 order_id = conn.select_query(
