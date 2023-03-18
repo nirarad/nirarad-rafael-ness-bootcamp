@@ -1,8 +1,7 @@
 import requests
 
-
 class BearerTokenizer:
-    def __init__(self, username, password):
+    def _init_(self, username, password):
         self.username = username
         self.password = password
         self.bearer_token = self.create_bearer_token()
@@ -35,11 +34,13 @@ class BearerTokenizer:
                                 allow_redirects=False)
 
         return self.parse_bearer_token(str(response.headers))
+
     @staticmethod
     def parse_request_verification_token(body_response):
         start_pos = body_response.find('__RequestVerificationToken') + 49
         length = body_response.index('"', start_pos)
         return body_response[start_pos:length]
+
     @staticmethod
     def parse_bearer_token(body_response):
         start_pos = body_response.find('access_token=') + 13
