@@ -37,4 +37,4 @@ class MSSQLConnector:
 if __name__ == '__main__':
     import pprint
     with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+        pprint.pprint(conn.select_query(f'SELECT * from ordering.orders where Id = {21}'))
