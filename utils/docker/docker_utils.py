@@ -31,7 +31,7 @@ if __name__ == '__main__':
     dm.start('eshop/ordering.api:linux-latest')
 
     dm.pause('eshop/ordering.api:linux-latest')
-    time.sleep(1)
+    time.sleep(5)
     dm.unpause('eshop/ordering.api:linux-latest')
 
     dm.restart('eshop/ordering.api:linux-latest')
