@@ -1,7 +1,7 @@
 import pytest
 
 from tests.scenarios.scenarios import *
-from utils.ordering.ordering_service_utils import OrderingServiceUtils
+from utils.eshop.ordering_service_utils import OrderingServiceUtils
 
 
 @pytest.mark.security
@@ -138,7 +138,7 @@ def test_order_creation_while_handling_ddos_simulation(ddos_simulation):
     """
     Source Test Case Title: Verify that the service is able to perform 300 orders while DDOS attack is simulated on the service.
 
-    Source Test Case Purpose: Verify that continuously sending an API request to get all the orders will not interrupt the service, while he tries to perform multiple ordering operations.
+    Source Test Case Purpose: Verify that continuously sending an API request to get all the orders will not interrupt the service, while he tries to perform multiple eshop operations.
 
     Source Test Case ID: 31
 

@@ -8,6 +8,7 @@ from constants import *
 from simulators.service_simulator import ServiceSimulator
 from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
 from utils.docker.docker_utils import DockerManager
+from utils.eshop.eshop_system_utils import EShopSystem
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -52,11 +53,11 @@ def purge_all_queues(setup_docker_containers):
     Fixture to purge all messages in each queue before every test.
     """
     print("Purge all queues...")
-    ServiceSimulator.purge_all_queues(
+    EShopSystem.purge_all_queues(
         [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME, CATALOG_QUEUE_NAME, PAYMENT_QUEUE_NAME, SIGNALR_HUB_QUEUE_NAME,
          WEBHOOKS_QUEUE_NAME, BACKGROUND_TASK_QUEUE_NAME])
     sleep(2)
-    ServiceSimulator.purge_all_queues(
+    EShopSystem.purge_all_queues(
         [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME, CATALOG_QUEUE_NAME, PAYMENT_QUEUE_NAME, SIGNALR_HUB_QUEUE_NAME,
          WEBHOOKS_QUEUE_NAME, BACKGROUND_TASK_QUEUE_NAME])
     sleep(1)

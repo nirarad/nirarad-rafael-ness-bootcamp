@@ -3,7 +3,7 @@ import pytest
 from tests.scenarios.scenarios import *
 from utils.db.db_utils import MSSQLConnector
 from utils.docker.docker_utils import DockerManager
-from utils.ordering.ordering_service_utils import OrderingServiceUtils
+from utils.eshop.ordering_service_utils import OrderingServiceUtils
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
@@ -12,7 +12,7 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
     """
     Source Test Case Title: Verify that the service is able to recover the data whenever the service crashes in between the ‘submitted’ to the ‘awaitingvalidation’ state.
 
-    Source Test Case Purpose: Verify that the service crashes, it has the ability to recover the ordering process data, from the exact point when the crash occurred.
+    Source Test Case Purpose: Verify that the service crashes, it has the ability to recover the eshop process data, from the exact point when the crash occurred.
 
     Source Test Case ID: 34
 
@@ -21,7 +21,7 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
     docker_manager = DockerManager()
 
     with RabbitMQ() as rabbit_mq, MSSQLConnector() as mssql_connector:
-        # Set pre-conditions: Stop the ordering service, and his background task.
+        # Set pre-conditions: Stop the eshop service, and his background task.
         docker_manager.stop(SIGNALR_HUB_SERVICE)
         docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
         docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
@@ -36,13 +36,13 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
         # to parameterize
         messages_amount_to_send = 3
 
-        # Step 1-2: Send 5 messages to the ordering queue.
+        # Step 1-2: Send 5 messages to the eshop queue.
         for _ in range(messages_amount_to_send):
             order_submission_without_response_waiting_scenario()
 
         sleep(5)
 
-        # Step 3-4: Simulate the ordering service crash.
+        # Step 3-4: Simulate the eshop service crash.
         docker_manager.start(ORDERING_SERVICE)
         docker_manager.stop(ORDERING_SERVICE)
         docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
@@ -58,11 +58,11 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
 
         assert message_counter == messages_amount_to_send
 
-        # Step 6: Start the ordering service (both api and background task services).
+        # Step 6: Start the eshop service (both api and background task services).
         docker_manager.start(ORDERING_SERVICE)
         docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
-        # Step 7: Verify that the given amount of order entities have been created within the ordering table, with OrderStatusID of 1 or 2.
+        # Step 7: Verify that the given amount of order entities have been created within the eshop table, with OrderStatusID of 1 or 2.
         assert OrderingServiceUtils.select_top_n_orders_with_same_status(
             mssql_connector=mssql_connector, status_number_1=SUBMITTED_STATUS,
             status_number_2=AWAITING_VALIDATION_STATUS, amount_of_orders=3, timeout=10)
@@ -73,7 +73,7 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
     """
     Source Test Case Title: Verify that the service is able to recover the data whenever the service crashes between the ‘awaitingvalidation’ and ‘stockconfirmed’ states.
 
-    Source Test Case Purpose: Verify that the service crashes, it has the ability to recover the ordering process data, from the exact point when the crash occurred.
+    Source Test Case Purpose: Verify that the service crashes, it has the ability to recover the eshop process data, from the exact point when the crash occurred.
 
     Source Test Case ID: 35
 
@@ -84,7 +84,7 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
 
     with RabbitMQ() as rabbit_mq, MSSQLConnector() as mssql_connector:
 
-        # Set pre-conditions: Stop the ordering.singlerhub service.
+        # Set pre-conditions: Stop the eshop.singlerhub service.
         docker_manager.stop(SIGNALR_HUB_SERVICE)
         sleep(5)
 
@@ -103,9 +103,9 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
 
         sleep(5)
 
-        #  When the order status changes to 2, simulate the ordering service crash.
-        if ServiceSimulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=50,
-                                                          order_id=OrderingServiceUtils.get_max_order_id()):
+        #  When the order status changes to 2, simulate the eshop service crash.
+        if EShopSystem.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=50,
+                                                     order_id=OrderingServiceUtils.get_max_order_id()):
             crash_ordering_service_scenario(docker_manager)
 
         sleep(5)
@@ -117,11 +117,11 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
 
         assert message_counter == messages_amount_to_send
 
-        # Step 6: Start the ordering service (both api and background task services).
+        # Step 6: Start the eshop service (both api and background task services).
         docker_manager.start(ORDERING_SERVICE)
         docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
-        # Step 7: Verify that n order entities have been created within the ordering table, with OrderStatusID of 2 or 3.
+        # Step 7: Verify that n order entities have been created within the eshop table, with OrderStatusID of 2 or 3.
         assert OrderingServiceUtils.select_top_n_orders_with_same_status(
             mssql_connector=mssql_connector, status_number_1=STOCK_CONFIRMED_STATUS,
             status_number_2=AWAITING_VALIDATION_STATUS, amount_of_orders=3, timeout=10)

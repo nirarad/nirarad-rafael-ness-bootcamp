@@ -1,7 +1,6 @@
 import json
 import os
 import time
-from abc import ABC
 
 from dotenv import load_dotenv
 
@@ -12,26 +11,30 @@ from utils.rabbitmq.rabbitmq_send import RabbitMQ
 load_dotenv()
 
 
-class ServiceSimulator(ABC):
+class ServiceSimulator:
     """
-    Abstract Class which represent an abstract service simulator.
-    Contains methods that allows the simulator and child classes to communicate with RabbitMQ and SQL Server.
+    Class which represent a service simulator.
+    Contains methods that allows the simulator and its child classes to communicate with the service queue.
     """
 
     # Will update according to the current id of the processed order.
     CURRENT_ORDER_ID = 0
 
-    def __init__(self, queue, routing_key=""):
+    def __init__(self, queue, confirm_routing_key="", reject_routing_key="", exchange=os.environ["EXCHANGE"]):
         """
-        Abstract service simulator class initializer.
+        Service simulator class initializer.
         Parameters:
             queue: The child service simulator class representative queue's name.
+            confirm_routing_key: The confirmation message routing key that the simulator sends.
+            exchange: The exchange of the message that being sends by teh simulator.
+
         """
         self.queue = queue
-        self.routing_key = routing_key
-        self.exchange = exchange = os.environ["EXCHANGE"]
+        self.confirm_routing_key = confirm_routing_key
+        self.reject_routing_key = reject_routing_key
+        self.exchange = exchange
 
-    def get_first_message(self, timeout=100):
+    def get_first_message_from_service_queue(self, timeout=100):
         """
         Method which reads the first messages from a given queue.
         Parameters:
@@ -66,22 +69,39 @@ class ServiceSimulator(ABC):
         except BaseException as b:
             print(b)
 
-    def send_message(self, body, routing_key="", exchange=""):
+    def send_confirmation_message(self, body):
         """
         Method to publish a given message to RabbitMQ.
         Parameters:
             body: The message pyload.
-            routing_key: The message routing key.
-            exchange: The exchange of the message.
         """
         with RabbitMQ() as mq:
             mq.publish(exchange=self.exchange,
-                       routing_key=self.routing_key,
+                       routing_key=self.confirm_routing_key,
                        body=json.dumps(body))
+        if self.queue == CATALOG_QUEUE_NAME:
+            print("Message Route: Catalog -> Ordering. Routing Key: OrderStockConfirmedIntegrationEvent")
+        elif self.queue == PAYMENT_QUEUE_NAME:
+            print("Message Route: Payment -> Ordering. Routing Key: OrderPaymentSucceededIntegrationEvent")
 
-    def verify_state_status_id(self, status_id=None, timeout=50):
+    def send_rejection_message(self, body):
         """
-        Method to validate that the current order status value is the expected value for the order state.
+        Method to publish a given message to RabbitMQ.
+        Parameters:
+            body: The message pyload.
+        """
+        with RabbitMQ() as mq:
+            mq.publish(exchange=self.exchange,
+                       routing_key=self.reject_routing_key,
+                       body=json.dumps(body))
+        if self.queue == CATALOG_QUEUE_NAME:
+            print("Message Route: Catalog -> Ordering. Routing Key: OrderStockRejectedIntegrationEvent")
+        elif self.queue == PAYMENT_QUEUE_NAME:
+            print("Message Route: Payment -> Ordering. Routing Key: OrderPaymentFailedIntegrationEvent")
+
+    def validate_order_current_status_id(self, status_id=None, timeout=50):
+        """
+        Method to validate that the current order status value is the expected value for the current order state.
         Parameters:
             status_id: The expected order status id.
             timeout: The max number of seconds for trying to verify the current order status.
@@ -91,10 +111,13 @@ class ServiceSimulator(ABC):
         if status_id is None:
             if self.queue == BASKET_QUEUE_NAME:
                 status_id = SUBMITTED_STATUS
+                print("Verifying Status ID is submitted...")
             elif self.queue == CATALOG_QUEUE_NAME:
                 status_id = AWAITING_VALIDATION_STATUS
+                print("Verifying Status ID is awaiting validation...")
             elif self.queue == PAYMENT_QUEUE_NAME:
                 status_id = PAID_STATUS
+                print("Verifying Status ID is paid...")
         try:
             with MSSQLConnector() as conn:
                 for i in range(timeout):
@@ -102,7 +125,7 @@ class ServiceSimulator(ABC):
                         # In the below query, we fetch the last inserted order status id
                         # and checks if its equal to the excreted value.
                         "SELECT o.OrderStatusId "
-                        "FROM ordering.orders o "
+                        "FROM eshop.orders o "
                         f"WHERE o.OrderStatusId = {status_id} "
                         f"and o.Id = {ServiceSimulator.CURRENT_ORDER_ID}"))
                     if counter > 0:
@@ -113,49 +136,6 @@ class ServiceSimulator(ABC):
 
                 # Order status is different from the excepted value.
                 return False
-        except ConnectionError as c:
-            raise ConnectionError(f'There were problem to retrieve the status id.\nException is: {c}')
-
-    @staticmethod
-    def purge_all_queues(queues_list):
-        """
-        Method to purge all the given queues.
-        Parameters:
-            queues_list: The queues to purge.
-        """
-        for q in queues_list:
-            with RabbitMQ() as mq:
-                mq.purge_queue(q)
-
-    @staticmethod
-    def explicit_status_id_validation(status_id, timeout=300, order_id=None):
-        """
-        Method to explicitly validates the current order status id.
-        Parameters:
-            status_id: The expected order status id.
-            timeout: The max number of seconds for trying to verify the current order status.
-            order_id: The current processed order id.
-        Returns:
-            True if the current processed order status its equal to the expected value, False otherwise.
-        """
-        if order_id is None:
-            order_id = ServiceSimulator.CURRENT_ORDER_ID
-        print(f"Validate status id is {status_id}...")
-        try:
-            with MSSQLConnector() as conn:
-                for i in range(timeout):
-                    counter = len(conn.select_query(
-                        # In the below query, we fetch the last inserted order status id
-                        # and checks if its equal to the excreted value.
-                        "SELECT o.OrderStatusId "
-                        "FROM ordering.orders o "
-                        f"WHERE o.OrderStatusId = {status_id} "
-                        f"and o.Id = {ServiceSimulator.CURRENT_ORDER_ID}"))
-                    if counter > 0:
-                        return True
-                    else:
-                        time.sleep(1)
-            return False
         except ConnectionError as c:
             raise ConnectionError(f'There were problem to retrieve the status id.\nException is: {c}')
 

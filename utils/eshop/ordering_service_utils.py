@@ -11,7 +11,7 @@ load_dotenv()
 
 class OrderingServiceUtils:
     """
-    Static class for ordering service and queue related operations.
+    Static class for eshop service and queue related operations.
     """
 
     @staticmethod
@@ -57,7 +57,7 @@ class OrderingServiceUtils:
             for _ in range(timeout):
                 # Select the sum of the top n order status id values.
                 sum_of_ids = mssql_connector.select_query(
-                    f"SELECT SUM(subquery.OrderStatusId) FROM (SELECT TOP {amount_of_orders} OrderStatusId FROM ordering.orders) AS subquery"
+                    f"SELECT SUM(subquery.OrderStatusId) FROM (SELECT TOP {amount_of_orders} OrderStatusId FROM eshop.orders) AS subquery"
                 )
 
                 # If the query result is equal for the amount of order multiply the order status id value,
@@ -87,15 +87,15 @@ class OrderingServiceUtils:
     @staticmethod
     def get_max_order_id():
         """
-        Method to get the maximum order id in the ordering table.
+        Method to get the maximum order id in the eshop table.
         Returns:
-             The maximum order id in the ordering table.
+             The maximum order id in the eshop table.
         """
         try:
             with MSSQLConnector() as conn:
                 order_id = conn.select_query(
                     # In the below query, we fetch the last inserted user order (according to the max order id).
-                    "SELECT MAX(o.Id) FROM ordering.orders o")
+                    "SELECT MAX(o.Id) FROM eshop.orders o")
                 return order_id[0]['']
         except ConnectionError as c:
             raise ConnectionError(f'There were problem to retrieve the order id.\nException is: {c}')

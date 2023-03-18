@@ -57,12 +57,12 @@ class DockerManager:
 if __name__ == '__main__':
     dm = DockerManager()
     dm.start_all_containers()
-    # dm.stop('eshop/ordering.api:linux-latest')
+    # dm.stop('eshop/eshop.api:linux-latest')
     # time.sleep(1)
-    # dm.start('eshop/ordering.api:linux-latest')
+    # dm.start('eshop/eshop.api:linux-latest')
     #
-    # dm.pause('eshop/ordering.api:linux-latest')
+    # dm.pause('eshop/eshop.api:linux-latest')
     # time.sleep(1)
-    # dm.unpause('eshop/ordering.api:linux-latest')
+    # dm.unpause('eshop/eshop.api:linux-latest')
     #
-    # dm.restart('eshop/ordering.api:linux-latest')
+    # dm.restart('eshop/eshop.api:linux-latest')

@@ -1,6 +1,5 @@
 import pytest
 
-from constants import *
 from tests.scenarios.scenarios import *
 
 
@@ -48,7 +47,7 @@ def test_payment_rejection_process():
 @pytest.mark.canceling_order
 def test_payment_process_rejection_caused_by_server_timeout():
     """
-    Source Test Case Title: Validate that the service will cancel the ordering process when the service is on ‘confirmstock’ status and the user does not initiate any action for 1 hour.
+    Source Test Case Title: Validate that the service will cancel the eshop process when the service is on ‘confirmstock’ status and the user does not initiate any action for 1 hour.
 
     Source Test Case Purpose: Verify that the integration with the payment service and its queue are working.
 
@@ -60,4 +59,4 @@ def test_payment_process_rejection_caused_by_server_timeout():
     assert order_submission_scenario()
     # Run step 2
     assert catalog_stock_confirmation_scenario()
-    ServiceSimulator.explicit_status_id_validation(status_id=CANCELED_STATUS, timeout=3600)
+    EShopSystem.explicit_status_id_validation(status_id=CANCELED_STATUS, timeout=3600)
