@@ -60,4 +60,4 @@ def test_payment_process_rejection_caused_by_server_timeout():
     assert order_submission_scenario()
     # Run step 2
     assert catalog_stock_confirmation_scenario()
-    Simulator.explicit_status_id_validation(status_id=CANCELED_STATUS, timeout=3600)
+    ServiceSimulator.explicit_status_id_validation(status_id=CANCELED_STATUS, timeout=3600)

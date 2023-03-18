@@ -3,13 +3,13 @@ from time import sleep
 
 from dotenv import load_dotenv
 
-from simulators.simulator import Simulator
+from simulators.service_simulator import ServiceSimulator
 from utils.db.db_utils import MSSQLConnector
 
 load_dotenv()
 
 
-class BasketSimulator(Simulator):
+class BasketSimulator(ServiceSimulator):
     """
     A class that simulate the Basket microservice's messages traffic with RabbitMQ.
     """
@@ -28,15 +28,15 @@ class BasketSimulator(Simulator):
             body: The payload of the message.
         """
         # The basket simulator sends to the ordering queue the validation for starting to create a new order.
-        self.send_message(body=body, routing_key=os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
+        self.send_message(body=body)
 
         # Wait for the order to enter the db
         sleep(10)
 
         # Set the current order id
-        Simulator.CURRENT_ORDER_ID = self.get_order_id()
+        ServiceSimulator.CURRENT_ORDER_ID = self.get_order_id()
         print(
-            f"Message Route: Basket -> Ordering. Routing Key: OrderStockConfirmedIntegrationEvent. Current Order ID is: {Simulator.CURRENT_ORDER_ID}")
+            f"Message Route: Basket -> Ordering. Routing Key: OrderStockConfirmedIntegrationEvent. Current Order ID is: {ServiceSimulator.CURRENT_ORDER_ID}")
 
     def verify_status_id_is_submitted(self):
         """

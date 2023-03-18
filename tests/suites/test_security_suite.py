@@ -1,6 +1,7 @@
 import pytest
 
 from tests.scenarios.scenarios import *
+from utils.ordering.ordering_service_utils import OrderingServiceUtils
 
 
 @pytest.mark.security
@@ -146,7 +147,7 @@ def test_order_creation_while_handling_ddos_simulation(ddos_simulation):
     create_order_thread, get_orders_thread, stop_event = ddos_simulation
 
     # Save the last order id before the ddos_simulation start.
-    start_order_id = Simulator.get_max_order_id()
+    start_order_id = OrderingServiceUtils.get_max_order_id()
 
     # Start the order creation thread.
     create_order_thread.start()
@@ -158,7 +159,7 @@ def test_order_creation_while_handling_ddos_simulation(ddos_simulation):
     create_order_thread.join()
     get_orders_thread.join()
 
-    end_order_id = Simulator.CURRENT_ORDER_ID
+    end_order_id = ServiceSimulator.CURRENT_ORDER_ID
 
     # Assert that the new orders thread reached the new order's goal number.
     assert create_order_thread.goal == 2

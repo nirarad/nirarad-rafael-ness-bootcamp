@@ -3,6 +3,7 @@ import pytest
 from constants import *
 from tests.scenarios.scenarios import *
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
+from utils.ordering.ordering_service_utils import OrderingServiceUtils
 
 
 @pytest.mark.scalability
@@ -60,4 +61,4 @@ def test_valid_pace_of_first_message_consumption():
     order_submission_without_response_waiting_scenario()
 
     # Validate that the time to consume that message us no longer than 3 seconds.
-    assert Simulator.get_number_of_seconds_to_consume_single_waiting_message(ORDERING_QUEUE_NAME) <= 3
+    assert OrderingServiceUtils.get_number_of_seconds_to_consume_single_waiting_message(ORDERING_QUEUE_NAME) <= 3

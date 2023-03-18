@@ -6,7 +6,7 @@ from constants import *
 from simulators.basket_simulator import BasketSimulator
 from simulators.catalog_simulator import CatalogSimulator
 from simulators.payment_simulator import PaymentSimulator
-from simulators.simulator import Simulator
+from simulators.service_simulator import ServiceSimulator
 from utils.api.ordering_api import OrderingAPI
 from utils.docker.docker_utils import DockerManager
 from utils.messages.messages_generator import MessageGenerator
@@ -166,7 +166,7 @@ def catalog_stock_rejection_scenario():
     catalog_mock.send_message_to_inform_items_not_in_stock(catalog_to_ordering_invalid_msg)
 
     # Expected Result #2 - The OrderStatusID is updated to 6.
-    if not Simulator.explicit_status_id_validation(CANCELED_STATUS):
+    if not ServiceSimulator.explicit_status_id_validation(CANCELED_STATUS):
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'canceled' status (status number 6).")
 
@@ -227,7 +227,7 @@ def payment_rejection_scenario():
     payment_mock.inform_payment_process_failed(payment_to_ordering_invalid_msg)
 
     # Expected Result #2 - The OrderStatusID is updated to 6.
-    if not Simulator.explicit_status_id_validation(CANCELED_STATUS):
+    if not ServiceSimulator.explicit_status_id_validation(CANCELED_STATUS):
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'canceled' status (status number 6).")
 
@@ -250,13 +250,13 @@ def ship_api_request_scenario(status_code=200, id_validation_timeout=300):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if ordering_api.ship_order(Simulator.CURRENT_ORDER_ID).status_code != status_code:
+    if ordering_api.ship_order(ServiceSimulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
     # The OrderStatusID in the orders table updated to 5.
     if status_code == 200:
-        if not Simulator.explicit_status_id_validation(SHIPPED_STATUS, timeout=id_validation_timeout):
+        if not ServiceSimulator.explicit_status_id_validation(SHIPPED_STATUS, timeout=id_validation_timeout):
             raise AssertionError(
                 f"Test failed. Failure reason is: The order status hasn't been changed to the 'shipped' status (status number 5).")
 
@@ -278,7 +278,7 @@ def ship_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 401 HTTP status code should be returned.
-    if ordering_api.ship_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code != status_code:
+    if ordering_api.ship_order_invalid_auth(ServiceSimulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -301,13 +301,13 @@ def cancel_api_request_scenario(status_code=200, timeout=200):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if not ordering_api.cancel_order(Simulator.CURRENT_ORDER_ID).status_code == status_code:
+    if not ordering_api.cancel_order(ServiceSimulator.CURRENT_ORDER_ID).status_code == status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
     # In case that the status code is 200, OrderStatusID in the orders table should be updated to 6.
     if status_code == 200:
-        if not Simulator.explicit_status_id_validation(CANCELED_STATUS, timeout=timeout):
+        if not ServiceSimulator.explicit_status_id_validation(CANCELED_STATUS, timeout=timeout):
             raise AssertionError(
                 f"Test failed. Failure reason is: The order status hasn't been changed to the  'cancel' status (status number 6).")
 
@@ -330,7 +330,7 @@ def cancel_invalid_auth_api_request_scenario(status_code=401):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 401 HTTP status code should be returned.
-    if ordering_api.cancel_order_invalid_auth(Simulator.CURRENT_ORDER_ID).status_code != status_code:
+    if ordering_api.cancel_order_invalid_auth(ServiceSimulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 
@@ -400,7 +400,7 @@ def get_order_by_id_api_request_scenario(status_code=200):
     ordering_api = OrderingAPI()
 
     # Expected Result #1 - 200 HTTP status code should be returned.
-    if ordering_api.get_order_by_id(Simulator.CURRENT_ORDER_ID).status_code != status_code:
+    if ordering_api.get_order_by_id(ServiceSimulator.CURRENT_ORDER_ID).status_code != status_code:
         raise AssertionError(
             f"Test failed. Failure reason is: Status Code {status_code} hasn't been returned.")
 

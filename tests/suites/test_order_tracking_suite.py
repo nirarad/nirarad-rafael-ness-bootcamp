@@ -32,7 +32,7 @@ def test_awatingvalidation_order_status_appears_on_correct_state():
     # Run step 1
     assert order_submission_scenario()
     # Run step 2
-    assert Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
+    assert ServiceSimulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
 
 
 @pytest.mark.order_tracking

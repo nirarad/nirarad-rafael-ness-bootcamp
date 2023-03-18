@@ -2,12 +2,12 @@ import os
 
 from dotenv import load_dotenv
 
-from simulators.simulator import Simulator
+from simulators.service_simulator import ServiceSimulator
 
 load_dotenv()
 
 
-class PaymentSimulator(Simulator):
+class PaymentSimulator(ServiceSimulator):
 
     def __init__(self):
         """
@@ -23,7 +23,7 @@ class PaymentSimulator(Simulator):
             body: The payload of the message.
         """
         # The payment simulator sends to the ordering queue the payment validation message.
-        self.send_message(body=body, routing_key=os.environ["PAYMENT_TO_ORDER_ROUTING_KEY_VALID"])
+        self.send_message(body=body)
         print("Message Route: Payment -> Ordering. Routing Key: OrderPaymentSucceededIntegrationEvent")
 
     def inform_payment_process_failed(self, body):

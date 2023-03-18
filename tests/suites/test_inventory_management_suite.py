@@ -35,6 +35,6 @@ def test_catalog_stock_rejection_process():
     # Run step 1
     assert order_submission_scenario()
     # Run step 2
-    assert Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
+    assert ServiceSimulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
     # Run step 3
     assert catalog_stock_rejection_scenario()

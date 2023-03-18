@@ -3,6 +3,7 @@ import pytest
 from tests.scenarios.scenarios import *
 from utils.db.db_utils import MSSQLConnector
 from utils.docker.docker_utils import DockerManager
+from utils.ordering.ordering_service_utils import OrderingServiceUtils
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
@@ -62,7 +63,7 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
         docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
         # Step 7: Verify that the given amount of order entities have been created within the ordering table, with OrderStatusID of 1 or 2.
-        assert Simulator.select_top_n_orders_with_same_status(
+        assert OrderingServiceUtils.select_top_n_orders_with_same_status(
             mssql_connector=mssql_connector, status_number_1=SUBMITTED_STATUS,
             status_number_2=AWAITING_VALIDATION_STATUS, amount_of_orders=3, timeout=10)
 
@@ -103,8 +104,8 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
         sleep(5)
 
         #  When the order status changes to 2, simulate the ordering service crash.
-        if Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=50,
-                                                   order_id=Simulator.get_max_order_id()):
+        if ServiceSimulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=50,
+                                                          order_id=OrderingServiceUtils.get_max_order_id()):
             crash_ordering_service_scenario(docker_manager)
 
         sleep(5)
@@ -121,6 +122,6 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
         docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
         # Step 7: Verify that n order entities have been created within the ordering table, with OrderStatusID of 2 or 3.
-        assert Simulator.select_top_n_orders_with_same_status(
+        assert OrderingServiceUtils.select_top_n_orders_with_same_status(
             mssql_connector=mssql_connector, status_number_1=STOCK_CONFIRMED_STATUS,
             status_number_2=AWAITING_VALIDATION_STATUS, amount_of_orders=3, timeout=10)

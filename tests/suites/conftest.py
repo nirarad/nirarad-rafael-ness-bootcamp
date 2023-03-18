@@ -5,7 +5,7 @@ import pytest
 from dotenv import load_dotenv
 
 from constants import *
-from simulators.simulator import Simulator
+from simulators.service_simulator import ServiceSimulator
 from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
 from utils.docker.docker_utils import DockerManager
 
@@ -52,11 +52,11 @@ def purge_all_queues(setup_docker_containers):
     Fixture to purge all messages in each queue before every test.
     """
     print("Purge all queues...")
-    Simulator.purge_all_queues(
+    ServiceSimulator.purge_all_queues(
         [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME, CATALOG_QUEUE_NAME, PAYMENT_QUEUE_NAME, SIGNALR_HUB_QUEUE_NAME,
          WEBHOOKS_QUEUE_NAME, BACKGROUND_TASK_QUEUE_NAME])
     sleep(2)
-    Simulator.purge_all_queues(
+    ServiceSimulator.purge_all_queues(
         [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME, CATALOG_QUEUE_NAME, PAYMENT_QUEUE_NAME, SIGNALR_HUB_QUEUE_NAME,
          WEBHOOKS_QUEUE_NAME, BACKGROUND_TASK_QUEUE_NAME])
     sleep(1)
