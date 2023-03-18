@@ -46,7 +46,7 @@ class EShopSystem:
                         # In the below query, we fetch the last inserted order status id
                         # and checks if its equal to the excreted value.
                         "SELECT o.OrderStatusId "
-                        "FROM eshop.orders o "
+                        "FROM ordering.orders o "
                         f"WHERE o.OrderStatusId = {status_id} "
                         f"and o.Id = {ServiceSimulator.CURRENT_ORDER_ID}"))
                     if counter > 0:

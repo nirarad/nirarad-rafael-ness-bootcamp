@@ -24,11 +24,11 @@ class BasketSimulator(ServiceSimulator):
 
     def send_message_to_create_an_order(self, body):
         """
-        Method to start the eshop process, by sending a confirmation message from the basket simulator to the eshop queue.
+        Method to start the ordering process, by sending a confirmation message from the basket simulator to the ordering queue.
         Parameters:
             body: The payload of the message.
         """
-        # The basket simulator sends to the eshop queue the validation for starting to create a new order.
+        # The basket simulator sends to the ordering queue the validation for starting to create a new order.
         self.send_confirmation_message(body=body)
         # Wait for the order to enter the db
         sleep(10)
@@ -37,15 +37,6 @@ class BasketSimulator(ServiceSimulator):
         ServiceSimulator.CURRENT_ORDER_ID = self.get_order_id()
         print(
             f"Message Route: Basket -> Ordering. Routing Key: UserCheckoutAcceptedIntegrationEvent. Current Order ID is: {ServiceSimulator.CURRENT_ORDER_ID}")
-
-    # def verify_status_id_is_submitted(self):
-    #     """
-    #     Method to verify that the current order status is submitted.
-    #     Returns:
-    #         True if the current order status is submitted and False otherwise.
-    #     """
-    #     print("Verifying Status ID is submitted...")
-    #     return self.validate_order_current_status_id()
 
     def get_order_id(self):
         """
@@ -57,7 +48,7 @@ class BasketSimulator(ServiceSimulator):
             with MSSQLConnector() as conn:
                 order_id = conn.select_query(
                     # In the below query, we fetch the last user order (max order id).
-                    "SELECT MAX(o.Id) FROM eshop.orders o")
+                    "SELECT MAX(o.Id) FROM ordering.orders o")
                 return order_id[0]['']
         except ConnectionError as c:
             raise f'There were problem to retrieve the order id.\nException is: {c}'

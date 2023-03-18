@@ -18,7 +18,7 @@ load_dotenv()
 def order_submission_scenario():
     """
     Method to simulate the order submission scenario, by sending message to create a new order entity
-    from the basket simulator to the eshop queue, and by receiving the output message from the eshop service to the basket queue.
+    from the basket simulator to the ordering queue, and by receiving the output message from the ordering service to the basket queue.
     Returns:
             Returns True only if the basket queue receive and send the correct messages,
             and in the end of the process, the order status id is 1 (submitted).
@@ -57,7 +57,7 @@ def order_submission_scenario():
 
         retry_attempts -= 1
 
-    # Verify that the correct message has been sent from the eshop service to the basket queue.
+    # Verify that the correct message has been sent from the ordering service to the basket queue.
     if actual_message['UserId'] != expected_message['UserId']:
         raise AssertionError(f"Test failed. Failure reason is: {actual_message} != {expected_message}.")
 
@@ -73,8 +73,8 @@ def order_submission_scenario():
 def order_submission_without_response_waiting_scenario():
     """
     Function to simulate the order submission scenario, by sending a message to create a new order entity
-    from the basket simulator to the eshop queue.
-    This function do not verify a valid response from the eshop service.
+    from the basket simulator to the ordering queue.
+    This function do not verify a valid response from the ordering service.
     """
     # Preparing test environment
     basket_mock = BasketSimulator()
@@ -99,8 +99,8 @@ def catalog_stock_confirmation_scenario():
     mg = MessageGenerator()
     catalog_to_ordering_msg = mg.catalog_to_ordering(catalog_mock.CURRENT_ORDER_ID)
 
-    # Step/Expected Result 1 - The catalog queue received the message from the eshop service, so the OrderStatusID in the orders table is updated to 2
-    if not catalog_mock.validate_order_current_status_id(timeout=300):
+    # Step/Expected Result 1 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
+    if not catalog_mock.validate_order_current_status_id():
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
 
@@ -129,8 +129,8 @@ def catalog_stock_confirmation_without_waiting_for_response_scenario():
     mg = MessageGenerator()
     catalog_to_ordering_msg = mg.catalog_to_ordering(catalog_mock.CURRENT_ORDER_ID)
 
-    # Step/Expected Result 1 - The catalog queue received the message from the eshop service, so the OrderStatusID in the orders table is updated to 2
-    if not catalog_mock.validate_order_current_status_id(timeout=300):
+    # Step/Expected Result 1 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
+    if not catalog_mock.validate_order_current_status_id():
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
 
@@ -155,9 +155,9 @@ def catalog_stock_rejection_scenario():
     mg = MessageGenerator()
     catalog_to_ordering_invalid_msg = mg.catalog_rejection_to_ordering(catalog_mock.CURRENT_ORDER_ID)
 
-    # Step/Expected Result 1 - The catalog queue received the message from the eshop service,
+    # Step/Expected Result 1 - The catalog queue received the message from the ordering service,
     # so the OrderStatusID in the orders table is updated to status 2 - awaitingvalidation
-    if not catalog_mock.validate_order_current_status_id(timeout=300):
+    if not catalog_mock.validate_order_current_status_id():
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'awaitingvalidation' status (status number 2).")
 
@@ -187,12 +187,12 @@ def payment_confirmation_scenario():
     messages = MessageGenerator()
     payment_to_ordering_msg = messages.payment_to_ordering(payment_mock.CURRENT_ORDER_ID)
 
-    # step 1 - Verify that the payment queue received from the correct message from the eshop service.
+    # step 1 - Verify that the payment queue received from the correct message from the ordering service.
     expected_result = [payment_to_ordering_msg["output"]["OrderId"], payment_to_ordering_msg["output"]["OrderStatus"]]
     message_from_queue = payment_mock.get_first_message_from_service_queue()
     actual_result = [message_from_queue["OrderId"], message_from_queue["OrderStatus"]]
 
-    # Expected Result #1 - The payment queue received the correct message from the eshop service.
+    # Expected Result #1 - The payment queue received the correct message from the ordering service.
     if actual_result[0] != expected_result[0] or actual_result[1] != expected_result[1]:
         raise AssertionError(
             f"Test failed. Failure reason is: {actual_result[0]} != {expected_result[0]} or {actual_result[1]} != {expected_result[1]} ")
@@ -201,7 +201,7 @@ def payment_confirmation_scenario():
     payment_mock.send_confirmation_message(payment_to_ordering_msg["input"])
 
     # Expected Result #2 - The OrderStatusID is updated to 4.
-    if not payment_mock.validate_order_current_status_id(400):
+    if not payment_mock.validate_order_current_status_id():
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'paid' status (status number 4).")
 

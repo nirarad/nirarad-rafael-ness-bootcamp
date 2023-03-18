@@ -14,7 +14,7 @@ load_dotenv()
 class ServiceSimulator:
     """
     Class which represent a service simulator.
-    Contains methods that allows the simulator and its child classes to communicate with the service queue.
+    Contains methods that allows the simulator and its child classes to communicate with a given service queue.
     """
 
     # Will update according to the current id of the processed order.
@@ -71,7 +71,7 @@ class ServiceSimulator:
 
     def send_confirmation_message(self, body):
         """
-        Method to publish a given message to RabbitMQ.
+        Method to publish a confirmation message to RabbitMQ.
         Parameters:
             body: The message pyload.
         """
@@ -86,7 +86,7 @@ class ServiceSimulator:
 
     def send_rejection_message(self, body):
         """
-        Method to publish a given message to RabbitMQ.
+        Method to publish a rejection message to RabbitMQ.
         Parameters:
             body: The message pyload.
         """
@@ -99,7 +99,7 @@ class ServiceSimulator:
         elif self.queue == PAYMENT_QUEUE_NAME:
             print("Message Route: Payment -> Ordering. Routing Key: OrderPaymentFailedIntegrationEvent")
 
-    def validate_order_current_status_id(self, status_id=None, timeout=50):
+    def validate_order_current_status_id(self, status_id=None, timeout=300):
         """
         Method to validate that the current order status value is the expected value for the current order state.
         Parameters:
@@ -125,7 +125,7 @@ class ServiceSimulator:
                         # In the below query, we fetch the last inserted order status id
                         # and checks if its equal to the excreted value.
                         "SELECT o.OrderStatusId "
-                        "FROM eshop.orders o "
+                        "FROM ordering.orders o "
                         f"WHERE o.OrderStatusId = {status_id} "
                         f"and o.Id = {ServiceSimulator.CURRENT_ORDER_ID}"))
                     if counter > 0:

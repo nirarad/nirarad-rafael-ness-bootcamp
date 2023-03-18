@@ -74,7 +74,7 @@ def test_user_can_cancel_order_on_status_2():
     """
     # Run step 1
     assert order_submission_scenario()
-    # Run step 2 - Verify that the catalog queue received from the eshop service the correct message.
+    # Run step 2 - Verify that the catalog queue received from the ordering service the correct message.
     assert EShopSystem.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=300)
     # Run step 3
     assert cancel_api_request_scenario()

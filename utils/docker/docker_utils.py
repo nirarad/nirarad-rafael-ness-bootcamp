@@ -52,17 +52,3 @@ class DockerManager:
             sleep(5)
             running_containers_amount = len(self.cli.containers.list())
             all_containers_amount = len(self.cli.containers.list(all=True))
-
-
-if __name__ == '__main__':
-    dm = DockerManager()
-    dm.start_all_containers()
-    # dm.stop('eshop/eshop.api:linux-latest')
-    # time.sleep(1)
-    # dm.start('eshop/eshop.api:linux-latest')
-    #
-    # dm.pause('eshop/eshop.api:linux-latest')
-    # time.sleep(1)
-    # dm.unpause('eshop/eshop.api:linux-latest')
-    #
-    # dm.restart('eshop/eshop.api:linux-latest')

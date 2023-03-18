@@ -8,9 +8,9 @@ WEBHOOKS_QUEUE_NAME = 'Webhooks'
 BACKGROUND_TASK_QUEUE_NAME = 'BackgroundTasks'
 
 # Docker Containers Identifiers
-ORDERING_SERVICE = "eshop/eshop.api:linux-latest"
-ORDERING_BACKGROUND_TASK_SERVICE = "eshop/eshop.backgroundtasks:linux-latest"
-SIGNALR_HUB_SERVICE = "eshop/eshop.signalrhub:linux-latest"
+ORDERING_SERVICE = "eshop/ordering.api:linux-latest"
+ORDERING_BACKGROUND_TASK_SERVICE = "eshop/ordering.backgroundtasks:linux-latest"
+SIGNALR_HUB_SERVICE = "eshop/ordering.signalrhub:linux-latest"
 BASKET_SERVICE = "eshop/basket.api:linux-latest"
 CATALOG_SERVICE = "eshop/catalog.api:linux-latest"
 PAYMENT_SERVICE = "eshop/payment.api:linux-latest"
