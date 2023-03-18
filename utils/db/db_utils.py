@@ -1,5 +1,7 @@
 # Instructions:
 # Download https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
+import pprint
+
 import pyodbc
 
 
@@ -33,8 +35,36 @@ class MSSQLConnector:
     def close(self):
         self.conn.close()
 
+    def orderStatusid(self, id):
+        with MSSQLConnector() as conn:
+            return conn.select_query(f'SELECT orderStatusid from ordering.orders where id={id}')[0]['orderStatusid']
+
+    def select_last_id(self):
+        with MSSQLConnector() as conn:
+            return conn.select_query('SELECT max(id) from ordering.orders')[0]['']
+
+    def available_stock(self):
+        with MSSQLConnector() as conn:
+            return conn.select_query('SELECT AvailableStock from [Microsoft.eShopOnContainers.Services.CatalogDb].[dbo].[Catalog]')[0]['AvailableStock']
+
+
+# class DbUtils:
+#
+#     @staticmethod
+#     def statuscode_byID(id):
+#         """
+#
+#         :param id:
+#         :return:
+#         """
+#         x = 0
+#         with MSSQLConnector() as conn:
+#             x = (conn.select_query(f'SELECT * from ordering.orders WHERE Id = {id}'))
+#
+#         return x[0]['OrderStatusId']
 
 if __name__ == '__main__':
-    import pprint
-    with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+    # print(MSSQLConnector().orderStatusid(1))
+    # print(MSSQLConnector().select_last_id())
+    print(MSSQLConnector().available_stock())
+
