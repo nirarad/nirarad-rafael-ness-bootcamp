@@ -1,0 +1,17 @@
+
+name: Meni Rotblat.
+date: 2023-03-18 22:43:33.054726. 
+description: 
+
+component: Basket
+
+[<BlockingChannel impl=<Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000022B52606B00> params=<ConnectionParameters host=localhost port=5672 virtual_host=/ ssl=False>>>>]
+
+ Method: <Basic.Deliver(['consumer_tag=ctag1.cc78e69fa16445a6a8cf27801cce433d', 'delivery_tag=1', 'exchange=eshop_event_bus', 'redelivered=False', 'routing_key=OrderStartedIntegrationEvent'])>,
+
+ Properties: <BasicProperties(['delivery_mode=2'])>,
+
+ Body: b'{\n  "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",\n  "Id": "24aa34f7-7817-41b0-b46a-2e112496086e",\n  "CreationDate": "2023-03-18T20:43:32.9051891Z"\n}'
+
+ ----------------.
+                     
