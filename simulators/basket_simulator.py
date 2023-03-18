@@ -1,19 +1,54 @@
-import pprint
+import json
+import time
 import uuid
-
-from utils.rabbitmq.eshop_rabbitmq_events import create_order
+import os
 from utils.rabbitmq.rabbitmq_receive import RabbitMQ
 from utils.testcase.jsondatareader import JSONDataReader
+from dotenv import load_dotenv
 
 
 class BasketSimulator:
-
-    def __init__(self):
+    def __init__(self, time_limit=30):
+        # ENV
+        self.dotenv_path = os.path.join(os.path.dirname(__file__), '../.env.development')
+        load_dotenv(self.dotenv_path)
         # RabbitMQ
         self.mq = RabbitMQ()
-        self.data = JSONDataReader('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/ORDERS_DATA.json')
+        # Basket queue
+        self.basket_queue = os.getenv('BASKET_QUEUE')
+        # Exchange bus
+        self.exchange = os.getenv('EXCHANGE_BUS')
+        # Bing key
+        self.bind_key = os.getenv('BASKET_BINDING')
+        # Basket routing key
+        self.basket_key = os.getenv('CREATE_ORDER_ROUTING_KEY')
+        # Flag of timeout
+        self.timeout_flag = False
+        # Time limit to consume
+        self.time_limit = time_limit
+        # Sent order is corrected by Ordering api need to handle
         self.sent_order = None
-        self.response_message = None
+        # Message from callback handler
+        self.message = None
+
+    def create_order(self, body_to_send):
+        """
+        Name: Artsyom Sharametsieu
+        Date: 05.03.2023
+        Function Name: create_order
+        Description: Function of Basket simulator.
+                     Sends message to RabbitMQ queue Ordering to create order.
+        :param body_to_send: body to send in message
+        :return: sent body with date corrected by server
+        """
+        if body_to_send is None:
+            raise Exception('Message body is None.')
+        # Sending message to RabbitMQ queue Ordering
+        with self.mq:
+            published_body = self.mq.publish(exchange=self.exchange,
+                                             routing_key=self.basket_key,
+                                             body=json.dumps(body_to_send))
+        return published_body
 
     def callback(self, ch, method, properties, body):
         """
@@ -29,8 +64,7 @@ class BasketSimulator:
         # RABBITMQ INFO
         print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
         # BODY FROM INFO IS STRING NEED TO CONVERT TO DICT TO GET PARAMS
-        self.response_message = eval(body)
-        self.mq.channel.stop_consuming()
+        self.message = eval(body)
 
     def consume(self):
         """
@@ -44,26 +78,22 @@ class BasketSimulator:
         # TEMPORARY INVOKING OF RABBITMQ
         with self.mq:
             # BIND
-            self.mq.bind('Basket', 'eshop_event_bus', 'OrderStartedIntegrationEven')
-            self.mq.consume('Basket', self.callback)
-
-    def place_order(self, order_to_send):
-        """
-        Name: Artsyom Sharametsieu
-        Date: 05.03.2023
-        Function Name: place_order
-        Description: Function sending message to RabbitMQ to Ordering queue create order.
-        """
-        self.sent_order = create_order(order_to_send)
+            self.mq.bind(self.basket_queue, self.exchange, self.bind_key)
+            self.mq.channel.basic_consume(queue=self.basket_queue, on_message_callback=self.callback,
+                                          auto_ack=True)
+            # Start consuming messages until getting message or time limit end
+            start_time = time.time()
+            while True:
+                self.mq.channel.connection.process_data_events()
+                if time.time() - start_time >= self.time_limit:  # Time limit
+                    self.mq.channel.stop_consuming()
+                    self.timeout_flag = True
+                    break
+            return self.timeout_flag
 
 
 if __name__ == '__main__':
+    data = JSONDataReader('test/DATA/ORDERS_DATA.json')
     bs = BasketSimulator()
-    order = bs.data.get_json_order('alice_normal_order', str(uuid.uuid4()))
-    bs.place_order(order)
-    print('\n')
-    pprint.pprint(bs.sent_order)
-    print('\n')
-    bs.consume()
-    print('\n')
-    pprint.pprint(bs.response_message)
+    order = data.get_json_order('alice_normal_order', str(uuid.uuid4()))
+    bs.create_order(order)

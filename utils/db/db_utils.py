@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 class MSSQLConnector:
 
     def __init__(self):
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
+        # ENV
+        self.dotenv_path = os.path.join(os.path.dirname(__file__), '../../.env.development')
+        load_dotenv(self.dotenv_path)
         self.SERVER = str(os.getenv('SERVER'))
         self.USER = os.getenv('USER')
         self.PASSWORD = os.getenv('PASSWORD')
@@ -91,15 +93,9 @@ class MSSQLConnector:
 
 
 if __name__ == '__main__':
-    from pprint import pprint as p
 
     with MSSQLConnector() as conn:
-        query = 'Update [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
+        test_query = 'Update [Microsoft.eShopOnContainers.Services.OrderingDb].[ordering].[orders] ' \
                 'set OrderStatusId = 4' \
                 'where Id = 161'
-        # pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
-        # p(conn.get_order_status_from_db(151))
-        # conn.update_order_db_id(161, 1)
-        # p(conn.get_order_status_from_db(151))
-        # p(conn.get_last_order_record_id_in_db())
         print(conn.get_next_order_id(1800))

@@ -10,11 +10,27 @@ from utils.rabbitmq.rabbitmq_receive import RabbitMQ
 class PaymentSimulator:
 
     def __init__(self, time_limit=30):
+        # ENV
+        self.dotenv_path = os.path.join(os.path.dirname(__file__), '../.env.development')
+        load_dotenv(self.dotenv_path)
         # RabbitMQ
-        self.time_limit = time_limit
         self.mq = RabbitMQ()
+        # Payment queue
+        self.payment_queue = os.getenv('PAYMENT_QUEUE')
+        # Exchange bus
+        self.exchange = os.getenv('EXCHANGE_BUS')
+        # Bing key
+        self.bind_key = os.getenv('PAYMENT_BINDING')
+        # Payment succeeded routing key
+        self.payment_succeeded_key = os.getenv('PAYMENT_SUCCEEDED_ROUTING_KEY')
+        # Payment failed routing key
+        self.payment_failed_key = os.getenv('PAYMENT_FAILED_ROUTING_KEY')
+        # RabbitMQ
+        self.mq = RabbitMQ()
+        # Time limit to close self
+        self.time_limit = time_limit
+        # Timeout flag
         self.timeout_flag = False
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
 
     def payment_succeeded(self, order_id, x_requestid, date):
         """
@@ -36,7 +52,7 @@ class PaymentSimulator:
             "Id": x_requestid,
             "CreationDate": date
         }
-        self.mq.publish('eshop_event_bus', os.getenv('PAYMENT_SUCCEEDED_ROUTING_KEY'), json.dumps(body_to_send))
+        self.mq.publish(self.exchange, self.payment_succeeded_key, json.dumps(body_to_send))
 
     def payment_succeeded_callback(self, ch, method, properties, body):
         """
@@ -60,15 +76,13 @@ class PaymentSimulator:
         Date: 05.03.2023
         Function Name: payment_failed
         Description: Function of Payment simulator.
-                     1.Sends message to RabbitMQ queue Ordering that order payment failed.
-                     P.S:
-                     It is response message for request of Ordering service to order payment.
+                     Sends message to RabbitMQ queue Ordering that order payment failed.
         :param date: order date,must be the same as in order,cause live processing
         :param order_id: autoincremented order id in db
         :param x_requestid: unique id of order generated from outside
         :return: True
         """
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
+        load_dotenv('/.env.test')
         body = {
             "OrderId": order_id,
             "OrderStatus": "stockconfirmed",
@@ -76,7 +90,7 @@ class PaymentSimulator:
             "Id": x_requestid,
             "CreationDate": date
         }
-        self.mq.publish('eshop_event_bus', os.getenv('PAYMENT_FAILED_ROUTING_KEY'), json.dumps(body))
+        self.mq.publish(self.exchange, self.payment_failed_key, json.dumps(body))
 
     def payment_failed_callback(self, ch, method, properties, body):
         """
@@ -100,7 +114,7 @@ class PaymentSimulator:
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: succeed_pay
+        Function Name: consume_to_succeed_payment
         Description: 1. Function invokes RabbitMQ consuming and get message from Payment queue.
                      2. Invokes callback payment succeeded to send message to Ordering queue.
         """
@@ -108,8 +122,8 @@ class PaymentSimulator:
 
         with self.mq:
             # BIND
-            self.mq.bind('Payment', 'eshop_event_bus', 'OrderStatusChangedToStockConfirmedIntegrationEvent')
-            self.mq.channel.basic_consume(queue='Payment', on_message_callback=self.payment_succeeded_callback,
+            self.mq.bind(self.payment_queue, self.exchange, self.bind_key)
+            self.mq.channel.basic_consume(queue=self.payment_queue, on_message_callback=self.payment_succeeded_callback,
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
             start_time = time.time()
@@ -132,7 +146,7 @@ class PaymentSimulator:
         # TEMPORARY INVOKING OF RABBITMQ
         with self.mq:
             # BIND
-            self.mq.bind('Payment', 'eshop_event_bus', 'OrderStatusChangedToStockConfirmedIntegrationEvent')
+            self.mq.bind(self.payment_queue, self.exchange, self.bind_key)
             self.mq.channel.basic_consume(queue='Payment', on_message_callback=self.payment_failed_callback,
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
@@ -151,4 +165,4 @@ if __name__ == '__main__':
     # ps.consume_to_succeed_payment()  # must be order status 4 (paid) in DB
     t = threading.Thread(target=ps.consume_to_succeed_payment)
     t.start()
-    t.join(50)
+    t.join(40)

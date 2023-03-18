@@ -20,7 +20,7 @@ class TestIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         # Env of tests
-        load_dotenv('DATA/.env.test')
+        load_dotenv('../.env.test')
 
         # Local Logger
         cls.logger = Logger('integration_logger', 'Logs/test_integration.log').logger
@@ -64,13 +64,13 @@ class TestIntegration(unittest.TestCase):
 
     # PAYMENT
     # TC011
-    def test_integration_with_payment_succeeded(self):
+    def test_order_payment_succeeded(self):
         """
         TC_ID: TC011
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: test_integration_with_payment_succeeded
-        Description: 1.Function tests Ordering service integration with Payment simulator.
+        Function Name: test_order_payment_succeeded
+        Description: 1.Function tests functionality of positive payment by Ordering api and Payment simulator.
                      2.Function creating order.
                      3.Validates if order is created and with status.
                      4.Changes status to stockconfirmed.
@@ -96,14 +96,14 @@ class TestIntegration(unittest.TestCase):
                     # To pass into loger Actual
                     self.new_order_id = x
                     self.logger.info(
-                        f'{self.test_integration_with_payment_succeeded.__doc__}'
+                        f'{self.test_order_payment_succeeded.__doc__}'
                         f'Order Id in DB -> Actual: ID {self.new_order_id}, '
                         f'Expected: New Order Id')
                     # Validate status order is 1
                     current_status = self.conn.get_order_status_from_db(self.new_order_id)
                     self.assertTrue(current_status, 1)
                     self.logger.info(
-                        f'{self.test_integration_with_payment_succeeded.__doc__} '
+                        f'{self.test_order_payment_succeeded.__doc__} '
                         f'Order status in DB -> Actual: {current_status} , Expected: {1}')
                     break
                 # if 10 sec pass no sense to wait
@@ -117,7 +117,7 @@ class TestIntegration(unittest.TestCase):
             # Validating order status in DB
             self.assertEqual(self.conn.get_order_status_from_db(self.new_order_id), 3)
             self.logger.info(
-                f'{self.test_integration_with_payment_succeeded.__doc__}Order status in DB -> '
+                f'{self.test_order_payment_succeeded.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {3}')
             # Return back format of body from str to dict to get creation date
             sent_body = eval(body_after_sending)
@@ -125,7 +125,7 @@ class TestIntegration(unittest.TestCase):
             # Sending message to Payment queue that order confirmed in stock
             status_changed_to_stock(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
             # Payment simulator confirms payment succeeded
-            self.payment_sim.succeed_pay()
+            self.payment_sim.consume_to_succeed_payment()
 
             # Wait for ordering service updating order status
             time.sleep(self.timeout)
@@ -135,11 +135,11 @@ class TestIntegration(unittest.TestCase):
             time.sleep(5)
             self.assertEqual(order_status, 4)
             self.logger.info(
-                f'{self.test_integration_with_payment_succeeded.__doc__}Order status in DB -> '
+                f'{self.test_order_payment_succeeded.__doc__}Order status in DB -> '
                 f'Actual: {self.conn.get_order_status_from_db(self.new_order_id)}, Expected: {4}')
 
         except Exception as e:
-            self.logger.exception(f"\n{self.test_integration_with_payment_succeeded.__doc__}Actual {e}")
+            self.logger.exception(f"\n{self.test_order_payment_succeeded.__doc__}Actual {e}")
             raise
 
     # TC012
@@ -203,15 +203,13 @@ class TestIntegration(unittest.TestCase):
             # Getting date created automatically by server in code
             # Sending message to Payment queue that order confirmed in stock
             status_changed_to_stock(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
-            # Payment simulator confirms payment succeeded
-            self.payment_sim.failed_pay()
+            # Payment simulator fails payment
+            self.payment_sim.consume_to_fail_payment()
 
             # Wait for ordering service updating order status
             time.sleep(self.timeout)
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
-            # WAIT UPDATING ORDER STATUS IN DB
-            time.sleep(5)
             self.assertEqual(order_status, 6)
             self.logger.info(
                 f'{self.test_integration_with_payment_failed.__doc__}Order status in DB -> '
@@ -365,8 +363,8 @@ class TestIntegration(unittest.TestCase):
             # Sending message to Catalog queue that order confirmed in stock
             status_changed_to_awaitingvalidation(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
 
-            # Catalog simulator confirms payment succeeded
-            self.catalog_sim.reject_stock()
+            # Catalog simulator rejecting stock
+            self.catalog_sim.consume_to_reject_stock()
 
             # Wait for ordering service updating order status
             time.sleep(self.timeout)
@@ -404,7 +402,7 @@ class TestIntegration(unittest.TestCase):
         try:
             last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
             order = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
-            self.basket_sim.place_order(order)
+            self.basket_sim.create_order(order)
             # Explicit wait until ordering creates order in DB
             start_time = time.time()
             while True:
@@ -431,10 +429,10 @@ class TestIntegration(unittest.TestCase):
                 # Basket consuming for message from Ordering api
                 self.basket_sim.consume()
                 # If message didn't come than something broken in Ordering api
-                self.assertNotEqual(self.basket_sim.response_message, None)
+                self.assertNotEqual(self.basket_sim.message, None)
             self.logger.info(
                 f'{self.test_order_api_integration_with_basket.__doc__}Message fro Ordering API -> '
-                f'Actual: {self.basket_sim.response_message}, Expected: not None')
+                f'Actual: {self.basket_sim.message}, Expected: not None')
 
         except Exception as e:
             self.logger.exception(f"\n{self.test_order_api_integration_with_basket.__doc__}Actual {e}")
@@ -456,7 +454,7 @@ class TestIntegration(unittest.TestCase):
         try:
             last_order_record_in_db = self.conn.get_last_order_record_id_in_db()
             order = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
-            self.basket_sim.place_order(order)
+            self.basket_sim.create_order(order)
             # Explicit wait until ordering creates order in DB
             start_time = time.time()
             while True:

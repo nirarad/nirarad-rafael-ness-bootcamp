@@ -9,11 +9,27 @@ from utils.rabbitmq.rabbitmq_receive import RabbitMQ
 class CatalogSimulator:
 
     def __init__(self, time_limit=30):
+        # ENV
+        self.dotenv_path = os.path.join(os.path.dirname(__file__), '../.env.development')
+        load_dotenv(self.dotenv_path)
         # RabbitMQ
         self.mq = RabbitMQ()
+        # Catalog queue
+        self.catalog_queue = os.getenv('CATALOG_QUEUE')
+        # Exchange bus
+        self.exchange = os.getenv('EXCHANGE_BUS')
+        # Bing key
+        self.bind_key = os.getenv('CATALOG_BINDING')
+        # Catalog stock confirmed routing key
+        self.catalog_in_stock_key = os.getenv('CONFIRM_STOCK_ROUTING_KEY')
+        # Catalog stock confirmed routing key
+        self.catalog_not_in_stock_key = os.getenv('REJECT_STOCK_ROUTING_KEY')
+        # RabbitMQ
+        self.mq = RabbitMQ()
+        # Time limit to close self
         self.time_limit = time_limit
+        # Timeout flag
         self.timeout_flag = False
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
 
     def confirm_stock(self, order_id, x_requestid, date):
         """
@@ -33,7 +49,7 @@ class CatalogSimulator:
             "Id": x_requestid,
             "CreationDate": date
         }
-        self.mq.publish('eshop_event_bus', 'OrderStockConfirmedIntegrationEvent', json.dumps(body))
+        self.mq.publish(self.exchange, self.catalog_in_stock_key, json.dumps(body))
 
     def in_stock_callback(self, ch, method, properties, body):
         """
@@ -64,7 +80,6 @@ class CatalogSimulator:
         :param order_id: autoincremented order id in db
         :param x_requestid: unique id of order generated from outside
         """
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
         body = {
             "OrderId": order_id,
             "OrderStockItems": [
@@ -76,7 +91,7 @@ class CatalogSimulator:
             "Id": x_requestid,
             "CreationDate": date
         }
-        self.mq.publish('eshop_event_bus', os.getenv('REJECT_STOCK_ROUTING_KEY'), json.dumps(body))
+        self.mq.publish(self.exchange, self.catalog_not_in_stock_key, json.dumps(body))
 
     def not_in_stock_callback(self, ch, method, properties, body):
         """
@@ -108,9 +123,9 @@ class CatalogSimulator:
         # TEMPORARY INVOKING OF RABBITMQ
         with self.mq:
             # BIND
-            self.mq.bind('Catalog', 'eshop_event_bus', 'OrderStatusChangedToAwaitingValidationIntegrationEvent')
+            self.mq.bind(self.catalog_queue, self.exchange, self.bind_key)
             # Set up a consumer with the callback function
-            self.mq.channel.basic_consume(queue='Catalog', on_message_callback=self.in_stock_callback,
+            self.mq.channel.basic_consume(queue=self.catalog_queue, on_message_callback=self.in_stock_callback,
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
             start_time = time.time()
@@ -134,8 +149,8 @@ class CatalogSimulator:
         # TEMPORARY INVOKING OF RABBITMQ
         with self.mq:
             # BIND
-            self.mq.bind('Catalog', 'eshop_event_bus', 'OrderStatusChangedToAwaitingValidationIntegrationEvent')
-            self.mq.channel.basic_consume(queue='Catalog', on_message_callback=self.not_in_stock_callback,
+            self.mq.bind(self.catalog_queue, self.exchange, self.bind_key)
+            self.mq.channel.basic_consume(queue=self.catalog_queue, on_message_callback=self.not_in_stock_callback,
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
             start_time = time.time()

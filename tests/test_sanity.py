@@ -6,6 +6,7 @@ from utils.api.ordering_api_mocker import OrderingAPI_Mocker
 from utils.rabbitmq.eshop_rabbitmq_events import *
 from utils.db.db_utils import MSSQLConnector
 from utils.testcase.jsondatareader import JSONDataReader
+from simulators.basket_simulator import BasketSimulator
 from dotenv import load_dotenv
 
 
@@ -15,12 +16,9 @@ class TestSanity(unittest.TestCase):
     # Variable of connection to DB
     conn = None
 
+    # Init of class TestSanity
     @classmethod
     def setUpClass(cls) -> None:
-        # Init of class TestCRUD
-
-        # Env of tests
-        load_dotenv('DATA/.env.test')
 
         # Local Logger
         cls.logger = Logger('sanity_logger', 'Logs/test_sanity.log').logger
@@ -28,20 +26,23 @@ class TestSanity(unittest.TestCase):
         # Ordering API mocker
         cls.oam = OrderingAPI_Mocker()
 
-        # Unique id generator handler
+        # Unique id handler
         cls.order_uuid = None
 
         # Connection to DB
         cls.conn = MSSQLConnector()
 
+        # Basket Simulator
+        cls.basket_sim = BasketSimulator()
+
         # Order Id saver
         cls.new_order_id = None
 
         # Json Data Order handler
-        cls.jdata_orders = JSONDataReader(os.getenv('ORDERS_PATH'))
+        cls.jdata_orders = JSONDataReader('DATA/ORDERS_DATA.json')
 
         # Json Data Order responses handler
-        cls.jdata_orders_responses = JSONDataReader(os.getenv('RESPONSES_PATH'))
+        cls.jdata_orders_responses = JSONDataReader('DATA/ORDER_RESPONSE_DATA.json')
 
     def setUp(self) -> None:
         # Reconnect
@@ -60,7 +61,7 @@ class TestSanity(unittest.TestCase):
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_create_order
-        Description: By default function creates normal order.
+        Description: By default function creates normal order,but can get any order to try creating
                      Function tests Ordering service creation order by RabbitMQ.
                      Function sends message to RabbitMQ queue Ordering to create order,
                      Ordering service have to create order in DB.
@@ -73,7 +74,7 @@ class TestSanity(unittest.TestCase):
             if message_body is None:
                 message_body = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
             # Sending message to RabbitMQ to Ordering queue to create order
-            create_order(message_body)
+            self.basket_sim.create_order(message_body)
             # Explicit wait until ordering creates order in DB
             start_time = time.time()
             while True:
@@ -96,8 +97,6 @@ class TestSanity(unittest.TestCase):
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
                     raise Exception("Record was not created")
-                # Updating timer
-                time.sleep(0.1)
         except Exception as e:
             self.logger.exception(f"\n{self.test_create_order.__doc__}Actual {e}")
             raise
@@ -105,7 +104,7 @@ class TestSanity(unittest.TestCase):
     # TC004
     def test_cancel_order_v1(self):
         """
-        TC_ID: TC002
+        TC_ID: TC004
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_cancel_order_v1
@@ -142,7 +141,7 @@ class TestSanity(unittest.TestCase):
     # TC005
     def test_cancel_order_v2(self):
         """
-        TC_ID: TC003
+        TC_ID: TC005
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_cancel_order_v2
@@ -191,7 +190,7 @@ class TestSanity(unittest.TestCase):
     # TC_006
     def test_cancel_order_v3(self):
         """
-        TC_ID: TC004
+        TC_ID: TC006
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_cancel_order_v3
@@ -209,7 +208,7 @@ class TestSanity(unittest.TestCase):
             # Message body to send
             message_body = self.jdata_orders.get_json_order('alice_normal_order', self.order_uuid)
             # Sending message to RabbitMQ to Ordering queue to create order
-            create_order(message_body)
+            self.basket_sim.create_order(message_body)
             # Wait until ordering creates order in DB
             start_time = time.time()
             while True:
@@ -232,8 +231,6 @@ class TestSanity(unittest.TestCase):
                 # if 10 sec pass no sense to wait
                 elif time.time() - start_time > 10:  # Timeout after 10 seconds
                     raise Exception("Record was not created")
-                # Updating timer
-                time.sleep(0.1)
 
             # Updating order status in DB to 3
             self.conn.update_order_db_status(self.new_order_id, 3)
@@ -265,19 +262,18 @@ class TestSanity(unittest.TestCase):
             self.logger.exception(f"\n{self.test_cancel_order_v3.__doc__}{e}")
             raise
 
-    # TC010
+    # TC009
     def test_get_order_details(self):
         """
-        TC_ID: TC008
+        TC_ID: TC009
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_get_order_details
-        Description: Function tests Ordering api cancel request when order not existing.
+        Description: Function tests Ordering api get order.
                      1. Sends message to RabbitMQ queue to create order.
                      2. Validates order creation in DB with status 1.
-                     3. Delete order from DB.
-                     4. Cancels order in DB.
-                     5. Validates response status 400.
+                     3. Validates response status 200.
+                     4. Validates order details.
         """
         try:
             # Creating message_body message

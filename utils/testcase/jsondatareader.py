@@ -1,16 +1,12 @@
 import json
 import os
-import pprint
 import uuid
-
-from dotenv import load_dotenv
 
 
 # Data getter for order in json file
 class JSONDataReader(object):
 
     def __init__(self, filepath):
-        load_dotenv('D:/eShopProject/rafael-ness-bootcamp/tests/DATA/.env.test')
         self.items = None
         self.item = None
         self.filepath = filepath
@@ -72,14 +68,14 @@ class JSONDataReader(object):
         """
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
-        Function Name: get_json_order
-        Description: 1.Function loads JSON ORDER DATA.
+        Function Name: get_json_order_response
+        Description: 1.Function loads JSON ORDER DATA RESPONSES.
                      2.Searching response in json by name of response.
                      3.Inserting Request id of order in DB.
                      4.Returning full proper response.
         :param id_db: id of order in DB
         :param response_name: response name in json data
-        :return: full order with ids
+        :return: full order response message with ids
         """
         if self.filepath is not None:
             if response_name is not None:
@@ -98,8 +94,7 @@ class JSONDataReader(object):
 
 
 if __name__ == '__main__':
-    d = JSONDataReader(os.getenv('RESPONSES_PATH'))
-    # order = d.get_json_order('alice_normal_order', str(uuid.uuid4()))
-    # print(order)
-    # orders = d.get_json_all_items()
-    # pprint.pp(orders)
+    d = JSONDataReader('../../tests/DATA/ORDERS_DATA.json')
+    order = d.get_json_order('alice_normal_order', str(uuid.uuid4()))
+    print(order)
+
