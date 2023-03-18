@@ -1,6 +1,7 @@
 import pytest
 
 from tests.scenarios.scenarios import *
+from constants import *
 
 
 @pytest.mark.order_management
@@ -74,7 +75,7 @@ def test_user_can_cancel_order_on_status_2():
     # Run step 1
     assert order_submission_scenario()
     # Run step 2 - Verify that the catalog queue received from the ordering service the correct message.
-    assert Simulator.explicit_status_id_validation(status_id=2, timeout=300)
+    assert Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=300)
     # Run step 3
     assert cancel_api_request_scenario()
 
@@ -119,7 +120,7 @@ def test_user_can_not_cancel_order_on_status_4():
     assert payment_confirmation_scenario()
     # Run step 6
     assert cancel_api_request_scenario(status_code=400, timeout=100)
-    assert Simulator.explicit_status_id_validation(status_id=4, timeout=100)
+    assert Simulator.explicit_status_id_validation(status_id=PAID_STATUS, timeout=100)
 
 
 @pytest.mark.order_management
@@ -144,7 +145,7 @@ def test_user_can_not_cancel_order_on_status_5():
     assert ship_api_request_scenario()
     # Run step 7
     assert cancel_api_request_scenario(status_code=400)
-    assert Simulator.explicit_status_id_validation(status_id=5, timeout=100)
+    assert Simulator.explicit_status_id_validation(status_id=SHIPPED_STATUS, timeout=100)
 
 
 @pytest.mark.order_management
@@ -202,10 +203,10 @@ def test_user_can_not_ship_order_on_status_2():
     # Run step 1
     assert order_submission_scenario()
     # Run step 2
-    assert Simulator.explicit_status_id_validation(status_id=2, timeout=100)
+    assert Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
     # Run step 3
     assert ship_api_request_scenario(status_code=400)
-    assert Simulator.explicit_status_id_validation(status_id=2, timeout=100)
+    assert Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
 
 
 @pytest.mark.order_management
@@ -227,7 +228,7 @@ def test_user_can_not_ship_order_on_status_3():
     # Run step 3
     assert ship_api_request_scenario(400)
     # Run step 4
-    assert Simulator.explicit_status_id_validation(status_id=3, timeout=100)
+    assert Simulator.explicit_status_id_validation(status_id=STOCK_CONFIRMED_STATUS, timeout=100)
 
 
 @pytest.mark.order_management
@@ -248,4 +249,4 @@ def test_user_can_not_ship_order_on_status_6():
     assert cancel_api_request_scenario()
     # Run step 3
     assert ship_api_request_scenario(400)
-    assert Simulator.explicit_status_id_validation(status_id=6, timeout=50)
+    assert Simulator.explicit_status_id_validation(status_id=CANCELED_STATUS, timeout=50)

@@ -2,6 +2,7 @@ from time import sleep
 
 from dotenv import load_dotenv
 
+from constants import *
 from simulators.basket_simulator import BasketSimulator
 from simulators.catalog_simulator import CatalogSimulator
 from simulators.payment_simulator import PaymentSimulator
@@ -45,7 +46,7 @@ def order_submission_scenario():
 
         # Restart the simulator related container.
         docker_manager = DockerManager()
-        docker_manager.restart("eshop/basket.api:linux-latest")
+        docker_manager.restart(BASKET_SERVICE)
         sleep(4)
 
         # Retry the process.
@@ -165,7 +166,7 @@ def catalog_stock_rejection_scenario():
     catalog_mock.send_message_to_inform_items_not_in_stock(catalog_to_ordering_invalid_msg)
 
     # Expected Result #2 - The OrderStatusID is updated to 6.
-    if not Simulator.explicit_status_id_validation(6):
+    if not Simulator.explicit_status_id_validation(CANCELED_STATUS):
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'canceled' status (status number 6).")
 
@@ -226,7 +227,7 @@ def payment_rejection_scenario():
     payment_mock.inform_payment_process_failed(payment_to_ordering_invalid_msg)
 
     # Expected Result #2 - The OrderStatusID is updated to 6.
-    if not Simulator.explicit_status_id_validation(6):
+    if not Simulator.explicit_status_id_validation(CANCELED_STATUS):
         raise AssertionError(
             f"Test failed. Failure reason is: The order status hasn't been changed to the 'canceled' status (status number 6).")
 
@@ -255,7 +256,7 @@ def ship_api_request_scenario(status_code=200, id_validation_timeout=300):
 
     # The OrderStatusID in the orders table updated to 5.
     if status_code == 200:
-        if not Simulator.explicit_status_id_validation(5, timeout=id_validation_timeout):
+        if not Simulator.explicit_status_id_validation(SHIPPED_STATUS, timeout=id_validation_timeout):
             raise AssertionError(
                 f"Test failed. Failure reason is: The order status hasn't been changed to the 'shipped' status (status number 5).")
 
@@ -306,7 +307,7 @@ def cancel_api_request_scenario(status_code=200, timeout=200):
 
     # In case that the status code is 200, OrderStatusID in the orders table should be updated to 6.
     if status_code == 200:
-        if not Simulator.explicit_status_id_validation(6, timeout=timeout):
+        if not Simulator.explicit_status_id_validation(CANCELED_STATUS, timeout=timeout):
             raise AssertionError(
                 f"Test failed. Failure reason is: The order status hasn't been changed to the  'cancel' status (status number 6).")
 
@@ -476,21 +477,15 @@ def get_card_types_invalid_auth_api_request_scenario(status_code=401):
     return True
 
 
-def crash_ordering_service_scenario(docker_manager, service_name_list=None):
+def crash_ordering_service_scenario(docker_manager):
     """
     Function to simulate a service crash scenario.
     Parameters:
         docker_manager: The docker manager to use.
-        service_name_list: Ths services to crash.
     """
-    if service_name_list is None:
-        service_name_list = ["eshop/ordering.api:linux-latest",
-                             "eshop/ordering.backgroundtasks:linux-latest",
-                             "eshop/ordering.signalrhub:linux-latest"]
-
     # Stop all the mentioned services.
-    docker_manager.stop("eshop/ordering.api:linux-latest")
-    docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
-    docker_manager.stop("eshop/ordering.api:linux-latest")
-    docker_manager.stop("eshop/ordering.signalrhub:linux-latest")
-    docker_manager.stop("eshop/ordering.api:linux-latest")
+    docker_manager.stop(ORDERING_SERVICE)
+    docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
+    docker_manager.stop(ORDERING_SERVICE)
+    docker_manager.stop(SIGNALR_HUB_SERVICE)
+    docker_manager.stop(ORDERING_SERVICE)

@@ -28,13 +28,7 @@ class Simulator(ABC):
         """
         self.queue = queue
         self.routing_key = routing_key
-
-    def is_related_queue_responding(self, body):
-        self.send_message(body=body, routing_key=self.routing_key)
-        if self.get_first_message(self.queue) is None:
-            return False
-        return True
-
+        
     def get_first_message(self, timeout=100):
         """
         Method which reads the first messages from a given queue.

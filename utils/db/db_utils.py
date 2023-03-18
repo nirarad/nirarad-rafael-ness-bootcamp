@@ -4,12 +4,6 @@ import pyodbc
 
 
 class MSSQLConnector:
-    __instance = None
-
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
 
     def __init__(self, database='OrderingDb'):
         self.SERVER = '127.0.0.1,5433'

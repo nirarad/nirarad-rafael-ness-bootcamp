@@ -2,7 +2,7 @@ import pytest
 
 from tests.scenarios.scenarios import *
 
-
+from constants import *
 @pytest.mark.order_tracking
 def test_submitted_order_status_appears_on_correct_state():
     """
@@ -32,7 +32,7 @@ def test_awatingvalidation_order_status_appears_on_correct_state():
     # Run step 1
     assert order_submission_scenario()
     # Run step 2
-    assert Simulator.explicit_status_id_validation(status_id=2, timeout=100)
+    assert Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=100)
 
 
 @pytest.mark.order_tracking

@@ -1,5 +1,6 @@
 import pytest
 
+from constants import *
 from tests.scenarios.scenarios import *
 from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
@@ -19,33 +20,26 @@ def test_valid_message_consumption_rate():
     """
     # Pre-conditions: Stop the ordering service, and his background task.
     docker_manager = DockerManager()
-    rabbit_mq = RabbitMQ()
 
-    sleep(5)
-    docker_manager.stop("eshop/ordering.api:linux-latest")
-    docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
-    sleep(5)
+    with RabbitMQ() as rabbit_mq:
+        sleep(5)
+        docker_manager.stop(ORDERING_SERVICE)
+        docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
+        sleep(5)
 
-    # Step 1: Send to the ordering queue x number of messages, there suppose to waiting there, until the service is goes up again.
-    for _ in range(2):
-        order_submission_without_response_waiting_scenario()
+        # Step 1: Send to the ordering queue x number of messages, there suppose to waiting there, until the service is goes up again.
+        for _ in range(2):
+            order_submission_without_response_waiting_scenario()
 
-    # Steps 2-3: Start the ordering service.
-    docker_manager.start("eshop/ordering.api:linux-latest")
-    docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
+        # Steps 2-3: Start the ordering service.
+        docker_manager.start(ORDERING_SERVICE)
+        docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
-    # Wait for the messages to be consumed.
-    sleep(5)
+        # Wait for the messages to be consumed.
+        sleep(5)
 
-    # Check if the ordering queue is clear from messages.
-    try:
-        assert rabbit_mq.validate_queue_is_empty_while_clearing('Ordering')
-
-    except AssertionError as a:
-        raise a
-
-    finally:
-        rabbit_mq.close()
+        # Check if the ordering queue is clear from messages.
+        assert rabbit_mq.validate_queue_is_empty_while_clearing(ORDERING_QUEUE_NAME)
 
 
 @pytest.mark.scalability
@@ -66,4 +60,4 @@ def test_valid_pace_of_first_message_consumption():
     order_submission_without_response_waiting_scenario()
 
     # Validate that the time to consume that message us no longer than 3 seconds.
-    assert Simulator.get_number_of_seconds_to_consume_single_waiting_message('Ordering') <= 3
+    assert Simulator.get_number_of_seconds_to_consume_single_waiting_message(ORDERING_QUEUE_NAME) <= 3

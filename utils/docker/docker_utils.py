@@ -4,6 +4,13 @@ import docker
 
 
 class DockerManager:
+    __instance = None
+
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
     def __init__(self):
         self.cli = docker.from_env()
         self.containers = self.cli.containers.list(all=True)

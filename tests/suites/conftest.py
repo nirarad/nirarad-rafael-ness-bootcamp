@@ -3,6 +3,7 @@ from time import sleep
 
 import pytest
 from dotenv import load_dotenv
+
 from constants import *
 from simulators.simulator import Simulator
 from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
@@ -52,10 +53,12 @@ def purge_all_queues(setup_docker_containers):
     """
     print("Purge all queues...")
     Simulator.purge_all_queues(
-        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+        [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME, CATALOG_QUEUE_NAME, PAYMENT_QUEUE_NAME, SIGNALR_HUB_QUEUE_NAME,
+         WEBHOOKS_QUEUE_NAME, BACKGROUND_TASK_QUEUE_NAME])
     sleep(2)
     Simulator.purge_all_queues(
-        ['Ordering', 'Basket', 'Catalog', 'Payment', 'Ordering.signalrhub', 'Webhooks', 'BackgroundTasks'])
+        [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME, CATALOG_QUEUE_NAME, PAYMENT_QUEUE_NAME, SIGNALR_HUB_QUEUE_NAME,
+         WEBHOOKS_QUEUE_NAME, BACKGROUND_TASK_QUEUE_NAME])
     sleep(1)
 
 
