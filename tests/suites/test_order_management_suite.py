@@ -5,7 +5,7 @@ from tests.scenarios.scenarios import *
 
 @pytest.mark.order_management
 @pytest.mark.main_success_scenario
-def test_mss(docker_manager):
+def test_mss():
     """
     Source Test Case Title: Verify the main success scenario for creating order is valid.
 
@@ -16,19 +16,9 @@ def test_mss(docker_manager):
     Source Test Case Traceability: 1.1.1
     """
     # Run steps 1-2
-    try:
-        assert order_submission_scenario()
-    except AssertionError:
-        docker_manager.restart("eshop/basket.api:linux-latest")
-        print("Try to submit order once again after docker service problem.")
-        assert order_submission_scenario()
+    assert order_submission_scenario()
     # Run steps 3-5
-    try:
-        assert catalog_stock_confirmation_scenario()
-    except AssertionError:
-        docker_manager.restart("eshop/catalog.api:linux-latest")
-        print("Try to submit order once again after docker service problem.")
-        assert catalog_stock_confirmation_scenario()
+    assert catalog_stock_confirmation_scenario()
     # Run steps 5-6
     assert payment_confirmation_scenario()
     # Run step 7

@@ -13,6 +13,12 @@ class DockerManager:
     def start(self, container_name):
         self.containers_dict[container_name].start()
 
+    def force_start(self, container_id, timeout=50):
+        while self.get_container_status(container_id) != 'Running' and timeout > 0:
+            self.cli.containers.get(container_id).start()
+            timeout -= 1
+            sleep(1)
+
     def stop(self, container_name):
         self.containers_dict[container_name].stop()
 

@@ -13,7 +13,7 @@ class MessageGenerator:
         self.current_date = "2023-03-05T13:43:13.8898923Z"
         self.basket_id = str(uuid.uuid4())
 
-    def basket_to_order(self):
+    def basket_to_ordering(self):
         """
         Method to generate order details.
 
@@ -62,7 +62,7 @@ class MessageGenerator:
             }
         }
 
-    def catalog_to_order(self, order_id):
+    def catalog_to_ordering(self, order_id=1):
         """
         Method to generate confirmation message from the catalog simulator to the ordering queue.
         Return:
@@ -79,7 +79,7 @@ class MessageGenerator:
             "output": {"OrderStatus": "awaitingvalidation"}
         }
 
-    def catalog_rejection_to_order(self, order_id):
+    def catalog_rejection_to_ordering(self, order_id=1):
         """
         Method to generate confirmation message from the catalog simulator to the ordering queue.
         Return:
@@ -97,7 +97,7 @@ class MessageGenerator:
             "CreationDate": "2023-03-05T15:51:11.5458796Z"
         }
 
-    def payment_to_order(self, order_id):
+    def payment_to_ordering(self, order_id=1):
         """
         Method to generate confirmation message from the payment simulator to the ordering queue.
         Return:
@@ -118,7 +118,7 @@ class MessageGenerator:
             }
         }
 
-    def payment_rejection_to_order(self, order_id):
+    def payment_rejection_to_order(self, order_id=1):
         """
         Method to generate rejection message from the payment simulator to the ordering queue.
         Return:

@@ -1,3 +1,5 @@
+from time import sleep
+
 from dotenv import load_dotenv
 
 from simulators.basket_simulator import BasketSimulator
@@ -5,6 +7,7 @@ from simulators.catalog_simulator import CatalogSimulator
 from simulators.payment_simulator import PaymentSimulator
 from simulators.simulator import Simulator
 from utils.api.ordering_api import OrderingAPI
+from utils.docker.docker_utils import DockerManager
 from utils.messages.messages_generator import MessageGenerator
 
 load_dotenv()
@@ -23,15 +26,37 @@ def order_submission_scenario():
     # Preparing test environment
     basket_mock = BasketSimulator()
     mg = MessageGenerator()
-    basket_to_ordering_msg = mg.basket_to_order()
+    basket_to_ordering_msg = mg.basket_to_ordering()
 
     # Step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
     basket_mock.send_message_to_create_an_order(basket_to_ordering_msg["input"])
 
     # Expected Result #1 - The basket queue received the correct output message (from the Message dictionary).
-    actual_message = basket_mock.get_first_message()['UserId']
-    expected_message = basket_to_ordering_msg["output"]['UserId']
-    if actual_message != expected_message:
+    actual_message = basket_mock.get_first_message()
+    expected_message = basket_to_ordering_msg["output"]
+
+    retry_attempts = 1
+    retry_max = 2
+
+    # If the message does not reach the queue, retry the test.
+    if actual_message is None and retry_attempts <= retry_max:
+        print(
+            f"There with the basket queue connection. Restarting the Basket service at {retry_attempts} retry attempt.")
+
+        # Restart the simulator related container.
+        docker_manager = DockerManager()
+        docker_manager.restart("eshop/basket.api:linux-latest")
+        sleep(4)
+
+        # Retry the process.
+        basket_mock.send_message_to_create_an_order(basket_to_ordering_msg["input"])
+        actual_message = basket_mock.get_first_message()
+        expected_message = basket_to_ordering_msg["output"]
+
+        retry_attempts -= 1
+
+    # Verify that the correct message has been sent from the ordering service to the basket queue.
+    if actual_message['UserId'] != expected_message['UserId']:
         raise AssertionError(f"Test failed. Failure reason is: {actual_message} != {expected_message}.")
 
     # Step 2 - Verify that a new order entity has been created within the orders table, with OrderStatusID of 1.
@@ -52,7 +77,7 @@ def order_submission_without_response_waiting_scenario():
     # Preparing test environment
     basket_mock = BasketSimulator()
     mg = MessageGenerator()
-    basket_to_ordering_msg = mg.basket_to_order()
+    basket_to_ordering_msg = mg.basket_to_ordering()
 
     # step 1 - Send from the basket mock to the Ordering queue massage to create a new order.
     basket_mock.send_message_to_create_an_order(basket_to_ordering_msg["input"])
@@ -70,7 +95,7 @@ def catalog_stock_confirmation_scenario():
     # Preparing test environment
     catalog_mock = CatalogSimulator()
     mg = MessageGenerator()
-    catalog_to_ordering_msg = mg.catalog_to_order(catalog_mock.CURRENT_ORDER_ID)
+    catalog_to_ordering_msg = mg.catalog_to_ordering(catalog_mock.CURRENT_ORDER_ID)
 
     # Step/Expected Result 1 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
     # The maximum time to wait for the order status to be updated is 30 seconds
@@ -101,7 +126,7 @@ def catalog_stock_confirmation_without_waiting_for_response_scenario():
     # Preparing test environment
     catalog_mock = CatalogSimulator()
     mg = MessageGenerator()
-    catalog_to_ordering_msg = mg.catalog_to_order(catalog_mock.CURRENT_ORDER_ID)
+    catalog_to_ordering_msg = mg.catalog_to_ordering(catalog_mock.CURRENT_ORDER_ID)
 
     # Step/Expected Result 1 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
     # The maximum time to wait for the order status to be updated is 30 seconds
@@ -128,7 +153,7 @@ def catalog_stock_rejection_scenario():
     # Preparing test environment
     catalog_mock = CatalogSimulator()
     mg = MessageGenerator()
-    catalog_to_ordering_invalid_msg = mg.catalog_rejection_to_order(catalog_mock.CURRENT_ORDER_ID)
+    catalog_to_ordering_invalid_msg = mg.catalog_rejection_to_ordering(catalog_mock.CURRENT_ORDER_ID)
 
     # Step/Expected Result 1 - The catalog queue received the message from the ordering service, so the OrderStatusID in the orders table is updated to 2
     # The maximum time to wait for the order status to be updated is 30 seconds
@@ -160,7 +185,7 @@ def payment_confirmation_scenario():
     # Preparing test environment
     payment_mock = PaymentSimulator()
     messages = MessageGenerator()
-    payment_to_ordering_msg = messages.payment_to_order(payment_mock.CURRENT_ORDER_ID)
+    payment_to_ordering_msg = messages.payment_to_ordering(payment_mock.CURRENT_ORDER_ID)
 
     # step 1 - Verify that the payment queue received from the correct message from the ordering service.
     expected_result = [payment_to_ordering_msg["output"]["OrderId"], payment_to_ordering_msg["output"]["OrderStatus"]]

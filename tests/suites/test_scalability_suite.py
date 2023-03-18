@@ -1,14 +1,13 @@
-from time import sleep
-
 import pytest
 
 from tests.scenarios.scenarios import *
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 
 @pytest.mark.scalability
 @pytest.mark.loads
 @pytest.mark.reliability
-def test_valid_message_consumption_rate(docker_manager, rabbit_mq):
+def test_valid_message_consumption_rate():
     """
     Source Test Case Title: Verify that the service can consume 150 messages that are waiting in the queue in a maximum time of one hour.
 
@@ -19,6 +18,9 @@ def test_valid_message_consumption_rate(docker_manager, rabbit_mq):
     Source Test Case Traceability: 6.1
     """
     # Pre-conditions: Stop the ordering service, and his background task.
+    docker_manager = DockerManager()
+    rabbit_mq = RabbitMQ()
+
     sleep(5)
     docker_manager.stop("eshop/ordering.api:linux-latest")
     docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
@@ -36,7 +38,14 @@ def test_valid_message_consumption_rate(docker_manager, rabbit_mq):
     sleep(5)
 
     # Check if the ordering queue is clear from messages.
-    assert rabbit_mq.validate_queue_is_empty_while_clearing('Ordering')
+    try:
+        assert rabbit_mq.validate_queue_is_empty_while_clearing('Ordering')
+
+    except AssertionError as a:
+        raise a
+
+    finally:
+        rabbit_mq.close()
 
 
 @pytest.mark.scalability

@@ -20,15 +20,22 @@ class Simulator(ABC):
     # Will update according to the current id of the processed order.
     CURRENT_ORDER_ID = 0
 
-    def __init__(self, queue):
+    def __init__(self, queue, routing_key=""):
         """
         Abstract simulator class initializer.
         Parameters:
             queue: The child service simulator class representative queue's name.
         """
         self.queue = queue
+        self.routing_key = routing_key
 
-    def get_first_message(self, timeout=300):
+    def is_related_queue_responding(self, body):
+        self.send_message(body=body, routing_key=self.routing_key)
+        if self.get_first_message(self.queue) is None:
+            return False
+        return True
+
+    def get_first_message(self, timeout=100):
         """
         Method which reads the first messages from a given queue.
         Parameters:
@@ -45,6 +52,7 @@ class Simulator(ABC):
                         time.sleep(1)
                     else:
                         return actual_message
+            return None
         except ValueError as v:
             print(v)
         except BaseException as b:
@@ -75,7 +83,7 @@ class Simulator(ABC):
                        routing_key=routing_key,
                        body=json.dumps(body))
 
-    def verify_state_status_id(self, status_id=None, timeout=300):
+    def verify_state_status_id(self, status_id=None, timeout=50):
         """
         Method to validate that the current order status value is the expected value for the order state.
         Parameters:
@@ -212,7 +220,8 @@ class Simulator(ABC):
             raise BaseException(f'There were problem with accessing the {queue_name} queue.\nException is: {c}')
 
     @staticmethod
-    def select_top_n_orders_with_same_status(mssql_connector, status_number_1, status_number_2, amount_of_orders, timeout):
+    def select_top_n_orders_with_same_status(mssql_connector, status_number_1, status_number_2, amount_of_orders,
+                                             timeout):
         """
         Method to check if a given amount of top orders are in the same status.
         Parameters:

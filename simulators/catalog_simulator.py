@@ -17,7 +17,7 @@ class CatalogSimulator(Simulator):
         Catalog simulator class initializer, send the parent class (The Simulator class),
         the catalog class related queue.
         """
-        super().__init__('Catalog')
+        super().__init__('Catalog', os.environ["CATALOG_TO_ORDER_ROUTING_KEY_VALID"])
 
     def send_message_to_validate_items_in_stock(self, body):
         """

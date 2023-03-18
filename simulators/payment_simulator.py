@@ -14,7 +14,7 @@ class PaymentSimulator(Simulator):
         Payment simulator class initializer, sends the parent class (The Simulator class),
         the payment class related queue name.
         """
-        super().__init__('Payment')
+        super().__init__('Payment', os.environ["PAYMENT_TO_ORDER_ROUTING_KEY_INVALID"])
 
     def send_message_to_validate_payment(self, body):
         """

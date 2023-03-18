@@ -19,7 +19,7 @@ class BasketSimulator(Simulator):
         Basket simulator class initializer, send the parent class (The Simulator class),
         the basket class related queue name.
         """
-        super().__init__("Basket")
+        super().__init__("Basket", os.environ["BASKET_TO_ORDER_ROUTING_KEY"])
 
     def send_message_to_create_an_order(self, body):
         """
