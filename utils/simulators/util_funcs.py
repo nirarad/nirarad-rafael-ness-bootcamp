@@ -18,7 +18,7 @@ def status_waiting(status) -> bool:
     span = 0
     order_id = DbQueries().last_id()
     while span < 50:
-        if DbQueries().check_OrderStatusId(order_id) == status:
+        if DbQueries().check_OrderStatusId(order_id) == int(status):
             return True
         time.sleep(1)
         span += 1

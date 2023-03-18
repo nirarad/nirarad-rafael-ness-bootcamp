@@ -15,7 +15,6 @@ class Catalog(object):
         self.routing_key_catalog_get = None
         self.count = 50
         self.config = dotenv.dotenv_values(dotenv_path=dotenv.find_dotenv("../../.env"))
-        self.body = json.load(open(self.config["BODY"]))
         self.queues = json.load(open(self.config["QUEUE"]))
         self.r_key = json.load(open(self.config["R_KEY"]))
         self.exch = json.load(open(self.config["EXCH"]))
@@ -26,6 +25,7 @@ class Catalog(object):
             send.publish(exchange=self.exch["exchange"],
                          routing_key=routing_key,
                          body=json.dumps(self.body(routing_key, order_id)))
+        time.sleep(20)
 
     def consume(self):
         def callback(ch, method, properties, body):
@@ -46,10 +46,10 @@ class Catalog(object):
     def body(self, routing_key, order_id):
 
         if routing_key == self.r_key["sending"]["catalog"]["confirmed"]:
-            self.body["catalog"]["confirmed"]["OrderId"] = order_id
-            self.body["catalog"]["confirmed"]["Id"] = str(uuid.uuid4())
-            return
+            self.body_obj["catalog"]["confirmed"]["OrderId"] = order_id
+            self.body_obj["catalog"]["confirmed"]["Id"] = str(uuid.uuid4())
+            return self.body_obj["catalog"]["confirmed"]
         if routing_key == self.r_key["sending"]["catalog"]["rejected"]:
-            self.body["catalog"]["rejected"]["Id"] = str(uuid.uuid4())
-            self.body["catalog"]["rejected"]["OrderId"] = order_id
-            return
+            self.body_obj["catalog"]["rejected"]["Id"] = str(uuid.uuid4())
+            self.body_obj["catalog"]["rejected"]["OrderId"] = order_id
+            return self.body_obj["catalog"]["rejected"]

@@ -30,6 +30,7 @@ class Payment(object):
             send.publish(exchange=self.exch["exchange"],
                          routing_key=routing_key,
                          body=json.dumps(self.body(routing_key, order_id)))
+        time.sleep(20)
 
     def consume(self):
         def callback(ch, method, properties, body):

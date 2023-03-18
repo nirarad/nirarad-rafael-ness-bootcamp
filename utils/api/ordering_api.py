@@ -1,3 +1,4 @@
+import time
 import uuid
 
 import requests
@@ -33,6 +34,7 @@ class OrderingAPI:
                 "orderNumber": order_id
             }, headers=self.headers)
         # pprint(orders.text)
+        time.sleep(15)
         return res.status_code
 
     def ship_order(self, order_id):
@@ -43,6 +45,7 @@ class OrderingAPI:
             json={
                 "orderNumber": order_id
             }, headers=self.headers)
+        time.sleep(15)
         return res
 
 if __name__ == '__main__':
