@@ -22,11 +22,9 @@ def clean_rabbitmq_messages():
         mq.clean_rabbit_messages()
 @pytest.fixture(scope="session")
 def api_alice():
-    #system.init_dockers()
     return OrderingAPI('alice','Pass123$')
 @pytest.fixture(scope="session")
 def api_bob():
-    #system.init_dockers()
     return OrderingAPI('bob','Pass123$')
 
 #works
@@ -45,7 +43,6 @@ def test_create_order_success_flow():
     basket = SingleMessageConsumer('Basket')
     basket.wait_for_message()
     assert basket.last_msg_method.routing_key == os.getenv('routing_key_submit')
-
     # checking the message sending after step 1 if there are enough products in stock has arrived in the catalog
     # Order status id =2
     catalog = SingleMessageConsumer('Catalog')
@@ -63,12 +60,12 @@ def test_create_order_success_flow():
     assert payment.last_msg_method.routing_key == os.getenv('routing_key_stock_confirmed')
     time.sleep(int(os.getenv('sleep_time')))
     assert MSSQLConnector().orderStatusid(order_id) == int(os.getenv('status_id_three'))
+
     # Checking that the message of payment succeeded has been sent and
     #           checking that a message sent to catalog to update the stock
     # Order status id = 4
     payment_succeeded(order_id)
     catalog.wait_for_message()
-
     assert catalog.last_msg_method.routing_key == os.getenv('routing_key_paid')
     time.sleep(int(os.getenv('sleep_time')))
     assert MSSQLConnector().orderStatusid(order_id) == int(os.getenv('status_id_four'))
