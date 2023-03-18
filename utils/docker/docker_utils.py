@@ -32,7 +32,7 @@ class DockerManager:
         self.containers_dict[container_name].unpause()
 
     def get_container_status(self, container_name):
-        return self.cli.containers.get(container_name).status()
+        return self.cli.containers.get(container_name).status
 
     def start_all_containers(self):
         running_containers_amount = len(self.cli.containers.list())

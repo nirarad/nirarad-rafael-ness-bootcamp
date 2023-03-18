@@ -1,5 +1,6 @@
 import pytest
 
+from constants import *
 from tests.scenarios.scenarios import *
 from utils.db.db_utils import MSSQLConnector
 from utils.docker.docker_utils import DockerManager
@@ -20,21 +21,24 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
     docker_manager = DockerManager()
     rabbit_mq = RabbitMQ()
     mssql_connector = MSSQLConnector()
+    rabbit_mq.connect()
+    mssql_connector.connect()
     sleep(5)
 
     try:
         # Set pre-conditions: Stop the ordering service, and his background task.
-        docker_manager.stop("eshop/ordering.signalrhub:linux-latest")
-        docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
-        docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
+        docker_manager.stop(SIGNALR_HUB_SERVICE)
+        docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
+        docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
         sleep(5)
 
         # Verify that both of the queues are empty.
-        if not rabbit_mq.validate_queue_is_empty_once('Ordering'):
-            rabbit_mq.purge_queue('Ordering')
-        if not rabbit_mq.validate_queue_is_empty_once('Basket'):
-            rabbit_mq.purge_queue('Basket')
+        if not rabbit_mq.validate_queue_is_empty_once(ORDERING_QUEUE_NAME):
+            rabbit_mq.purge_queue(ORDERING_QUEUE_NAME)
+        if not rabbit_mq.validate_queue_is_empty_once(BASKET_QUEUE_NAME):
+            rabbit_mq.purge_queue(BASKET_QUEUE_NAME)
 
+        # to parameterize
         messages_amount_to_send = 3
 
         # Step 1-2: Send 5 messages to the ordering queue.
@@ -42,26 +46,26 @@ def test_valid_data_recovery_on_crash_between_status_1_and_2():
             order_submission_without_response_waiting_scenario()
 
         # Step 3-4: Simulate the ordering service crash.
-        docker_manager.start("eshop/ordering.api:linux-latest")
-        docker_manager.stop("eshop/ordering.api:linux-latest")
-        docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
-        docker_manager.stop("eshop/ordering.backgroundtasks:linux-latest")
-        docker_manager.stop("eshop/ordering.api:linux-latest")
-        docker_manager.stop("eshop/ordering.api:linux-latest")
+        docker_manager.start(ORDERING_SERVICE)
+        docker_manager.stop(ORDERING_SERVICE)
+        docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
+        docker_manager.stop(ORDERING_BACKGROUND_TASK_SERVICE)
+        docker_manager.stop(ORDERING_SERVICE)
+        docker_manager.stop(ORDERING_SERVICE)
         sleep(10)
 
         # Step 5: Verify that there are still 5 messages in the order queue, or in the basket queue, or distributed in both queues.
         message_counter = 0
-        for queue in ["Ordering", "Basket"]:
+        for queue in [ORDERING_QUEUE_NAME, BASKET_QUEUE_NAME]:
             message_counter += rabbit_mq.get_number_of_messages_in_queue(queue)
 
         assert message_counter == messages_amount_to_send
 
         # Step 6: Start the ordering service (both api and background task services).
-        docker_manager.start("eshop/ordering.api:linux-latest")
-        docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
+        docker_manager.start(ORDERING_SERVICE)
+        docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
-        # Step 7: Verify that 5 order entities have been created within the ordering table, with OrderStatusID of 1 or 2.
+        # Step 7: Verify that the given amount of order entities have been created within the ordering table, with OrderStatusID of 1 or 2.
         assert Simulator.select_top_n_orders_with_same_status(
             mssql_connector=mssql_connector, status_number_1=1,
             status_number_2=2, amount_of_orders=3, timeout=10)
@@ -88,44 +92,46 @@ def test_valid_data_recovery_on_crash_between_status_2_and_3():
     """
 
     docker_manager = DockerManager()
-    rabbit_mq = RabbitMQ()
-    mssql_connector = MSSQLConnector()
+    rabbit_mq = RabbitMQ().connect()
+    mssql_connector = MSSQLConnector().connect()
     sleep(5)
 
     try:
         # Set pre-conditions: Stop the ordering.singlerhub service.
-        docker_manager.stop("eshop/ordering.signalrhub:linux-latest")
+        docker_manager.stop(SIGNALR_HUB_SERVICE)
         sleep(5)
 
         # Verify that both of the queues are empty.
-        if not rabbit_mq.validate_queue_is_empty_once('Ordering'):
-            rabbit_mq.purge_queue('Ordering')
-        if not rabbit_mq.validate_queue_is_empty_once('Basket'):
-            rabbit_mq.purge_queue('Basket')
-        if not rabbit_mq.validate_queue_is_empty_once('Catalog'):
-            rabbit_mq.purge_queue('Catalog')
+        if not rabbit_mq.validate_queue_is_empty_once(ORDERING_QUEUE_NAME):
+            rabbit_mq.purge_queue(ORDERING_QUEUE_NAME)
+        if not rabbit_mq.validate_queue_is_empty_once(BASKET_QUEUE_NAME):
+            rabbit_mq.purge_queue(BASKET_QUEUE_NAME)
+        if not rabbit_mq.validate_queue_is_empty_once(CATALOG_QUEUE_NAME):
+            rabbit_mq.purge_queue(CATALOG_QUEUE_NAME)
 
+        # to parameterize
         messages_amount_to_send = 3
-        for _ in range(3):
+        for _ in range(messages_amount_to_send):
             order_submission_without_response_waiting_scenario()
 
         #  When the order status changes to 2, simulate the ordering service crash.
-        if Simulator.explicit_status_id_validation(2, 50, Simulator.get_max_order_id()):
-            crash_ordering_service_scenario(docker_manager, service_name_list=["eshop/ordering.api:linux-latest",
-                                                                               "eshop/ordering.backgroundtasks:linux-latest",
-                                                                               "eshop/ordering.signalrhub:linux-latest"])
+        if Simulator.explicit_status_id_validation(status_id=AWAITING_VALIDATION_STATUS, timeout=50,
+                                                   order_id=Simulator.get_max_order_id()):
+            crash_ordering_service_scenario(docker_manager, service_name_list=[ORDERING_SERVICE,
+                                                                               ORDERING_BACKGROUND_TASK_SERVICE,
+                                                                               SIGNALR_HUB_SERVICE])
         sleep(5)
 
         # Verify that there are still n messages in the order queue, or in the catalog queue, or distributed in both queues.
         message_counter = 0
-        for queue in ["Ordering", "Catalog"]:
+        for queue in [ORDERING_QUEUE_NAME, CATALOG_QUEUE_NAME]:
             message_counter += rabbit_mq.get_number_of_messages_in_queue(queue)
 
         assert message_counter == messages_amount_to_send
 
         # Step 6: Start the ordering service (both api and background task services).
-        docker_manager.start("eshop/ordering.api:linux-latest")
-        docker_manager.start("eshop/ordering.backgroundtasks:linux-latest")
+        docker_manager.start(ORDERING_SERVICE)
+        docker_manager.start(ORDERING_BACKGROUND_TASK_SERVICE)
 
         # Step 7: Verify that n order entities have been created within the ordering table, with OrderStatusID of 2 or 3.
         assert Simulator.select_top_n_orders_with_same_status(

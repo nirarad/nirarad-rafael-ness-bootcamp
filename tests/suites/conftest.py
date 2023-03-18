@@ -3,8 +3,7 @@ from time import sleep
 
 import pytest
 from dotenv import load_dotenv
-
-from constants import Constants
+from constants import *
 from simulators.simulator import Simulator
 from tests.scenarios.multi_threading_scenarios import CreateOrderThread, GetOrdersRequestsThread
 from utils.docker.docker_utils import DockerManager
@@ -26,8 +25,8 @@ def setup_docker_containers():
     docker_manager = DockerManager()
     print("Setting up docker containers...")
 
-    representative_simulators_containers = [Constants.CATALOG_SERVICE, Constants.PAYMENT_SERVICE,
-                                            Constants.BASKET_SERVICE]
+    representative_simulators_containers = [CATALOG_SERVICE, PAYMENT_SERVICE,
+                                            BASKET_SERVICE]
 
     # Start all containers, only if the current running containers amount is invalid.
     if len(docker_manager.running_containers) != len(docker_manager.containers) - len(
@@ -43,7 +42,7 @@ def setup_docker_containers():
 
         sleep(10)
 
-        docker_manager.force_start(Constants.IDENTITY_SERVICE)
+        docker_manager.force_start(IDENTITY_SERVICE_ID)
 
 
 @pytest.fixture(autouse=True)
