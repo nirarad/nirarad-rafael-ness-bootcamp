@@ -64,10 +64,10 @@ class TestScalability(unittest.TestCase):
     def tearDownClass(cls):
         cls.conn.close()
 
-    # TC016
+    # TC018
     def test_ordering_service_scalability_100_orders(self):
         """
-        TC_ID: TC016
+        TC_ID: TC018
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_ordering_service_scalability_100_orders
@@ -158,10 +158,10 @@ class TestScalability(unittest.TestCase):
             self.logger.exception(f"\n{self.test_ordering_service_scalability_100_orders.__doc__}{e}")
             raise
 
-    # TC017
+    # TC019
     def test_order_api_reliability(self):
         """
-        TC_ID: TC017
+        TC_ID: TC019
         Name: Artsyom Sharametsieu
         Date: 05.03.2023
         Function Name: test_order_api_reliability
