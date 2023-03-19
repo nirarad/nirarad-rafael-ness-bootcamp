@@ -274,8 +274,7 @@ class TestRegression:
         last_id = id_waiting()
 
         # catalog get msg from orders to check if item in stock and catalog return an answer
-        self.catalog.send_to_queue(self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id),
-                                   last_id)
+        self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"],last_id)
         #  OrderStatusChangedToAwaitingValidationIntegrationEvent
         self.signalrhub.consume()
         # awaiting to status 3
@@ -334,7 +333,7 @@ class TestRegression:
         last_id = id_waiting()
 
         # catalog get msg from orders to check if item in stock and catalog return an answer
-        self.catalog.send_to_queue(self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id))
+        self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id)
         #  OrderStatusChangedToAwaitingValidationIntegrationEvent
         self.signalrhub.consume()
         # awaiting to status 3
@@ -401,7 +400,7 @@ class TestRegression:
         last_id = id_waiting()
 
         # catalog get msg from orders to check if item in stock and catalog return an answer
-        self.catalog.send_to_queue(self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id))
+        self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id)
         #  OrderStatusChangedToAwaitingValidationIntegrationEvent
         self.signalrhub.consume()
         # awaiting to status 3

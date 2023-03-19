@@ -29,26 +29,25 @@ class TestSanity:
 
         #  get all orders
         all_orders = self.api.get_orders()
-        assert all_orders.status_code == self.config["SUCCESS"]
+        assert all_orders.status_code == int(self.config["SUCCESS"])
         self.log.send(self.config["TEST_PASS"].format("test_api", "get_orders", all_orders))
 
         #  get order by id
         res = self.api.get_order_by_id(id_under_test)
-        assert res.status_code == self.config["SUCCESS"]
+        assert res.status_code == int(self.config["SUCCESS"])
         self.log.send(self.config["TEST_PASS"].format("test_api", "get_order_by_id", res))
 
         # get card types from db
         res = self.api.get_cardtypes()
-        assert res.status_code == self.config["SUCCESS"]
+        assert res.status_code == int(self.config["SUCCESS"])
         self.log.send(self.config["TEST_PASS"].format("test_api", "get_cardtypes", res))
         # move the item to "item in stock => id = 3"
-        self.catalog.send_to_queue(
-            self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], id_under_test))
+        self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], id_under_test)
         # move the item to "payment succeeded" => id = 4"
         self.payment.send_to_queue(config.r_key["sending"]["payment"]["succeeded"], id_under_test)
         #  move the item to "shipped" => id = 5"
         res = self.api.ship_order(id_under_test)
-        assert res.status_code == self.config["SUCCESS"]
+        assert res.status_code == int(self.config["SUCCESS"])
         self.log.send(self.config["TEST_PASS"].format("test_api", "ship_order", res))
 
         self.basket.send_to_queue(config.r_key["sending"]["basket"])
@@ -57,7 +56,7 @@ class TestSanity:
         # move item to "cancel order" => id = 6"
         #  we can only do it with OrderStatusId is between 1-3
         res = self.api.cancel_order(id_cancel_test)
-        assert res == self.config["SUCCESS"]
+        assert res == int(self.config["SUCCESS"])
         self.log.send(self.config["TEST_PASS"].format("test_api", "cancel_order", res))
 
     @pytest.mark.mss
@@ -86,7 +85,7 @@ class TestSanity:
         #  catalog approve that item in stock => catalog simulator send msg. status need to be: 3
 
         last_id = id_waiting()
-        self.catalog.send_to_queue(self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id))
+        self.catalog.send_to_queue(config.r_key["sending"]["catalog"]["confirmed"], last_id)
         assert status_waiting(self.config["STOCK_CONFIRMED"])
         self.log.send(
             self.config["TEST_PASS"].format("test_successful_flow_mms", "OrderStockConfirmedIntegrationEvent",

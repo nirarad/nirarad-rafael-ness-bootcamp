@@ -15,9 +15,11 @@ class DockerManager:
 
     def start(self, container_name):
         self.containers_dict[container_name].start()
+        time.sleep(5)
 
     def stop(self, container_name):
         self.containers_dict[container_name].stop()
+        time.sleep(5)
 
     def restart(self, container_name):
         self.containers_dict[container_name].restart()

@@ -89,13 +89,15 @@ class TestNonFunc:
         """
         clear_all_queues_msg()
         self.dm.start(config.containers["ordering_api"])
+        time.sleep(10)
         # basket simulator send msg
         self.basket.send_to_queue(config.r_key["sending"]["basket"])
         self.basket.consume()
+        time.sleep(30)
         # self.catalog.consume()
         # waits to get status number 2 from db
         if status_waiting(self.config["SUBMITTED"]) is False:
-            raise ValueError(self.config["VALUE_ERROR"].format("status isn't 2"))
+            raise ValueError(self.config["VALUE_ERROR"].format(f"status isn't self.config['SUBMITTED']"))
         last_id = id_waiting()
 
         # shutdown the ordering api, catalog send msg and tuning on ordering api
@@ -111,8 +113,6 @@ class TestNonFunc:
             raise ValueError(
                 f"{self.catalog.routing_key_catalog_get} != OrderStatusChangedToAwaitingValidationIntegrationEvent")
 
-        self.dm.start(config.containers["ordering_api"])
-
     @pytest.mark.reporting
     def test_reporting(self):
         """
@@ -121,10 +121,13 @@ class TestNonFunc:
         Date: 12/3/23\n
         """
         clear_all_queues_msg()
+        self.dm.start(config.containers["ordering_api"])
         # shutdown the "ordering-signalrhub-1", ordering sub-service, to catch the report massage
         self.dm.containers_dict[config.containers["signalrhub"]].stop()
+        time.sleep(10)
         # basket simulator send msg
         self.basket.send_to_queue(config.r_key["sending"]["basket"])
+        time.sleep(30)
         self.signalrhub.consume()
         assert self.signalrhub.routing_key_srh_get == config.r_key["receive"]["signalrhub"]["submit"]\
                or config.r_key["receive"]["signalrhub"]["waiting"]
@@ -145,6 +148,7 @@ class TestNonFunc:
         # payment send msg that paid confirmed
         self.payment.send_to_queue(config.r_key["sending"]["payment"]["succeeded"], last_id)
         time.sleep(5)
+        time.sleep(30)
         self.signalrhub.consume()
         assert self.signalrhub.routing_key_srh_get == config.r_key["receive"]["signalrhub"]["paid"]
         # time.sleep(10)
