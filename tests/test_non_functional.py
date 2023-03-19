@@ -87,7 +87,7 @@ class NonFunctionalSuit(unittest.TestCase):
         """
         try:
             # Amount of orders to create and check
-            order_amount = 2
+            order_amount = 100
             # Need to know which was last before creating new order
             last_order_id = self.conn.get_last_order_record_id_in_db()
             # 100 orders creation loop
