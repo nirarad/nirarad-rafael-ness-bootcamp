@@ -10,8 +10,10 @@ class CatalogSimulator:
 
     def __init__(self, time_limit=30):
         # ENV
-        self.dotenv_path = os.path.join(os.path.dirname(__file__), '../.env.development')
+        self.dotenv_path = os.path.join(os.path.dirname(__file__), '../.env.test')
         load_dotenv(self.dotenv_path)
+        # Flag to stop simulator
+        self.stop = False
         # RabbitMQ
         self.mq = RabbitMQ()
         # Catalog queue
@@ -127,10 +129,11 @@ class CatalogSimulator:
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
             start_time = time.time()
-            while True:
+            while self.stop is not True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
                     break
+            self.stop = False
 
     def consume_to_reject_stock(self):
         """
@@ -149,10 +152,11 @@ class CatalogSimulator:
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
             start_time = time.time()
-            while True:
+            while self.stop is not True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
                     break
+            self.stop = False
 
 
 if __name__ == '__main__':

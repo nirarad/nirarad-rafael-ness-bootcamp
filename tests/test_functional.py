@@ -1,3 +1,4 @@
+import threading
 import time
 import unittest
 
@@ -12,10 +13,12 @@ from simulators.basket_simulator import BasketSimulator
 from dotenv import load_dotenv
 
 
-class TestFunctional(unittest.TestCase):
+class FunctionalSuit(unittest.TestCase):
     # Tests of functionality of ordering api with payment,basket,catalog simulators
 
     # Handler of connection to DB
+    catalog_sim = None
+    payment_sim = None
     docker = None
     conn = None
 
@@ -25,11 +28,6 @@ class TestFunctional(unittest.TestCase):
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
         # Docker manager
         cls.docker = DockerManager()
-        # Run common containers
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('functional_logger', 'Logs/test_functional.log').logger
         # Unique id generator
@@ -43,21 +41,29 @@ class TestFunctional(unittest.TestCase):
         # Json Data Order responses handler
         cls.jdata_orders_responses = JSONDataReader('DATA/ORDER_RESPONSE_DATA.json')
         # Payment simulator
-        cls.payment_sim = PaymentSimulator(time_limit=60)
+        cls.payment_sim = PaymentSimulator(time_limit=50)
         # Catalog simulator
-        cls.catalog_sim = CatalogSimulator(time_limit=60)
+        cls.catalog_sim = CatalogSimulator(time_limit=50)
+        # Success payment thread
+        cls.consume_to_succeed_payment_thread = threading.Thread(target=cls.payment_sim.consume_to_succeed_payment)
+        # Failed payment thread
+        cls.consume_to_fail_payment_thread = threading.Thread(target=cls.payment_sim.consume_to_fail_payment)
+        # Catalog thread for items in stock
+        cls.consume_to_confirm_stock_thread = threading.Thread(target=cls.catalog_sim.consume_to_confirm_stock)
+        # Catalog thread for items not in stock
+        cls.consume_to_reject_stock_thread = threading.Thread(target=cls.catalog_sim.consume_to_reject_stock)
         # Basket simulator
         cls.basket_sim = BasketSimulator()
         # Last order created
         cls.last_order = None
         # Timeout
-        cls.timeout = 360
+        cls.timeout = 120
         # Clean messages from previous using of RabbitMQ queues
         with RabbitMQ() as mq:
             mq.purge_all()
 
     def setUp(self) -> None:
-        # Run common containers and stop not needed
+        # Run common containers and stop not needed or crashed
         self.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
         self.docker.start(os.getenv('RABBITMQ_CONTAINER'))
         self.docker.start(os.getenv('SQLDATA_CONTAINER'))
@@ -133,7 +139,7 @@ class TestFunctional(unittest.TestCase):
             # Sending message to Payment queue that order confirmed in stock
             status_changed_to_stock(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
             # Payment simulator confirms payment succeeded
-            self.payment_sim.consume_to_succeed_payment()
+            self.consume_to_succeed_payment_thread.start()
             # Getting current order status
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
             # Wait until ordering api updating order status
@@ -143,6 +149,8 @@ class TestFunctional(unittest.TestCase):
                 # Timeout
                 if time.time() - start_time > self.timeout:
                     raise Exception("Order status is not updated")
+            # Stopping simulator
+            self.payment_sim.stop = True
             # Validating status 4 (paid) in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(int(os.getenv('PAID')), order_status)
@@ -200,7 +208,6 @@ class TestFunctional(unittest.TestCase):
                 # Timeout
                 elif time.time() - start_time > self.timeout:
                     raise Exception("Record was not created")
-
             # Updating order status in DB to 3 (stockconfirmed)
             self.conn.update_order_db_status(self.new_order_id, int(os.getenv('STOCKCONFIRMED')))
             # Validating order status in DB
@@ -214,7 +221,7 @@ class TestFunctional(unittest.TestCase):
             # Sending message to Payment queue that order confirmed in stock
             status_changed_to_stock(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
             # Payment simulator fails payment
-            self.payment_sim.consume_to_fail_payment()
+            self.consume_to_fail_payment_thread.start()
             # Getting current order status
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
             # Wait until status will update
@@ -224,6 +231,8 @@ class TestFunctional(unittest.TestCase):
                 # Timeout
                 if time.time() - start_time > self.timeout:
                     raise Exception("Order status is not updated")
+            # Stopping payment simulator
+            self.payment_sim.stop = True
             # Validating status 6 (cancelled) in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(int(os.getenv('CANCELLED')), order_status)
@@ -296,7 +305,7 @@ class TestFunctional(unittest.TestCase):
             # Sending message to Catalog queue that order confirmed in stock
             status_changed_to_awaitingvalidation(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
             # Catalog simulator confirms payment succeeded
-            self.catalog_sim.consume_to_confirm_stock()
+            self.consume_to_confirm_stock_thread.start()
             # Wait until status will update
             start_time = time.time()
             while current_status != int(os.getenv('STOCKCONFIRMED')):
@@ -304,6 +313,8 @@ class TestFunctional(unittest.TestCase):
                 # Timeout
                 if time.time() - start_time > self.timeout:
                     raise Exception("Order status is not updated")
+            # Stopping Catalog simulator
+            self.catalog_sim.stop = True
             # Validating status paid in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(int(os.getenv('STOCKCONFIRMED')), order_status)
@@ -375,7 +386,7 @@ class TestFunctional(unittest.TestCase):
             # Sending message to Catalog queue that order confirmed in stock
             status_changed_to_awaitingvalidation(self.new_order_id, self.order_uuid, sent_body['CreationDate'])
             # Catalog simulator rejecting stock
-            self.catalog_sim.consume_to_reject_stock()
+            self.consume_to_reject_stock_thread.start()
             # Wait until status will update
             start_time = time.time()
             while current_status != int(os.getenv('CANCELLED')):
@@ -383,6 +394,8 @@ class TestFunctional(unittest.TestCase):
                 # Timeout
                 if time.time() - start_time > self.timeout:
                     raise Exception("Order status is not updated")
+            # Stopping Catalog simulator
+            self.catalog_sim.stop = True
             # Validating status 6 (cancelled) in order in DB
             order_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(int(os.getenv('CANCELLED')), order_status)

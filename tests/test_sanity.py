@@ -25,11 +25,6 @@ class SanitySuit(unittest.TestCase):
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
         # Docker manager
         cls.docker = DockerManager()
-        # Run common containers
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('sanity_logger', 'Logs/test_sanity.log').logger
         # Ordering API mocker
@@ -53,7 +48,7 @@ class SanitySuit(unittest.TestCase):
             mq.purge_all()
 
     def setUp(self) -> None:
-        # Run common containers
+        # Run common containers and stop not needed or crashed
         self.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
         self.docker.start(os.getenv('RABBITMQ_CONTAINER'))
         self.docker.start(os.getenv('SQLDATA_CONTAINER'))

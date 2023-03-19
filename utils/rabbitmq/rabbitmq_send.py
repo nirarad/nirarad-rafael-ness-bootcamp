@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 class RabbitMQ:
     def __init__(self, host='localhost'):
         # ENV
-        load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env.development'))
+        load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env.test'))
         self.queues = [os.getenv('BASKET_QUEUE'), os.getenv('ORDERING_QUEUE'), os.getenv('CATALOG_QUEUE'),
                        os.getenv('PAYMENT_QUEUE')]
         self.connection = None

@@ -25,11 +25,6 @@ class NonFunctionalSuit(unittest.TestCase):
     def setUpClass(cls) -> None:
         # Env of tests
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
-        # Run common containers
-        cls.docker.start(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('non_functional_logger', 'Logs/test_non_functional.log').logger
         # Connection to DB
@@ -55,7 +50,7 @@ class NonFunctionalSuit(unittest.TestCase):
             mq.purge_all()
 
     def setUp(self) -> None:
-        # Run common containers
+        # Run common containers and stop not needed or crashed
         self.docker.stop(os.getenv('ORDERING_CONTAINER'))
         self.docker.start(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
         self.docker.start(os.getenv('RABBITMQ_CONTAINER'))

@@ -28,11 +28,6 @@ class SecuritySuit(unittest.TestCase):
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
         # Docker manager
         cls.docker = DockerManager()
-        # Run common containers
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('security_logger', 'Logs/test_security.log').logger
         # Ordering API mocker,user Alice
