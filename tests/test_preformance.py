@@ -1,4 +1,5 @@
-from tests.test_functional import *
+from tests.functions_test import *
+
 
 @pytest.mark.preformance
 def test_reliability_create_order_before_status_1(start_docker):

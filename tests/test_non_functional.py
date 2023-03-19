@@ -1,4 +1,5 @@
-from tests.test_functional import *
+from tests.functions_test import *
+
 @pytest.mark.non_functional
 @pytest.mark.update_check_successfully_status_4_to_5
 def test_update_check_successfully_status_4_to_5(start_connect):

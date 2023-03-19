@@ -1,4 +1,5 @@
-from tests.test_functional import *
+from tests.functions_test import *
+
 @pytest.mark.security
 def test_user_request_with_invalid_token(start_connect):
     """

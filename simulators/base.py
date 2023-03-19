@@ -60,7 +60,7 @@ class Base(object):
                 # Sending to the consume function, receives the queue name and the callback function.
                 mq.consume(self.queue, callback)
                 # Emptying the queue
-                mq.purge_queue()
+                # mq.purge_queue()
         except Exception as e:
             self.l.writeLog(f"Failed in-Messages_that_rabbitMQ_receives function,"
                             f" parameter: queue:{self.queue} {e}")

@@ -1,4 +1,5 @@
-from tests.test_functional import *
+from tests.functions_test import *
+
 @pytest.mark.load
 @pytest.mark.scalability_for_handling_high_volumes_of_orders
 def test_scalability_for_handling_high_volumes_of_orders(start_docker):

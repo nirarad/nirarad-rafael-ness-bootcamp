@@ -376,3 +376,35 @@
  +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001A583B42310>>(3407)
  +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001A583B42310>> = <utils.api.ordering_api.OrderingAPI object at 0x000001A583B42310>.put_cancel_order
 
+2023-03-19 03:32:29.416554 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000013285FD1890>>(3446)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000013285FD1890>> = <utils.api.ordering_api.OrderingAPI object at 0x0000013285FD1890>.put_cancel_order
+
+2023-03-19 03:33:01.566893 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000132860E9510>>(3447)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000132860E9510>> = <utils.api.ordering_api.OrderingAPI object at 0x00000132860E9510>.put_cancel_order
+
+2023-03-19 03:34:11.750537 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000132860D00D0>>(3448)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000132860D00D0>> = <utils.api.ordering_api.OrderingAPI object at 0x00000132860D00D0>.put_cancel_order
+
+2023-03-19 03:50:39.927897 - assert {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} == 401
+ +  where {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} = <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x00000132860BC610>>(501)
+ +    where <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x00000132860BC610>> = <utils.api.ordering_api.OrderingAPI object at 0x00000132860BC610>.get_order_by_id
+
+2023-03-19 04:13:29.677988 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001992DBDFBD0>>(3489)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001992DBDFBD0>> = <utils.api.ordering_api.OrderingAPI object at 0x000001992DBDFBD0>.put_cancel_order
+
+2023-03-19 04:14:02.319458 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001992DB06710>>(3490)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001992DB06710>> = <utils.api.ordering_api.OrderingAPI object at 0x000001992DB06710>.put_cancel_order
+
+2023-03-19 04:15:13.297157 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001992E2276D0>>(3491)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001992E2276D0>> = <utils.api.ordering_api.OrderingAPI object at 0x000001992E2276D0>.put_cancel_order
+
+2023-03-19 04:21:22.046406 - assert {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} == 401
+ +  where {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} = <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x000001992DBD5A50>>(501)
+ +    where <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x000001992DBD5A50>> = <utils.api.ordering_api.OrderingAPI object at 0x000001992DBD5A50>.get_order_by_id
+

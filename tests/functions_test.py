@@ -4,8 +4,42 @@ from simulators.basket import Basket
 from simulators.catalog import Catalog
 from simulators.payment import Payment
 import pytest
-
+from utils.api.ordering_api import OrderingAPI
+from utils.db.db_utils import MSSQLConnector
+from utils.docker.docker_utils import DockerManager
+from utils.rabbitmq.rabbitmq_send import *
+import time
 l = Log()
+
+@pytest.fixture(autouse=True)
+def clean_rabbitmq_messages():
+    # prepare something ahead of all tests
+    with RabbitMQ() as mq:
+        mq.clean_rabbit_messages()
+
+
+@pytest.fixture()
+def start_connect():
+    return OrderingAPI()
+
+
+def start_connect_bob():
+    return OrderingAPI("bob", "Pass123%24")
+
+
+@pytest.fixture()
+def start_mq():
+    return RabbitMQ()
+
+
+@pytest.fixture()
+def start_docker():
+    return DockerManager()
+
+
+@pytest.fixture()
+def start_db():
+    return MSSQLConnector()
 
 
 def create_order_test_and_expected_after_step_1(number_json, db):
