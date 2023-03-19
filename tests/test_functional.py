@@ -69,7 +69,7 @@ def test_mss(start_connect):
     writer: chana kadosh
     Create new order success flow.
     """
-    pre_conditions()
+    # pre_conditions()
     with MSSQLConnector() as db:
         # step 1 -- create order and expected Result
         # The function receives - the object number from the json file, db.

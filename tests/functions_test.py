@@ -21,9 +21,9 @@ def create_order_test_and_expected_after_step_1(number_json, db):
         # Creating an order with a json object - (number_json)
         simulatorBasket.create_order(number_json)
         # A function that listens to messages in rabbitMQ (Listening to the 'Basket' queue)
-        # simulatorBasket.Messages_that_rabbitMQ_receives()
+        simulatorBasket.Messages_that_rabbitMQ_receives()
         # Compares whether the received routing key is equal to it
-        # assert check_routing_key('OrderStartedIntegrationEvent') == True
+        assert check_routing_key('OrderStartedIntegrationEvent') == True
         # Waiting until the status becomes 1
         re = simulatorBasket.waiting_for_an_update(1, db)
         assert re == 1
@@ -46,9 +46,9 @@ def catalog_success_test_and_expected_after_step_2(id_order, db):
     try:
         simulatorCatalog = Catalog()
         # A function that listens to messages in rabbitMQ (Listening to the 'Catalog' queue)
-        # simulatorCatalog.Messages_that_rabbitMQ_receives()
+        simulatorCatalog.Messages_that_rabbitMQ_receives()
         # Compares whether the received routing key is equal to it
-        # assert check_routing_key('OrderStatusChangedToAwaitingValidationIntegrationEvent') == True
+        assert check_routing_key('OrderStatusChangedToAwaitingValidationIntegrationEvent') == True
         simulatorCatalog.catalog_in_stock(id_order)
         # Waiting until the status becomes 3.
         re = simulatorCatalog.waiting_for_an_update(3, db)
