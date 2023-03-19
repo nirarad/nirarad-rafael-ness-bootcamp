@@ -1,7 +1,4 @@
-# Instructions:
-# Download https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
 import pyodbc
-
 
 class MSSQLConnector:
     def __init__(self, database='OrderingDb'):
@@ -29,12 +26,6 @@ class MSSQLConnector:
         for row in cursor.fetchall():
             results.append(dict(zip(columns, row)))
         return results
-
+    
     def close(self):
         self.conn.close()
-
-
-if __name__ == '__main__':
-    import pprint
-    with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
