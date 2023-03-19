@@ -29,8 +29,6 @@ class PaymentSimulator:
         self.mq = RabbitMQ()
         # Time limit to close self
         self.time_limit = time_limit
-        # Timeout flag
-        self.timeout_flag = False
 
     def payment_succeeded(self, order_id, x_requestid, date):
         """
@@ -123,17 +121,15 @@ class PaymentSimulator:
         with self.mq:
             # BIND
             self.mq.bind(self.payment_queue, self.exchange, self.bind_key)
-            self.mq.channel.basic_consume(queue=self.payment_queue, on_message_callback=self.payment_succeeded_callback,
+            self.mq.channel.basic_consume(queue=self.payment_queue,
+                                          on_message_callback=self.payment_succeeded_callback,
                                           auto_ack=True)
-            # Start consuming messages until getting message or time limit end
+            # Start consuming messages until time limit end
             start_time = time.time()
             while True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
-                    self.mq.channel.stop_consuming()
-                    self.timeout_flag = True
                     break
-        return self.timeout_flag
 
     def consume_to_fail_payment(self):
         """
@@ -147,17 +143,15 @@ class PaymentSimulator:
         with self.mq:
             # BIND
             self.mq.bind(self.payment_queue, self.exchange, self.bind_key)
-            self.mq.channel.basic_consume(queue='Payment', on_message_callback=self.payment_failed_callback,
+            self.mq.channel.basic_consume(queue=self.payment_queue,
+                                          on_message_callback=self.payment_failed_callback,
                                           auto_ack=True)
-            # Start consuming messages until getting message or time limit end
+            # Start consuming messages until time limit end
             start_time = time.time()
             while True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
-                    self.mq.channel.stop_consuming()
-                    self.timeout_flag = True
                     break
-        return self.timeout_flag
 
 
 if __name__ == '__main__':

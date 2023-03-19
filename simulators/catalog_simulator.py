@@ -28,8 +28,6 @@ class CatalogSimulator:
         self.mq = RabbitMQ()
         # Time limit to close self
         self.time_limit = time_limit
-        # Timeout flag
-        self.timeout_flag = False
 
     def confirm_stock(self, order_id, x_requestid, date):
         """
@@ -132,10 +130,7 @@ class CatalogSimulator:
             while True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
-                    self.mq.channel.stop_consuming()
-                    self.timeout_flag = True
                     break
-            return self.timeout_flag
 
     def consume_to_reject_stock(self):
         """
@@ -157,9 +152,7 @@ class CatalogSimulator:
             while True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
-                    self.timeout_flag = True
                     break
-        return self.timeout_flag
 
 
 if __name__ == '__main__':

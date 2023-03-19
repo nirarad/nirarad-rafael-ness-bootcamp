@@ -22,8 +22,6 @@ class BasketSimulator:
         self.bind_key = os.getenv('BASKET_BINDING')
         # Basket routing key
         self.basket_key = os.getenv('CREATE_ORDER_ROUTING_KEY')
-        # Flag of timeout
-        self.timeout_flag = False
         # Time limit to consume
         self.time_limit = time_limit
         # Sent order is corrected by Ordering api need to handle
@@ -79,17 +77,15 @@ class BasketSimulator:
         with self.mq:
             # BIND
             self.mq.bind(self.basket_queue, self.exchange, self.bind_key)
-            self.mq.channel.basic_consume(queue=self.basket_queue, on_message_callback=self.callback,
+            self.mq.channel.basic_consume(queue=self.basket_queue,
+                                          on_message_callback=self.callback,
                                           auto_ack=True)
             # Start consuming messages until getting message or time limit end
             start_time = time.time()
             while True:
                 self.mq.channel.connection.process_data_events()
                 if time.time() - start_time >= self.time_limit:  # Time limit
-                    self.mq.channel.stop_consuming()
-                    self.timeout_flag = True
                     break
-            return self.timeout_flag
 
 
 if __name__ == '__main__':
