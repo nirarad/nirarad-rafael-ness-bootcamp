@@ -1,0 +1,132 @@
+{
+    "UserCheckoutAcceptedIntegrationEvent": {
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserName": "alice",
+        "OrderNumber": 0,
+        "City": "Redmond",
+        "Street": "15703 NE 61st Ct",
+        "State": "WA",
+        "Country": "U.S.",
+        "ZipCode": "98052",
+        "CardNumber": "4012888888881881",
+        "CardHolderName": "Alice Smith",
+        "CardExpiration": "2024-12-31T22:00:00Z",
+        "CardSecurityNumber": "123",
+        "CardTypeId": 1,
+        "Buyer": null,
+        "RequestId": "",
+        "Basket": {
+            "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Items": [
+                {
+                    "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+                    "ProductId": 1,
+                    "ProductName": ".NET Bot Black Hoodie",
+                    "UnitPrice": 19.5,
+                    "OldUnitPrice": 0,
+                    "Quantity": 1,
+                    "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+                }
+            ]
+        },
+        "Id": "",
+        "CreationDate": "2023-03-04T14:20:24.4730559Z"
+    }, "UserCheckoutAcceptedIntegrationEvent2": {
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "UserName": "bob",
+        "OrderNumber": 0,
+        "City": "Redmond",
+        "Street": "15703 NE 61st Ct",
+        "State": "WA",
+        "Country": "U.S.",
+        "ZipCode": "98052",
+        "CardNumber": "4012888888881881",
+        "CardHolderName": "bob Smith",
+        "CardExpiration": "2024-12-31T22:00:00Z",
+        "CardSecurityNumber": "123",
+        "CardTypeId": 1,
+        "Buyer": null,
+        "RequestId": "",
+        "Basket": {
+            "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+            "Items": [
+                {
+                    "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+                    "ProductId": 1,
+                    "ProductName": ".NET Bot Black Hoodie",
+                    "UnitPrice": 19.5,
+                    "OldUnitPrice": 0,
+                    "Quantity": 1,
+                    "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+                }
+            ]
+        },
+        "Id": "",
+        "CreationDate": "2023-03-04T14:20:24.4730559Z"
+    },
+    "OrderStockConfirmedIntegrationEvent": {
+        "OrderId": 71,
+        "Id": "e9b80940-c861-4e5b-9d7e-388fd256acef",
+        "CreationDate": "2023-03-07T09:52:56.6412897Z"
+    },
+    "OrderStockRejectedIntegrationEvent": {
+        "OrderId": 51,
+        "OrderStockItems": [
+            {
+                "ProductId": 1,
+                "HasStock": false
+            }
+        ],
+        "Id": "99c3f974-c6ed-41a4-8e01-5cb00f9e6335",
+        "CreationDate": "2023-03-05T15:51:11.5458796Z"
+    },
+    "OrderPaymentSucceededIntegrationEven": {
+        "OrderId": 41,
+        "Id": "b84dc7a5-1d0e-429e-a800-d3024d9c724f",
+        "CreationDate": "2023-03-05T15:33:18.1376971Z"
+    },
+    "OrderStatusChangedToAwaitingValidationIntegrationEvent": {
+        "OrderId": 31,
+        "OrderStatus": "awaitingvalidation",
+        "BuyerName": "alice",
+        "OrderStockItems": [
+            {
+                "ProductId": 1,
+                "Units": 1
+            }
+        ],
+        "Id": "1f07939c-8ad2-404b-963f-efe02cb6615a",
+        "CreationDate": "2023-03-05T14:27:28.8042812Z"
+    },
+    "OrderPaymentSucceededIntegrationEvent": {
+        "OrderId": 51,
+        "Id": "7ebe80ad-31be-4244-a501-bcc67290ec7e",
+        "CreationDate": "2023-03-05T16:07:11.8297341Z"
+    },
+    "OrderPaymentFailedIntegrationEvent": {
+        "OrderId": 51,
+        "OrderStatus": "stockconfirmed",
+        "BuyerName": "alice",
+        "Id": "cca155c0-4480-4c93-a763-910e54218040",
+        "CreationDate": "2023-03-05T17:07:35.6306122Z"
+    },
+    "OrderStartedIntegrationEvent": {
+        "UserId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+        "Id": "a2fbc6c0-07cf-4536-a1f5-fc9ede9fec07",
+        "CreationDate": "2023-03-05T13:43:13.8898923Z"
+    },
+    "OrderStatusChangedToSubmittedIntegrationEvent": {
+        "OrderId": 31,
+        "OrderStatus": "submitted",
+        "BuyerName": "alice",
+        "Id": "cca359ec-15b0-4a9d-b5fd-44f896f49570",
+        "CreationDate": "2023-03-05T13:43:15.7845974Z"
+    },
+    "OrderStatusChangedToStockConfirmedIntegrationEvent": {
+        "OrderId": 51,
+        "OrderStatus": "stockconfirmed",
+        "BuyerName": "alice",
+        "Id": "cca155c0-4480-4c93-a763-910e54218040",
+        "CreationDate": "2023-03-05T17:07:35.6306122Z"
+    }
+}
