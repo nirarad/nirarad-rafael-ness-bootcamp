@@ -11,6 +11,7 @@ from utils.rabbitmq.rabbitmq_send import *
 import time
 l = Log()
 
+
 @pytest.fixture(autouse=True)
 def clean_rabbitmq_messages():
     # prepare something ahead of all tests

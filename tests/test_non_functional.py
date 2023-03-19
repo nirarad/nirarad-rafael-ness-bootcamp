@@ -1,10 +1,10 @@
-from tests.functions_test import *
+from tests.functions import *
 
 @pytest.mark.non_functional
 @pytest.mark.update_check_successfully_status_4_to_5
 def test_update_check_successfully_status_4_to_5(start_connect):
     """
-    Test number: 4
+    Test number: 5
     The test updates the order from "Paid" status (4) to "Shipped" status (5) -
     expected result: status 200
     :param start_connect: An instance of the Order API
@@ -31,7 +31,7 @@ def test_update_check_successfully_status_4_to_5(start_connect):
 @pytest.mark.update_check_failed_status_2_to_5
 def test_update_check_failed_status_2_to_5(start_connect):
     """
-    Test number: 5
+    Test number: 6
     The test updates the order from "Awaitingvalidation" status (2) to "Shipped" status (5) -
     expected result: status 400
     :param start_connect: An instance of the Order API
@@ -48,7 +48,7 @@ def test_update_check_failed_status_2_to_5(start_connect):
 @pytest.mark.update_check_failed_status_3_to_5
 def test_update_check_failed_status_3_to_5(start_connect):
     """
-    Test number: 6
+    Test number: 7
     The test updates the order from "Stockconfirmed" status (3) to "Shipped" status (5) -
     expected result: status 400
     :param start_connect: An instance of the Order API
@@ -69,7 +69,7 @@ def test_update_check_failed_status_3_to_5(start_connect):
 @pytest.mark.update_check_failed_status_5_to_6
 def test_update_check_failed_status_5_to_6(start_connect):
     """
-    Test number: 7
+    Test number: 8
     The test updates the order from "Shipped" status (5) to "Cancelled" status (6) -
     expected result: status 400
     :param start_connect: An instance of the Order API
@@ -99,7 +99,7 @@ def test_update_check_failed_status_5_to_6(start_connect):
 @pytest.mark.cancel_order_successfully_status_1_to_6
 def test_cancel_order_successfully_status_1_to_6(start_connect, start_docker):
     """
-    Test number: 8
+    Test number: 9
     The test cancels the order from "Submitted" status (1) to "Cancelled" status (6) -
     expected result: status 200
     :param start_connect: An instance of the Order API
@@ -130,7 +130,7 @@ def test_cancel_order_successfully_status_1_to_6(start_connect, start_docker):
 @pytest.mark.non_functional
 def test_cancel_order_successfully_status_2_to_6(start_connect):
     """
-    Test number: 9
+    Test number: 10
     The test cancels the order from "Awaitingvalidation" status (2) to "Cancelled" status (6) -
     expected result: status 200
     :param start_connect: An instance of the Order API
@@ -152,7 +152,7 @@ def test_cancel_order_successfully_status_2_to_6(start_connect):
 @pytest.mark.cancel_order_successfully_status_3_to_6
 def test_cancel_order_successfully_status_3_to_6(start_connect):
     """
-    Test number: 10
+    Test number: 11
     The test cancels the order from the status "Stockconfirmed" (3) to the status "Cancelled" (6) -
     expected result: status 200
     :param start_connect: An instance of the Order
@@ -174,7 +174,7 @@ def test_cancel_order_successfully_status_3_to_6(start_connect):
 
 def test_order_cancel_failure_4_to_6(start_connect):
     """
-    Test number: 11
+    Test number: 12
     The test cancels the order from "Paid" status (4) to "Cancelled" status (6) -
     expected result: status 400
     :param start_connect: An instance of the Order API
@@ -201,7 +201,7 @@ def test_order_cancel_failure_4_to_6(start_connect):
 @pytest.mark.order_cancel_failure_5_to_6
 def test_order_cancel_failure_5_to_6(start_connect):
     """
-    Test number: 12
+    Test number: 13
     The test cancels the order from the status "shipped" (5) to the status "Cancelled" (6) -
     expected result: status 400
     :param start_connect: An instance of the Order API

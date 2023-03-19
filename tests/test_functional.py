@@ -1,14 +1,4 @@
-import time
-
-import pytest
-
-from utils.api.ordering_api import OrderingAPI
-from utils.db.db_utils import MSSQLConnector
-from utils.docker.docker_utils import DockerManager
-# from log.logger import Log
-from utils.rabbitmq.rabbitmq_send import *
-# from simulators.basket import Basket
-from tests.functions_test import *
+from tests.functions import *
 
 l = Log()
 
@@ -16,12 +6,20 @@ l = Log()
 
 @pytest.mark.one
 def test_call_the_ordering_api(start_connect):
+    """
+    Test number: 28
+    chana kadosh
+    the test connect with api
+    :param start_connect:
+    :return:
+    """
     assert start_connect.contact_with_the_serve() == 200
 
 @pytest.mark.functional
 def test_get_order_by_id(start_connect):
     """
-
+    Test number: 27
+    chana kadosh
     get order by id
     :param start_connect:
     :return:
@@ -39,7 +37,6 @@ def test_mss(start_connect):
     writer: chana kadosh
     Create new order success flow.
     """
-    # pre_conditions()
     with MSSQLConnector() as db:
         # step 1 -- create order and expected Result
         # The function receives - the object number from the json file, db.
@@ -122,7 +119,7 @@ def test_create_order_with_an_empty_basket():
 @pytest.mark.functional
 def test_create_order(start_connect):
     """
-    Test number: 18
+    Test number: 24
     create order
     :return:
     """
@@ -132,7 +129,7 @@ def test_create_order(start_connect):
 @pytest.mark.functional
 def test_create_order_and_confirmation_from_catalog():
     """
-    Test number: 19
+    Test number: 25
     The catalog test
     :return:
     """
@@ -144,7 +141,7 @@ def test_create_order_and_confirmation_from_catalog():
 @pytest.mark.functional
 def test_price_invalid():
     """
-    Test number: 21
+    Test number: 26
     Creating an order with an incorrect amount
     :return:
     """
@@ -158,7 +155,7 @@ def test_price_invalid():
 @pytest.mark.test_create_order_fail_with_card_type_4
 def test_create_order_fail_with_card_type_4():
     """
-    Test number: 16
+    Test number: 23
     Creating an order with the wrong card
     Requirement: 5
     :return:

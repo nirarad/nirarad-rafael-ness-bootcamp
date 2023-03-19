@@ -1,10 +1,10 @@
-from tests.functions_test import *
+from tests.functions import *
 
 @pytest.mark.load
 @pytest.mark.scalability_for_handling_high_volumes_of_orders
 def test_scalability_for_handling_high_volumes_of_orders(start_docker):
     """
-    Test number: 13
+    Test number: 14
     Checks how the server handles a load of messages
     :return:
     """
@@ -12,25 +12,25 @@ def test_scalability_for_handling_high_volumes_of_orders(start_docker):
         sum = get_count_order(db)
         start_docker.stop('eshop/ordering.api:linux-latest')
         simulatorBasket = Basket()
-        for i in range(2):
+        for i in range(100):
             simulatorBasket.create_order(0)
         start_docker.start('eshop/ordering.api:linux-latest')
         time.sleep(20)
         sum1 = get_count_order(db)
         time.sleep(100)
-        assert sum + 2 == sum1
+        assert sum + 100 == sum1
 
 @pytest.mark.load
 def test_Checking_100_orders_per_hour():
     """
-    Test number: 24
+    Test number: 28
     The function creates a hundred orders and checks whether the creation of
     the orders was in less than an hour or equal to one hour
     :return:
     """
     start_time = time.time()
     simulatorBasket = Basket()
-    for i in range(2):
+    for i in range(100):
         time.sleep(1)
         simulatorBasket.create_order(0)
     end_time = time.time()

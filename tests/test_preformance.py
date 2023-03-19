@@ -1,9 +1,10 @@
-from tests.functions_test import *
+from tests.functions import *
 
 
 @pytest.mark.preformance
 def test_reliability_create_order_before_status_1(start_docker):
     """
+    Test number: 15
     :param start_docker:
     :return:
     """
@@ -25,6 +26,7 @@ def test_reliability_create_order_before_status_1(start_docker):
 @pytest.mark.preformance
 def test_reliability_create_order_after_status_1(start_docker):
     """
+    Test number: 16
     :param start_docker:
     :return:
     """
@@ -48,7 +50,7 @@ def test_reliability_create_order_after_status_1(start_docker):
 @pytest.mark.reliability
 def test_reliability_ordering_backgroundtasks_after_status_2(start_docker):
     """
-    Test number: 14
+    Test number: 17
     chana kadosh
     The test checks the reliability of the server,(after status 2)
     downloading the API order server in the middle of placing an order,
@@ -80,7 +82,7 @@ def test_reliability_ordering_backgroundtasks_after_status_2(start_docker):
 @pytest.mark.reliability
 def test_reliability_ordering_backgroundtasks_after_status_3(start_docker):
     """
-    Test number:
+    Test number: 18
     chana kadosh
     The test checks the reliability of the server,(after status 3)
     downloading the API order server in the middle of placing an order,

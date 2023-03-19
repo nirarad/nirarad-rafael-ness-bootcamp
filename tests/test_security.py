@@ -1,9 +1,9 @@
-from tests.functions_test import *
+from tests.functions import *
 
 @pytest.mark.security
 def test_user_request_with_invalid_token(start_connect):
     """
-    Test number: 17
+    Test number: 22
     Test with invalid token,
     expected result: 401 status
     :param start_connect:
@@ -16,7 +16,7 @@ def test_user_request_with_invalid_token(start_connect):
 @pytest.mark.ecurity_connect_user_for_user_another_get
 def test_security_connect_user_for_user_another_get(start_connect):
     """
-    Test number:15
+    Test number:19
     ----bug----
     security
     """
@@ -38,7 +38,7 @@ def test_security_connect_user_for_user_another_get(start_connect):
 @pytest.mark.security
 def test_security_connect_user_for_user_another_cancel():
     """
-    Test number: 22
+    Test number: 20
     The function connects with Bob and tries to cancel another user's order
     :return:
     security
@@ -52,7 +52,7 @@ def test_security_connect_user_for_user_another_cancel():
 @pytest.mark.security
 def test_security_connect_user_for_user_another_update():
     """
-    Test number: 23
+    Test number: 21
     The function connects with one user and tries to update another user's order
     :return:
     security
