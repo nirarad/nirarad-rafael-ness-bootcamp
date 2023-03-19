@@ -26,6 +26,13 @@ class SecuritySuit(unittest.TestCase):
     def setUpClass(cls) -> None:
         # Env of tests
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
+        # Docker manager
+        cls.docker = DockerManager()
+        # Run common containers
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('security_logger', 'Logs/test_security.log').logger
         # Ordering API mocker,user Alice
@@ -42,16 +49,8 @@ class SecuritySuit(unittest.TestCase):
         cls.basket_sim = BasketSimulator()
         # Json Data Order handler
         cls.jdata_orders = JSONDataReader('DATA/ORDERS_DATA.json')
-        # Docker manager
-        cls.docker = DockerManager()
         # Timeout
         cls.timeout = 300
-        # Run common containers and stop not needed
-        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Clean messages from previous using of RabbitMQ queues
         with RabbitMQ() as mq:
             mq.purge_all()

@@ -23,6 +23,13 @@ class TestFunctional(unittest.TestCase):
     def setUpClass(cls) -> None:
         # Env of tests
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
+        # Docker manager
+        cls.docker = DockerManager()
+        # Run common containers
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('functional_logger', 'Logs/test_functional.log').logger
         # Unique id generator
@@ -36,29 +43,21 @@ class TestFunctional(unittest.TestCase):
         # Json Data Order responses handler
         cls.jdata_orders_responses = JSONDataReader('DATA/ORDER_RESPONSE_DATA.json')
         # Payment simulator
-        cls.payment_sim = PaymentSimulator(time_limit=15)
+        cls.payment_sim = PaymentSimulator(time_limit=60)
         # Catalog simulator
-        cls.catalog_sim = CatalogSimulator(time_limit=15)
+        cls.catalog_sim = CatalogSimulator(time_limit=60)
         # Basket simulator
         cls.basket_sim = BasketSimulator()
-        # Docker manager
-        cls.docker = DockerManager()
         # Last order created
         cls.last_order = None
         # Timeout
         cls.timeout = 360
-        # Run common containers
-        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Clean messages from previous using of RabbitMQ queues
         with RabbitMQ() as mq:
             mq.purge_all()
 
     def setUp(self) -> None:
-        # Run common containers
+        # Run common containers and stop not needed
         self.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
         self.docker.start(os.getenv('RABBITMQ_CONTAINER'))
         self.docker.start(os.getenv('SQLDATA_CONTAINER'))

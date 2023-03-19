@@ -26,6 +26,14 @@ class CrudSuit(unittest.TestCase):
     def setUpClass(cls) -> None:
         # Env of tests
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
+        # Docker manager
+        cls.docker = DockerManager()
+        # Run common containers and stop not needed
+        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('crud_logger', 'Logs/test_crud.log').logger
         # Ordering API mocker
@@ -42,16 +50,8 @@ class CrudSuit(unittest.TestCase):
         cls.jdata_orders = JSONDataReader('DATA/ORDERS_DATA.json')
         # Json Data Order responses handler
         cls.jdata_orders_responses = JSONDataReader('DATA/ORDER_RESPONSE_DATA.json')
-        # Docker manager
-        cls.docker = DockerManager()
         # Timeout
         cls.timeout = 30
-        # Run common containers and stop not needed
-        cls.docker.stop(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Clean messages from previous using of RabbitMQ queues
         with RabbitMQ() as mq:
             mq.purge_all()

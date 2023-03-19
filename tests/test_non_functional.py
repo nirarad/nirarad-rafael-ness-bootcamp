@@ -25,6 +25,11 @@ class NonFunctionalSuit(unittest.TestCase):
     def setUpClass(cls) -> None:
         # Env of tests
         load_dotenv(os.path.join(os.path.dirname(__file__), '../.env.test'))
+        # Run common containers
+        cls.docker.start(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
+        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
+        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
+        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
         # Local Logger
         cls.logger = Logger('non_functional_logger', 'Logs/test_non_functional.log').logger
         # Connection to DB
@@ -35,8 +40,6 @@ class NonFunctionalSuit(unittest.TestCase):
         cls.jdata_orders = JSONDataReader('DATA/ORDERS_DATA.json')
         # Last order created
         cls.last_order = None
-        # Docker manager
-        cls.docker = DockerManager()
         # Basket Simulator
         cls.basket_sim = BasketSimulator()
         # Payment simulator
@@ -45,12 +48,8 @@ class NonFunctionalSuit(unittest.TestCase):
         cls.catalog_sim = None
         # Timeout
         cls.timeout = 720
-        # Run common containers and stop not needed
-        cls.docker.stop(os.getenv('ORDERING_CONTAINER'))
-        cls.docker.start(os.getenv('ORDERING_BACKGROUNDTASKS_CONTAINER'))
-        cls.docker.start(os.getenv('RABBITMQ_CONTAINER'))
-        cls.docker.start(os.getenv('SQLDATA_CONTAINER'))
-        cls.docker.start(os.getenv('IDENTITY_CONTAINER'))
+        # Docker manager
+        cls.docker = DockerManager()
         # Clean messages from previous using of RabbitMQ queues
         with RabbitMQ() as mq:
             mq.purge_all()
