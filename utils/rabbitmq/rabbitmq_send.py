@@ -1,10 +1,5 @@
 import pika
 import uuid
-import json
-
-
-# To test RabbitMQ use the following command:
-# docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
 
 
 class RabbitMQ:
@@ -25,10 +20,39 @@ class RabbitMQ:
         self.channel = self.connection.channel()
 
     def declare_queue(self, queue):
-        self.channel.queue_declare(queue=queue)
+        self.channel.queue_declare(queue, durable=True)
 
     def close(self):
         self.connection.close()
+
+    def purge_queue(self):
+        """
+        Method to purge the given queue.
+        """
+        try:
+            with RabbitMQ() as mq:
+                mq.purge_queue(self.queue)
+        except ValueError as v:
+            print(v)
+        except BaseException as b:
+            print(b)
+
+    def purge(self, queue):
+        self.channel.queue_purge(queue=queue)
+
+    def clean_rabbit_messages(self):
+        """
+          Writer: chani kadosh
+          Date:14/03/23
+          function that cleans up all the rabbit stacked messages
+        """
+        self.purge('Basket')
+        self.purge('Catalog')
+        self.purge('Payment')
+        self.purge('BackgroundTasks')
+        self.purge('Ordering')
+
+
 
     def publish(self, exchange, routing_key, body):
         self.channel.basic_publish(exchange=exchange,
@@ -37,17 +61,22 @@ class RabbitMQ:
         print(f"[{routing_key}] Sent '{body}'")
 
     def consume(self, queue, callback):
-        self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
-        self.channel.start_consuming()
+            self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+            self.channel.start_consuming()
 
 
 if __name__ == '__main__':
-    body = {
-        "OrderId": 1,
-        "Id": str(uuid.uuid4()),
-        "CreationDate": "2023-03-05T15:33:18.1376971Z"
-    }
+
     with RabbitMQ() as mq:
-        mq.publish(exchange='eshop_event_bus',
-                   routing_key='OrderPaymentSucceededIntegrationEvent',
-                   body=json.dumps(body))
+        pass
+        # mq.publish(exchange='eshop_event_bus',
+        #            routing_key='UserCheckoutAcceptedIntegrationEvent',
+        #            body=json.dumps(body))
+        # mq.connect()
+        # time.sleep(300)
+        # mq.read_first_message('Ordering')
+        # mq.declare_queue1("Payment", durable=False)
+        # print(mq.queues_list())
+        # print(mq.purge_all_queues(mq.queues_list()))
+        # mq.purge_queuep('Catalog')
+

@@ -1,0 +1,366 @@
+
+2023-03-16 00:51:58.159930 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket name 'RabbitMQ' is not defined
+
+2023-03-16 00:51:58.159930 - Failed in-create_order_test_and_expected_after_step_1 function name 'routingkey' is not defined
+
+2023-03-16 00:51:58.162570 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:OrderStockRejectedIntegrationEvent  name 'RabbitMQ' is not defined
+
+2023-03-16 00:53:26.943126 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 00:55:03.905301 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 00:56:19.311098 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 00:57:12.947528 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 00:58:18.478390 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 00:58:43.453615 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 00:59:18.807531 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 00:59:51.911483 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:02:04.198065 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:03:18.683283 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:04:34.693342 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:05:19.000272 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:05:57.875041 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:06:19.176945 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:10:10.096760 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:11:51.520244 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 01:12:20.517955 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:14:01.969060 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 01:14:02.125757 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:14:30.281750 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:16:11.700698 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 01:35:28.408710 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:37:09.859696 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 01:39:19.582616 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:41:50.428356 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:42:19.594508 - Failed in-create_order_test_and_expected_after_step_1 function 'RabbitMQ' object has no attribute 'purge_queue'
+
+2023-03-16 01:44:12.471530 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:45:19.815736 - Failed in-create_order_test_and_expected_after_step_1 function 'RabbitMQ' object has no attribute 'purge_queue'
+
+2023-03-16 01:45:20.006850 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:47:46.086172 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:48:20.266859 - Failed in-create_order_test_and_expected_after_step_1 function 'RabbitMQ' object has no attribute 'purge_queue'
+
+2023-03-16 01:48:20.400191 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:54:25.594671 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:55:19.939635 - Failed in-create_order_test_and_expected_after_step_1 function 'RabbitMQ' object has no attribute 'purge_queue'
+
+2023-03-16 01:55:20.094208 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:56:32.174362 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:57:20.564482 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:57:59.093862 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 01:58:20.333756 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 01:59:05.879722 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:00:20.393161 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:00:47.771440 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:01:21.075433 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:03:16.455677 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:11:20.941676 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:12:19.752279 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:13:08.083010 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:13:08.596634 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:14:08.041466 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:14:31.408195 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:15:08.124546 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:16:07.514042 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:16:07.962791 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:17:08.343930 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:17:32.378334 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:19:13.891465 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 02:19:15.746973 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:20:57.379512 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 02:20:57.549045 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:20:58.207178 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:22:39.615014 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-16 02:48:31.131637 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 02:49:15.417183 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 02:59:38.595581 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 03:00:21.632576 - Failed in - test_reliability function, parameter id: 1163
+
+2023-03-16 03:01:35.671948 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 03:02:59.250539 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 03:12:55.461233 - The function fails to connect to the API
+
+2023-03-16 03:45:17.036203 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:33:56.768331 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:34:01.949305 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 04:34:24.551412 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:35:02.864298 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 04:35:32.584080 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:36:02.834868 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 04:36:25.417619 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:37:02.746338 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 04:38:42.281577 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:39:02.495369 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 04:39:23.312398 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 04:40:02.623968 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 17:42:10.969062 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 17:43:10.281026 - Failed in-create_order_test_and_expected_after_step_1 function 'RabbitMQ' object has no attribute 'purge_queue'
+
+2023-03-16 17:43:10.425438 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 17:45:41.879518 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 17:46:11.049181 - Failed in-create_order_test_and_expected_after_step_1 function 'RabbitMQ' object has no attribute 'purge_queue'
+
+2023-03-16 17:53:27.728700 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 17:54:10.980512 - Failed in-create_order_test_and_expected_after_step_1 function 'Basket' object has no attribute 'purge_queue'
+
+2023-03-16 17:55:08.546441 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 17:56:10.918506 - Failed in-create_order_test_and_expected_after_step_1 function 'Basket' object has no attribute 'purge_queue'
+
+2023-03-16 19:43:28.180362 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 19:44:11.391209 - Failed in-create_order_test_and_expected_after_step_1 function 'Basket' object has no attribute 'purge_queue'
+
+2023-03-16 19:52:03.230308 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 19:55:53.205439 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 20:29:01.421010 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 20:31:14.154844 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 20:32:13.803046 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Catalog Channel is closed.
+
+2023-03-16 21:02:13.411929 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 21:05:25.579481 - Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 21:05:25.579481 - Failed in-create_order_test_and_expected_after_step_1 function Failed in-Messages_that_rabbitMQ_receives function, parameter: queue:Basket Channel is closed.
+
+2023-03-16 21:14:37.617572 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  list index out of range
+
+2023-03-16 21:15:54.781550 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  list index out of range
+
+2023-03-16 21:17:07.138403 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  list index out of range
+
+2023-03-16 21:24:28.748530 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  list index out of range
+
+2023-03-16 21:29:31.658736 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-16 21:29:58.218040 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-17 01:37:14.108987 - The function fails to connect to the API
+
+2023-03-18 20:54:40.599593 - Failed in-create_order_test_and_expected_after_step_1 function assert False == True
+ +  where False = check_routing_key('OrderStartedIntegrationEvent')
+
+2023-03-18 21:13:40.253725 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000018DA8C78410>>(2231)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000018DA8C78410>> = <utils.api.ordering_api.OrderingAPI object at 0x0000018DA8C78410>.put_cancel_order
+
+2023-03-18 21:15:22.594836 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 21:15:22.609166 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 21:16:14.273367 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000018DA7DE1B50>>(2233)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000018DA7DE1B50>> = <utils.api.ordering_api.OrderingAPI object at 0x0000018DA7DE1B50>.put_cancel_order
+
+2023-03-18 21:18:52.095896 - The function fails to connect to the API
+
+2023-03-18 21:37:50.289444 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E385369410>>(2249)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E385369410>> = <utils.api.ordering_api.OrderingAPI object at 0x000001E385369410>.put_cancel_order
+
+2023-03-18 21:39:13.334477 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E38531C290>>(2250)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E38531C290>> = <utils.api.ordering_api.OrderingAPI object at 0x000001E38531C290>.put_cancel_order
+
+2023-03-18 21:40:25.127079 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E38531C990>>(2251)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E38531C990>> = <utils.api.ordering_api.OrderingAPI object at 0x000001E38531C990>.put_cancel_order
+
+2023-03-18 21:42:35.236049 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-18 21:44:25.336427 - The function fails to connect to the API
+
+2023-03-18 21:44:25.339982 - The function fails to connect to the API
+
+2023-03-18 21:56:42.167600 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E3859F3050>>(2276)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E3859F3050>> = <utils.api.ordering_api.OrderingAPI object at 0x000001E3859F3050>.put_cancel_order
+
+2023-03-18 21:57:57.795564 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E385A1FDD0>>(2277)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E385A1FDD0>> = <utils.api.ordering_api.OrderingAPI object at 0x000001E385A1FDD0>.put_cancel_order
+
+2023-03-18 21:58:37.423703 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E3859F0690>>(2278)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001E3859F0690>> = <utils.api.ordering_api.OrderingAPI object at 0x000001E3859F0690>.put_cancel_order
+
+2023-03-18 22:00:48.742782 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-18 22:11:58.680766 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001A27BF6FD90>>(2291)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001A27BF6FD90>> = <utils.api.ordering_api.OrderingAPI object at 0x000001A27BF6FD90>.put_cancel_order
+
+2023-03-18 22:13:41.321528 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:13:41.327032 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:15:23.112740 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:15:23.116976 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:17:24.121883 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-18 22:19:13.279526 - The function fails to connect to the API
+
+2023-03-18 22:19:13.284364 - The function fails to connect to the API
+
+2023-03-18 22:31:30.547646 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001A27C5F56D0>>(2317)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001A27C5F56D0>> = <utils.api.ordering_api.OrderingAPI object at 0x000001A27C5F56D0>.put_cancel_order
+
+2023-03-18 22:33:12.395779 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:33:12.400656 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:34:54.247169 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:34:54.252902 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 22:36:48.364001 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-18 22:54:29.507010 - The function fails to connect to the API
+
+2023-03-18 22:54:29.513662 - The function fails to connect to the API
+
+2023-03-18 22:54:37.876229 - The function fails to connect to the API
+
+2023-03-18 22:54:37.880441 - The function fails to connect to the API
+
+2023-03-18 22:56:04.839762 - The function fails to connect to the API
+
+2023-03-18 22:56:04.853211 - The function fails to connect to the API
+
+2023-03-18 23:03:53.388988 - assert 'stockconfirmed' == 400
+
+2023-03-18 23:07:32.520267 - assert 'stockconfirmed' == 400
+
+2023-03-18 23:37:07.235248 - assert {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} == 401
+ +  where {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} = <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x0000021EA20F7210>>(501)
+ +    where <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x0000021EA20F7210>> = <utils.api.ordering_api.OrderingAPI object at 0x0000021EA20F7210>.get_order_by_id
+
+2023-03-18 23:49:21.794766 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000268A48A3590>>(2815)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000268A48A3590>> = <utils.api.ordering_api.OrderingAPI object at 0x00000268A48A3590>.put_cancel_order
+
+2023-03-18 23:51:13.340534 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 23:51:13.346181 - Failed in-create_order_test_and_expected_after_step_1 function assert 1 == 2
+
+2023-03-18 23:52:41.376307 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000002D9C8A46E90>>(2817)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000002D9C8A46E90>> = <utils.api.ordering_api.OrderingAPI object at 0x000002D9C8A46E90>.put_cancel_order
+
+2023-03-18 23:52:58.815264 - 'eshop/ordering.backgroundtasks:linux-latest'
+
+2023-03-18 23:53:30.310835 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001C5D00C6E90>>(2818)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x000001C5D00C6E90>> = <utils.api.ordering_api.OrderingAPI object at 0x000001C5D00C6E90>.put_cancel_order
+
+2023-03-18 23:54:38.927521 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000168A02C3390>>(2819)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000168A02C3390>> = <utils.api.ordering_api.OrderingAPI object at 0x00000168A02C3390>.put_cancel_order
+
+2023-03-19 00:27:20.218597 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-19 00:28:09.165793 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-19 00:29:23.230269 - Failed in-Receives_a_routing_key_and_transfers_to_rabbitMQ function,parameter: routing_key:UserCheckoutAcceptedIntegrationEvent  'BuyerId'
+
+2023-03-19 01:59:46.602116 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000229938E4210>>(3353)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000229938E4210>> = <utils.api.ordering_api.OrderingAPI object at 0x00000229938E4210>.put_cancel_order
+
+2023-03-19 02:00:19.111742 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000022993F96810>>(3354)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x0000022993F96810>> = <utils.api.ordering_api.OrderingAPI object at 0x0000022993F96810>.put_cancel_order
+
+2023-03-19 02:01:28.869325 - assert 400 == 200
+ +  where 400 = <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000229939E8450>>(3355)
+ +    where <bound method OrderingAPI.put_cancel_order of <utils.api.ordering_api.OrderingAPI object at 0x00000229939E8450>> = <utils.api.ordering_api.OrderingAPI object at 0x00000229939E8450>.put_cancel_order
+
+2023-03-19 02:14:21.947825 - assert {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} == 401
+ +  where {'city': 'Redmond', 'country': 'U.S.', 'date': '2023-03-14T12:17:34.7861128', 'description': None, ...} = <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x0000022993FBE950>>(501)
+ +    where <bound method OrderingAPI.get_order_by_id of <utils.api.ordering_api.OrderingAPI object at 0x0000022993FBE950>> = <utils.api.ordering_api.OrderingAPI object at 0x0000022993FBE950>.get_order_by_id
+
