@@ -15,6 +15,4 @@ class Basket(Simulator):
         super(Basket, self).send(body=self.body['message1.01'], routing_key=os.getenv('USER_CHECKOUT'))
         
     def remove_items_form_basket(self):
-        return super(Basket, self).receive('Basket' ,os.getenv('EMPTY_BASKET'))        
-        
-            
+        return super(Basket, self).receive('Basket' ,os.getenv('EMPTY_BASKET'))

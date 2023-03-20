@@ -168,5 +168,3 @@ def test_crashes_before_step_4_mss():
     #step 5: Verify that the order status is set to "4".
     payment.payment_succeeded()
     assert queries.get_status(3,4) == 4
-    
-   

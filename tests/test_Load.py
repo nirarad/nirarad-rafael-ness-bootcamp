@@ -25,6 +25,4 @@ def test_Check_loads_on_creating_an_order():
       
     after = queries.count_order()
     assert before + 100 == after   
-    assert time_before - time.time() == timedelta(hours=1) 
-    
-        
+    assert time_before - time.time() == timedelta(hours=1)    

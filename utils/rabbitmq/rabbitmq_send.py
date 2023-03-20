@@ -36,23 +36,10 @@ class RabbitMQ:
         self.channel.basic_publish(exchange=exchange,
                                    routing_key=routing_key,
                                    body=body)
-        #print(f"[{routing_key}] Sent '{body}'")
-
+        
     def consume(self, queue, callback):
         self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
         self.channel.start_consuming()
-
-
-# if __name__ == '__main__':
-#     body = {
-#         "OrderId": 1,
-#         "Id": str(uuid.uuid4()),
-#         "CreationDate": "2023-03-05T15:33:18.1376971Z"
-#     }
-#     with RabbitMQ() as mq:
-#         mq.publish(exchange='eshop_event_bus',
-#                    routing_key='OrderPaymentSucceededIntegrationEvent',
-#                    body=json.dumps(body))
 
 
 

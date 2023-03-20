@@ -20,4 +20,3 @@ class Payment(Simulator):
     def payment_failed(self):
         self.body['message1.7']['OrderId'] = self.last_order
         super(Payment, self).send(body=self.body['message1.7'], routing_key=os.getenv('ORDER_PAYMENT_FAILES'))
-    

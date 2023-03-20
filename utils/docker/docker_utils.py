@@ -22,16 +22,5 @@ class DockerManager:
 
     def unpause(self, container_name):
         self.containers_dict[container_name].unpause()
-
-
-if __name__ == '__main__':
-    load_dotenv()
-    dm = DockerManager()
-    
-    # dm.pause('eshop/ordering.api:linux-latest')
-    # time.sleep(1)
-    # dm.unpause('eshop/ordering.api:linux-latest')
-
-    # dm.restart('eshop/ordering.api:linux-latest')
     
     

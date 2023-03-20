@@ -30,4 +30,4 @@ class Queries:
         while status1!= status2 and time.time() - start_time < sec:
             order_id = self.get_last_ordering()
             status1 = self._run_query(f'{query} = {order_id}')[0]['OrderStatusId']
-        return status1   
+        return status1

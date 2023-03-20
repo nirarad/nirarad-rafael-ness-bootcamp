@@ -2,9 +2,6 @@
 from shared_imports import *
 
 @pytest.mark.functional    
-def test_a():
-    assert 1 == 1
-    
 def test_mss():
     """
     Test the complete order creation process with successful payment.
@@ -178,4 +175,3 @@ def test_ship_an_order_with_paid_status():
     test_mss()
     assert orderingAPI.ship_order_by_id(queries.get_last_ordering()).status_code == 200
     assert queries.get_status(4, 5) == 5
-    

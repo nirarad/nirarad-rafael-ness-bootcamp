@@ -47,16 +47,3 @@ class OrderingAPI:
             return order.json()[0]['ordernumber']
         else:
             return 0
-    
-
-if __name__ == '__main__':
-    import pprint
-    api = OrderingAPI()
-    #pprint.pprint(api.get_order_by_id(43).json())
-    #a = api.get_order_by_id(43).json()
-    #pprint.pprint(api.get_orders().json())
-    #pprint.pprint(api.cancel_order_by_id(79))
-    pprint.pprint(api.get_ordernumber_by_username_and_password())
-    #pprint.pprint(api.get_order_by_id(311))
-
-    

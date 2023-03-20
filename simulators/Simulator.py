@@ -19,6 +19,7 @@ class Simulator:
         with open(self.json_path, 'r') as f:
             self.body = json.load(f)
         self.last_order = Simulator.queries.get_last_ordering()
+        self.routing = None
     
     def send(self, body, routing_key):
         with RabbitMQ() as mq:
@@ -27,19 +28,14 @@ class Simulator:
             body=json.dumps(body))
         
     def callback(self, ch, method, properties, body):
+        self.routing = method.routing_key
         if method.routing_key != None:
             ch.stop_consuming()
             
     def receive(self, queue, routing_key):
         with RabbitMQ() as mq:
             mq.consume(queue, self.callback)
-        if routing_key != '':
+        if routing_key != self.routing:
             return True
         else:
             return False
-
-    
-    
-
-
-            

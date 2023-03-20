@@ -20,4 +20,3 @@ class Catalog(Simulator):
     def item_out_of_stock(self):
         self.body['message1.3']['OrderId'] = self.last_order
         super(Catalog, self).send(body=self.body['message1.3'], routing_key=os.getenv('ORDER_STOCK_REJECTED'))
-
