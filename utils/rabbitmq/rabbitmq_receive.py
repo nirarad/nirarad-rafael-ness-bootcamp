@@ -4,22 +4,12 @@ rk=''
 
 routigkey=[]
 def callback(ch, method, properties, body):
-    #print(type(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}"))
-    #str= f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}"
     global rk
     rk=''
     rk=method.routing_key
     if rk!='':
         ch.stop_consuming()
 
-
-    # routigkey=[]
-    # routigkey.append(method.routing_key)
-    # if len(routigkey)>0:
-    #     print('1')
-    #     ch.stop_consuming()
-    #     print('2')
-    #     return str
 
 def returnglob():
     rkey=rk

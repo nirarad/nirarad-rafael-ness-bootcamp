@@ -51,17 +51,17 @@ class OrderingAPI:
 
 
 if __name__ == '__main__':
-    import pprint
-    api = OrderingAPI('alice')
+    #import pprint
+    #api = OrderingAPI('alice')
 
     #pprint.pprint(api.get_order_by_id(21).json())
-    with MSSQLConnector() as conn:
-        orderids = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
+    #with MSSQLConnector() as conn:
+        #orderids = conn.select_query('SELECT MAX(Id) from ordering.orders where orders.OrderStatusId = 2')
         #print(orderid[0][''])
         #orderid=orderid[0]['']
-
-    orders=(api.get_order_by_id(68))
-    pprint.pprint(type(orders.status_code))
+    print(str(uuid.uuid4()))
+    #orders=(api.get_order_by_id(68))
+    #pprint.pprint(type(orders.status_code))
     #print(api.get_order_by_id(53).json())
     #api.update_to_shiped(41)
     #print(api.status())

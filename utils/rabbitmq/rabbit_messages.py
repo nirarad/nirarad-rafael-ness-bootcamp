@@ -3,48 +3,47 @@ import json
 import pika
 from utils.db.db_utils import MSSQLConnector
 class RabbitMessages:
-    #with MSSQLConnector() as conn:
-        #id = conn.select_query('SELECT MAX(Id) FROM ordering.orders')
-    def usercheckout(self,productid=1,quantity=1,cardtype=1,username="alice",CardSecurityNumber=123):
+    def usercheckout(self,productid=1,quantity=1,cardtype=1,username="alice",cardsecuritynumber='123',cardnumber='4012888888881881',
+                     year='2024',month='12',day='31'):
      if username!='alice' or 'bob':
          userid=str(uuid.uuid4())
          cardnameholder="john wick"
      else:
          userid='b9e5dcdd-dae2-4b1c-a991-f74aae042814'
          cardnameholder = "Alice Smith"
-     body= {
-                "UserId": 'b9e5dcdd-dae2-4b1c-a991-f74aae042814',
-                "UserName": username,
-                "OrderNumber": 0,
-                "City": "la",
-                "Street": "1599 NE 61st Ct",
-                "State": "WA",
-                "Country": "U.S.",
-                "ZipCode": "98052",
-                "CardNumber": "4012888888881881",
-                "CardHolderName": cardnameholder,
-                "CardExpiration": "2024-12-31T22:00:00Z",
-                "CardSecurityNumber": CardSecurityNumber,
-                "CardTypeId": cardtype,
-                "Buyer": 'null',
-                "RequestId": str(uuid.uuid4()),
-                "Basket": {
-                    "BuyerId": 'b9e5dcdd-dae2-4b1c-a991-f74aae042814',
-                    "Items": [
-                        {
-                            "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
-                            "ProductId": productid,
-                            "ProductName": ".NET Bot Black Hoodie",
-                            "UnitPrice": 19.5,
-                            "OldUnitPrice": 0,
-                            "Quantity": quantity,
-                            "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
-                        }
-                    ]
-                },
-                "Id": "16c5ddbc-229e-4c19-a4bd-d4148417529c",
-                "CreationDate": "2023-03-04T14:20:24.4730559Z"
-            }
+     body={
+            "UserId": userid,
+            "UserName": username,
+            "OrderNumber": 0,
+            "City": "Redmond",
+            "Street": "15703 NE 61st Ct",
+            "State": "WA",
+            "Country": "U.S.",
+            "ZipCode": "98052",
+            "CardNumber": cardnumber,
+            "CardHolderName": cardnameholder,
+            "CardExpiration": f"{year}-{month}-{day}T22:00:00Z",
+            "CardSecurityNumber": cardsecuritynumber,
+            "CardTypeId": cardtype,
+            "Buyer": 'null',
+            "RequestId": str(uuid.uuid4()),
+            "Basket": {
+                        "BuyerId": "b9e5dcdd-dae2-4b1c-a991-f74aae042814",
+                        "Items": [
+                           {
+                                "Id": "c1f98125-a109-4840-a751-c12a77f58dff",
+                                "ProductId": 1,
+                                "ProductName": ".NET Bot Black Hoodie",
+                                "UnitPrice": 19.5,
+                                "OldUnitPrice": 0,
+                                "Quantity": 1,
+                                 "PictureUrl": "http://host.docker.internal:5202/c/api/v1/catalog/items/1/pic/"
+                           }
+                                 ]
+  },
+            "Id": "16c5ddbc-229e-4c19-a4bd-d4148417529c",
+            "CreationDate": "2023-03-04T14:20:24.4730559Z"
+         }
      return body
 
     def stockconfirmed(self):
@@ -125,6 +124,5 @@ class RabbitMessages:
             }
         return body
 
-    #def respone_of_get_order_of_diffrent_user(self):
 
 
