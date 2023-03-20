@@ -1,6 +1,10 @@
+import datetime
+
 import pika
 import uuid
 import json
+HOST = 'localhost'
+
 
 
 # To test RabbitMQ use the following command:
@@ -8,10 +12,13 @@ import json
 
 
 class RabbitMQ:
-    def __init__(self, host='localhost'):
+    def __init__(self, host=HOST):
         self.connection = None
         self.channel = None
         self.host = host
+        self.last_msg_method = None
+        self.last_msg_body = None
+
 
     def __enter__(self):
         self.connect()
@@ -34,11 +41,18 @@ class RabbitMQ:
         self.channel.basic_publish(exchange=exchange,
                                    routing_key=routing_key,
                                    body=body)
-        print(f"[{routing_key}] Sent '{body}'")
 
-    def consume(self, queue, callback):
-        self.channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+    def consume(self, queue):
+        self.channel.basic_consume(queue=queue, on_message_callback=self.callback, auto_ack=True)
         self.channel.start_consuming()
+
+
+    def callback(self,ch, method, properties, body):
+        self.last_msg_method = method
+        self.last_msg_body = json.loads(body)
+        self.channel.stop_consuming()
+
+
 
 
 if __name__ == '__main__':
@@ -51,3 +65,8 @@ if __name__ == '__main__':
         mq.publish(exchange='eshop_event_bus',
                    routing_key='OrderPaymentSucceededIntegrationEvent',
                    body=json.dumps(body))
+        mq.consume('Ordering')
+        print(mq.last_msg_body)
+
+
+

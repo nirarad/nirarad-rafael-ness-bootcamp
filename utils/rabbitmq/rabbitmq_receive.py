@@ -1,13 +1,16 @@
-from utils.rabbitmq.rabbitmq_send import RabbitMQ
-import threading
-def callback(ch, method, properties, body):
-    print(f"[{ch}] Method: {method}, Properties: {properties}, Body: {body}")
+import json
+import pprint
 
+from utils.rabbitmq.rabbitmq_send import RabbitMQ
 
 if __name__ == '__main__':
+    #with RabbitMQ() as mq:
+    mq=RabbitMQ()
+    mq.connect()
+    mq.consume('Basket')
+    print(mq.last_msg_body)
+    print(mq.last_msg_method.routing_key)
+    mq.close()
 
-    with RabbitMQ() as mq:
-        #open listener
-        thread = threading.Thread(target=mq.consume('Basket', callback), args=(callback))
-        #mq.consume('Ordering', callback)
+
 

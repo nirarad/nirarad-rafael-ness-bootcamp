@@ -1,0 +1,2 @@
+env_path="C:\\Users\\ohana\\OneDrive\\שולחן העבודה\\FinalProject\\code\\rafael-ness-bootcamp\\tests\\test.env"
+users_path='C:\\Users\\ohana\\OneDrive\\\שולחן העבודה\FinalProject\\code\\rafael-ness-bootcamp\\Data\\users.json'

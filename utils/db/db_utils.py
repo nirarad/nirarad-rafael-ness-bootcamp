@@ -44,4 +44,7 @@ class MSSQLConnector:
 if __name__ == '__main__':
     import pprint
     with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+        res=conn.select_query('SELECT ordering.orders.Id from ordering.orders where OrderStatusId in (1,2)')
+        for i in res :
+            print(i['Id'])
+       # pprint.pprint(conn.select_query('SELECT * from ordering.orders'))

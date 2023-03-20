@@ -23,15 +23,23 @@ class DockerManager:
     def unpause(self, container_name):
         self.containers_dict[container_name].unpause()
 
+def create_env():
+    dm = DockerManager()
+    dm.start('eshop/ordering.api:linux-latest')
+
 
 if __name__ == '__main__':
     dm = DockerManager()
+    create_env()
+    time.sleep(1)
     dm.stop('eshop/ordering.api:linux-latest')
     time.sleep(1)
+    create_env()
+    """time.sleep(1)
     dm.start('eshop/ordering.api:linux-latest')
 
     dm.pause('eshop/ordering.api:linux-latest')
     time.sleep(1)
     dm.unpause('eshop/ordering.api:linux-latest')
 
-    dm.restart('eshop/ordering.api:linux-latest')
+    dm.restart('eshop/ordering.api:linux-latest')"""
