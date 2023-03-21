@@ -1,6 +1,7 @@
 # Instructions:
 # Download https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
 import json
+import time
 
 import pyodbc
 
@@ -48,7 +49,12 @@ if __name__ == '__main__':
     #     pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
 
     # MSSQLConnector().req_query('SELECT * from ordering.orders')
-    a = MSSQLConnector().req_query('SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC')[0]
-    print(a)
+    # a = MSSQLConnector().req_query('SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC')[0]
+    # print(a)
 
+
+    a = MSSQLConnector().req_query('SELECT top 1 Id from ordering.orders ORDER BY Id DESC')[0]['Id']
+    b = MSSQLConnector().req_query(f'SELECT count(Id) as amount, OrderStatusId from ordering.orders where Id > ({a}) GROUP BY OrderStatusId')
+    c = MSSQLConnector().req_query(f'SELECT amount from (SELECT count(Id) as amount, OrderStatusId from ordering.orders where Id > ({a}) GROUP BY OrderStatusId) o where OrderStatusId = 4')[0]['amount']
+    print(c)
 

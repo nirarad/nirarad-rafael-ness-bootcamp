@@ -12,6 +12,14 @@ class OrderingAPI:
         order = requests.get(f'{self.base_url}/api/v1/orders/{order_id}', headers=self.headers)
         return order
 
+    def get_orders(self):
+        orders = requests.get(f'{self.base_url}/api/v1/orders', headers=self.headers)
+        return orders
+
+    def put_ship(self):
+        orders = requests.get(f'{self.base_url}/api/v1/orders/ship', headers=self.headers)
+        return orders
+
 
 if __name__ == '__main__':
     import pprint
