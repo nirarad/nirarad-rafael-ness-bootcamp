@@ -43,12 +43,7 @@ def test_cancel_order_from_another_user():
         order_id_query = get_id_of_last_order()
         order_id = order_id_query[0]['id']
         # Wait for the order status to change to 2
-        while order_status != int(os.getenv('ID_TWO')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 2
-        assert order_status == int(os.getenv('ID_TWO'))
+        wait_to_status(2)
 
     another_user = OrderingAPI('bob','Pass123$')
     cancel_order = another_user.update_statusId_to_cancelled(order_id)
@@ -75,12 +70,7 @@ def test_update_order_from_another_user():
         order_id_query = get_id_of_last_order()
         order_id = order_id_query[0]['id']
         # Wait for the order status to change to 2
-        while order_status != int(os.getenv('ID_TWO')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 2
-        assert order_status == int(os.getenv('ID_TWO'))
+        wait_to_status(2)
 
         mq.consume('Catalog', callback)
         assert global_key() == os.getenv('order_to_catalog')
@@ -88,24 +78,14 @@ def test_update_order_from_another_user():
         # step 2
         inputs = Inputs()
         inputs.catalog_confirm(order_id)
-        while order_status != int(os.getenv('ID_THREE')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 3
-        assert order_status == int(os.getenv('ID_THREE'))
+        wait_to_status(3)
 
         mq.consume('Payment', callback)
         assert global_key() == os.getenv('ORDER_TO_PAYMENT')
 
         # step 3
         inputs.payment_confirm(order_id)
-        while order_status != int(os.getenv('ID_FOUR')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 4
-        assert order_status == int(os.getenv('ID_FOUR'))
+        wait_to_status(4)
 
         another_user = OrderingAPI('bob', 'Pass123$')
         update_order = another_user.update_statusId_to_cancelled(order_id)
@@ -126,12 +106,7 @@ def test_get_order_by_another_user():
         order_id_query = get_id_of_last_order()
         order_id = order_id_query[0]['id']
         # Wait for the order status to change to 2
-        while order_status != int(os.getenv('ID_TWO')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 2
-        assert order_status == int(os.getenv('ID_TWO'))
+        wait_to_status(2)
 
 
     another_user = OrderingAPI('bob','Pass123$')
@@ -164,35 +139,18 @@ def test_create_order_when_ordering_service_down():
             order_id_query = get_id_of_last_order()
             order_id = order_id_query[0]['id']
             # Wait for the order status to change to 2
-            while order_status != int(os.getenv('ID_TWO')):
-                time.sleep(1)  # Wait for 1 second before checking the status again
-                results = get_status_of_last_order()
-                order_status = results[0]['orderstatusid']
-            # Assert that the order status is 2
-            assert order_status == int(os.getenv('ID_TWO'))
-
+            wait_to_status(2)
             mq.consume('Catalog', callback)
             assert global_key() == os.getenv('order_to_catalog')
 
             inputs.catalog_confirm(order_id)
 
-            while order_status != int(os.getenv('ID_THREE')):
-                time.sleep(1)  # Wait for 1 second before checking the status again
-                results = get_status_of_last_order()
-                order_status = results[0]['orderstatusid']
-            # Assert that the order status is 3
-            assert order_status == int(os.getenv('ID_THREE'))
-
+            wait_to_status(3)
             mq.consume('Payment', callback)
             assert global_key() == os.getenv('ORDER_TO_PAYMENT')
             inputs.payment_confirm(order_id)
 
-            while order_status != int(os.getenv('ID_FOUR')):
-                time.sleep(1)  # Wait for 1 second before checking the status again
-                results = get_status_of_last_order()
-                order_status = results[0]['orderstatusid']
-            # Assert that the order status is 4
-            assert order_status == int(os.getenv('ID_FOUR'))
+            wait_to_status(4)
 
             mq.consume('Catalog', callback)
             assert global_key() == os.getenv('ORDER_TO_CATALOG_END')
@@ -229,6 +187,7 @@ def test_create_order_when_ordering_service_restarts():
       Description: check how ordering cope with new order when the service get restart while in process.
       date: 16.3.23
       """
+    # step1
     inputs = Inputs()
     inputs.create_new_order()
     order_status = None
@@ -243,36 +202,20 @@ def test_create_order_when_ordering_service_restarts():
         order_id_query = get_id_of_last_order()
         order_id = order_id_query[0]['id']
         # Wait for the order status to change to 2
-        while order_status != int(os.getenv('ID_TWO')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 2
-        assert order_status == int(os.getenv('ID_TWO'))
+        wait_to_status(2)
 
         mq.consume('Catalog', callback)
         assert global_key() == os.getenv('order_to_catalog')
 
+        # step2
         inputs.catalog_confirm(order_id)
-
-        while order_status != int(os.getenv('ID_THREE')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-        # Assert that the order status is 3
-        assert order_status == int(os.getenv('ID_THREE'))
-
+        wait_to_status(3)
         mq.consume('Payment', callback)
         assert global_key() == os.getenv('ORDER_TO_PAYMENT')
+
+        # step3
         inputs.payment_confirm(order_id)
-
-        while order_status != int(os.getenv('ID_FOUR')):
-            time.sleep(1)  # Wait for 1 second before checking the status again
-            results = get_status_of_last_order()
-            order_status = results[0]['orderstatusid']
-
-        assert order_status == int(os.getenv('ID_FOUR'))
-
+        wait_to_status(4)
         mq.consume('Catalog', callback)
         assert global_key() == os.getenv('ORDER_TO_CATALOG_END')
 
@@ -284,12 +227,12 @@ def test_create_100_new_orders_per_hour():
       Description: check how ordering cope with 100 new orders request
       date: 16.3.23
       """
+    # step1
     inputs = Inputs()
     count_of_rows_before = get_order_count()
     start_time = time.time()
     for i in range(10):
         inputs.create_new_order()
-        order_status = None
         with RabbitMQ() as mq:
             mq.consume('Basket', callback)
             assert global_key() == os.getenv('order_to_basket')
@@ -299,12 +242,7 @@ def test_create_100_new_orders_per_hour():
             order_id_query = get_id_of_last_order()
             order_id = order_id_query[0]['id']
             # Wait for the order status to change to 2
-            while order_status != int(os.getenv('ID_TWO')):
-                time.sleep(1)  # Wait for 1 second before checking the status again
-                results = get_status_of_last_order()
-                order_status = results[0]['orderstatusid']
-            # Assert that the order status is 2
-            assert order_status == int(os.getenv('ID_TWO'))
+            wait_to_status(2)
 
             mq.consume('Catalog', callback)
             assert global_key() == os.getenv('order_to_catalog')
@@ -312,24 +250,14 @@ def test_create_100_new_orders_per_hour():
             # step 2
             inputs = Inputs()
             inputs.catalog_confirm(order_id)
-            while order_status != int(os.getenv('ID_THREE')):
-                time.sleep(1)  # Wait for 1 second before checking the status again
-                results = get_status_of_last_order()
-                order_status = results[0]['orderstatusid']
-            # Assert that the order status is 3
-            assert order_status == int(os.getenv('ID_THREE'))
+            wait_to_status(3)
 
             mq.consume('Payment', callback)
             assert global_key() == os.getenv('ORDER_TO_PAYMENT')
 
             # step 3
             inputs.payment_confirm(order_id)
-            while order_status != int(os.getenv('ID_FOUR')):
-                time.sleep(1)  # Wait for 1 second before checking the status again
-                results = get_status_of_last_order()
-                order_status = results[0]['orderstatusid']
-            # Assert that the order status is 4
-            assert order_status == int(os.getenv('ID_FOUR'))
+            wait_to_status(4)
 
             mq.consume('Catalog', callback)
             assert global_key() == os.getenv('ORDER_TO_CATALOG_END')
