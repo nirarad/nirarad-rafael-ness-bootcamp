@@ -15,13 +15,21 @@ def global_key():
     key = routing
     return key
 
-
+def clear_purge():
+    """
+    Author: Artium Brovarnik
+    Description: clear queues from messages
+    date 16.3.23
+    """
+    with RabbitMQ() as mq:
+        mq.clear_queues('Basket')
+        mq.clear_queues('Catalog')
+        mq.clear_queues('Payment')
 
 
 
 if __name__ == '__main__':
-    #  with RabbitMQ() as mq:
-    # #     mq.consume('Basket', callback)
+
     pass
 
 

@@ -45,10 +45,10 @@ if __name__ == '__main__':
     import pprint
     api = OrderingAPI()
     # pprint.pprint(api.get_order_by_id(1).json())
-    # #pprint.pprint(api.get_orders())
-    # #pprint.pprint(api.get_cardTypes().json())
-    # pprint.pprint(api.update_statusId_to_shipped(1468))
-    pprint.pprint(api.update_statusId_to_cancelled(630))
+    # pprint.pprint(api.get_orders())
+    # pprint.pprint(api.get_cardTypes().json())
+    #pprint.pprint(api.update_statusId_to_shipped(3771))
+    # pprint.pprint(api.update_statusId_to_cancelled(4161))
 
 
 

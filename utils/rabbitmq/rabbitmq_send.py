@@ -1,3 +1,4 @@
+
 import pika
 import uuid
 import json
@@ -42,6 +43,8 @@ class RabbitMQ:
 
     def clear_queues(self,queue):
         self.channel.queue_purge(queue=queue)
+
+
 
 
 if __name__ == '__main__':

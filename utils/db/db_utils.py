@@ -34,9 +34,5 @@ class MSSQLConnector:
         self.conn.close()
 
 
-
-
 if __name__ == '__main__':
-    import pprint
-    with MSSQLConnector() as conn:
-        pprint.pprint(conn.select_query('SELECT * from ordering.orders'))
+    pass
