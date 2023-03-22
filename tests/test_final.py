@@ -71,15 +71,11 @@ def queues_clone():
 
 
 @pytest.mark.requirement1
-def test_create_order_mss(queues_clone):
+def test_create_order_mss(stop_containers, queues_clone):
     """
     This test check create order - mss
     :param
     """
-    dm.stop('eshop/basket.api:linux-latest')
-    dm.stop('eshop/catalog.api:linux-latest')
-    dm.stop('eshop/payment.api:linux-latest')
-    dm.stop('eshop/ordering.signalrhub:linux-latest')
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
             # step 1
@@ -91,7 +87,7 @@ def test_create_order_mss(queues_clone):
             expected_step_1(mq, sql)
             # step 2
             data[1]["Body"]["OrderId"] = \
-            sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             data[1]["Body"]["Id"] = str(uuid.uuid4())
             mq.publish(exchange='eshop_event_bus',
@@ -100,7 +96,7 @@ def test_create_order_mss(queues_clone):
             expected_step_2(mq, sql)
             # step 3
             data[2]["Body"]["OrderId"] = \
-            sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             data[2]["Body"]["Id"] = str(uuid.uuid4())
             mq.publish(exchange='eshop_event_bus',
@@ -156,7 +152,7 @@ def test_create_order_with_incorrect_payment(stop_containers, queues_clone):
             expected_step_1(mq, sql)
             # step 2
             data[1]["Body"]["OrderId"] = \
-                sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+                sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                     "Id"]
             data[1]["Body"]["Id"] = str(uuid.uuid4())
             mq.publish(exchange='eshop_event_bus',
@@ -165,7 +161,7 @@ def test_create_order_with_incorrect_payment(stop_containers, queues_clone):
             expected_step_2(mq, sql)
             # step 3
             data[4]["Body"]["OrderId"] = \
-            sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             data[4]["Body"]["Id"] = str(uuid.uuid4())
             mq.publish(exchange='eshop_event_bus',
@@ -175,7 +171,7 @@ def test_create_order_with_incorrect_payment(stop_containers, queues_clone):
             assert check_rk("OrderStatusChangedToCancelledIntegrationEvent") == True
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "OrderStatusId"] == 6
 
 
@@ -225,7 +221,7 @@ def test_lower_card_type_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -236,7 +232,7 @@ def test_lower_card_type_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -248,7 +244,7 @@ def test_upper_card_type_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -259,7 +255,7 @@ def test_upper_card_type_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -271,7 +267,7 @@ def test_negative_card_type_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -282,7 +278,7 @@ def test_negative_card_type_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -294,7 +290,7 @@ def test_expiration_card_past(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -305,7 +301,7 @@ def test_expiration_card_past(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -317,7 +313,7 @@ def test_expiration_card_today(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -328,7 +324,7 @@ def test_expiration_card_today(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -340,7 +336,7 @@ def test_expiration_card_format_hebrew(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -351,7 +347,7 @@ def test_expiration_card_format_hebrew(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -363,7 +359,7 @@ def test_short_card_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -374,7 +370,7 @@ def test_short_card_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -386,7 +382,7 @@ def test_zero_card_security_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -397,7 +393,7 @@ def test_zero_card_security_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -409,7 +405,7 @@ def test_negative_card_security_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -420,7 +416,7 @@ def test_negative_card_security_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -432,7 +428,7 @@ def test_product_name_deleted(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[7]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -442,7 +438,7 @@ def test_product_name_deleted(stop_containers, queues_clone):
                        body=json.dumps(data[7]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -454,7 +450,7 @@ def test_diff_product_name_type(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -465,7 +461,7 @@ def test_diff_product_name_type(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -476,7 +472,7 @@ def test_many_requests(stop_containers, queues_clone):
     check - from last line (before 100 requests) if I have 100 lines on sql with status id = 4 in hour
     :param
     """
-    start_containers()
+    flag = 0
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
             last_id = sql.req_query('SELECT top 1 Id from ordering.orders ORDER BY Id DESC')[0]['Id']
@@ -485,23 +481,28 @@ def test_many_requests(stop_containers, queues_clone):
             for i in range(1, 101):
                 data[0]["Body"]["RequestId"] = str(uuid.uuid4())
                 data[0]["Body"]["Id"] = str(uuid.uuid4())
+                data[0]["Body"]["Basket"]["Items"][0]["ProductId"] = 4
+                data[0]["Body"]["Basket"]["Items"][0]["ProductName"] = ".NET Foundation T-shirt"
+                data[0]["Body"]["Basket"]["Items"][0]["UnitPrice"] = 12.00
                 mq.publish(exchange='eshop_event_bus',
                            routing_key=data[0]["RoutingKey"],
                            body=json.dumps(data[0]["Body"]))
-            while True:
-                start_time = time.time()
-                if time.time() - start_time > 360:
+            start_containers()
+            start_time = time.time()
+            while flag == 0:
+                if time.time() - start_time > 300:
                     if time.time() - start_time > 3600 or sql.req_query(f'SELECT amount from (SELECT count(Id) as '
                                                                         f'amount, OrderStatusId from ordering.orders '
                                                                         f'where Id > ({last_id}) GROUP BY '
                                                                         f'OrderStatusId) o where OrderStatusId = 4')[
                                                                         0]['amount'] == 100:
-                        end_time = time.time()
-                        print(end_time - start_time)
-                        assert sql.req_query(f'SELECT amount from (SELECT count(Id) as amount, OrderStatusId from '
-                                             f'ordering.orders where Id > ({last_id}) GROUP BY OrderStatusId) o where'
-                                             f' OrderStatusId = 4')[0]['amount'] == 100
-                        break
+                        sum_time = time.time() - start_time
+                        amount_4 = sql.req_query(f'SELECT amount from (SELECT count(Id)  as amount, OrderStatusId '
+                                                 f'from ordering.orders where Id > ({last_id}) GROUP BY '
+                                                 f'OrderStatusId) o where OrderStatusId = 4')[0]['amount']
+                        flag = 1
+                        assert sum_time < 3600 and amount_4 == 100
+
                 time.sleep(1)
 
 
@@ -514,7 +515,7 @@ def test_incorrect_card_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -524,7 +525,7 @@ def test_incorrect_card_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] != last_order
 
 
@@ -537,7 +538,7 @@ def test_long_card_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -548,7 +549,7 @@ def test_long_card_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] != last_order
 
 
@@ -561,7 +562,7 @@ def test_negative_card_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -572,7 +573,7 @@ def test_negative_card_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] != last_order
 
 
@@ -585,7 +586,7 @@ def test_incorrect_card_holder_name(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -596,7 +597,7 @@ def test_incorrect_card_holder_name(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] != last_order
 
 
@@ -609,7 +610,7 @@ def test_number_card_holder_name(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -620,7 +621,7 @@ def test_number_card_holder_name(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] != last_order
 
 
@@ -633,7 +634,7 @@ def test_incorrect_card_security_number(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -644,7 +645,7 @@ def test_incorrect_card_security_number(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] != last_order
 
 
@@ -657,7 +658,7 @@ def test_zero_quantity(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -668,7 +669,7 @@ def test_zero_quantity(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -681,7 +682,7 @@ def test_upper_quantity(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -692,7 +693,7 @@ def test_upper_quantity(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -705,7 +706,7 @@ def test_negative_quantity(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -716,7 +717,7 @@ def test_negative_quantity(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -729,7 +730,7 @@ def test_zero_product_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -740,7 +741,7 @@ def test_zero_product_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -753,7 +754,7 @@ def test_upper_product_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -764,7 +765,7 @@ def test_upper_product_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -777,7 +778,7 @@ def test_negative_product_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -788,7 +789,7 @@ def test_negative_product_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -801,7 +802,7 @@ def test_empty_product_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -812,7 +813,7 @@ def test_empty_product_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -825,7 +826,7 @@ def test_product_id_deleted(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[5]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -835,7 +836,7 @@ def test_product_id_deleted(stop_containers, queues_clone):
                        body=json.dumps(data[5]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -848,7 +849,7 @@ def test_product_name_error(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[6]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -859,7 +860,7 @@ def test_product_name_error(stop_containers, queues_clone):
                        body=json.dumps(data[6]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -872,7 +873,7 @@ def test_another_user_name(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -883,7 +884,7 @@ def test_another_user_name(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -896,7 +897,7 @@ def test_another_user_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -907,7 +908,7 @@ def test_another_user_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -920,7 +921,7 @@ def test_empty_user_name(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -931,7 +932,7 @@ def test_empty_user_name(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order
 
 
@@ -944,7 +945,7 @@ def test_empty_user_id(stop_containers, queues_clone):
     """
     with RabbitMQ() as mq:
         with MSSQLConnector() as sql:
-            last_order = sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            last_order = sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                 "Id"]
             # step 1
             data[0]["Body"]["RequestId"] = str(uuid.uuid4())
@@ -955,5 +956,5 @@ def test_empty_user_id(stop_containers, queues_clone):
                        body=json.dumps(data[0]["Body"]))
             time.sleep(15)
             start_containers()
-            assert sql.req_query("SELECT Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
+            assert sql.req_query("SELECT top 1 Id,OrderStatusId from ordering.orders ORDER BY Id DESC")[0][
                        "Id"] == last_order

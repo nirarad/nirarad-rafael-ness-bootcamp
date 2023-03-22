@@ -55,6 +55,6 @@ if __name__ == '__main__':
 
     a = MSSQLConnector().req_query('SELECT top 1 Id from ordering.orders ORDER BY Id DESC')[0]['Id']
     b = MSSQLConnector().req_query(f'SELECT count(Id) as amount, OrderStatusId from ordering.orders where Id > ({a}) GROUP BY OrderStatusId')
-    c = MSSQLConnector().req_query(f'SELECT amount from (SELECT count(Id) as amount, OrderStatusId from ordering.orders where Id > ({a}) GROUP BY OrderStatusId) o where OrderStatusId = 4')[0]['amount']
+    c = MSSQLConnector().req_query(f'SELECT amount from (SELECT count(Id) as amount, OrderStatusId from ordering.orders where Id >= ({a}) GROUP BY OrderStatusId) o where OrderStatusId = 4')[0]['amount']
     print(c)
 
