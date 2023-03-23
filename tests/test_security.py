@@ -115,10 +115,10 @@ class SecuritySuit(unittest.TestCase):
                     raise Exception("Record was not created")
             # Validating response status
             response = self.oam_bob.get_order_by_id(self.new_order_id)
-            self.assertEqual(400, response.status_code)
+            self.assertEqual(401, response.status_code)
             self.logger.info(
                 f'{self.test_get_order_with_other_user_token.__doc__} '
-                f"Order status in DB -> Actual: {response.status_code} , Expected: {400}")
+                f"Order status in DB -> Actual: {response.status_code} , Expected: {401}")
         except Exception as e:
             self.logger.exception(f"\n{self.test_get_order_with_other_user_token.__doc__}{e}")
             raise
@@ -168,10 +168,10 @@ class SecuritySuit(unittest.TestCase):
                     raise Exception("Record was not created")
             # Validating response status
             response_status = self.oam_bob.cancel_order(self.new_order_id, self.order_uuid)
-            self.assertEqual(400, response_status.status_code)
+            self.assertEqual(401, response_status.status_code)
             self.logger.info(
                 f'{self.test_cancel_order_with_other_user_token.__doc__} '
-                f"Order status in DB -> Actual: {response_status.status_code} , Expected: {400}")
+                f"Order status in DB -> Actual: {response_status.status_code} , Expected: {401}")
             # Validating order status in DB
             current_status = self.conn.get_order_status_from_db(self.new_order_id)
             self.assertEqual(current_status, int(os.getenv('SUBMITTED')))
