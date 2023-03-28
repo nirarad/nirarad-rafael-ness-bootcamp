@@ -23,15 +23,21 @@ class DockerManager:
     def unpause(self, container_name):
         self.containers_dict[container_name].unpause()
 
+    def check_status(self, container_name):
+        container = self.containers_dict[container_name]
+        status = container.status
+        return status
 
 if __name__ == '__main__':
     dm = DockerManager()
-    dm.stop('eshop/ordering.api:linux-latest')
-    time.sleep(1)
-    dm.start('eshop/ordering.api:linux-latest')
+#    dm.stop('eshop/ordering.api:linux-latest')
+#    time.sleep(1)
+#   dm.start('eshop/ordering.api:linux-latest')
 
-    dm.pause('eshop/ordering.api:linux-latest')
-    time.sleep(1)
-    dm.unpause('eshop/ordering.api:linux-latest')
+#    dm.pause('eshop/ordering.api:linux-latest')
+#    time.sleep(1)
+#    dm.unpause('eshop/ordering.api:linux-latest')
 
-    dm.restart('eshop/ordering.api:linux-latest')
+ #   dm.restart('eshop/ordering.api:linux-latest')
+    print(dm.check_status('eshop/ordering.backgroundtasks:linux-latest'))
+
